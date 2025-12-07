@@ -2,7 +2,8 @@
 /.nrepl-port
 /.cpcache
 node_modules/
-public/js
+/public/js
+/public/assets/app/js
 
 /target
 /checkouts
