@@ -1,11 +1,17 @@
 ;; shadow-cljs configuration
 {:source-paths
- ["src/dev"
-  "src/main"
-  "src/test"]
+ ["src"]
 
+ ;; Use deps.edn
  :dependencies
  []
+ 
+ :dev-http
+ {4242 "public"}
 
  :builds
- {}}
+ {:app {:target :browser
+        :output-dir "public/assets/app/js"
+        :asset-path "/assets/app/js"
+        :modules {:main {:entries [net.eraserhead.arbor]
+                         :init-fn net.eraserhead.arbor/start}}}}}
