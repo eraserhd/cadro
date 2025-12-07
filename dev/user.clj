@@ -1,0 +1,10 @@
+(ns user
+  (:require
+   [clojure.repl :refer [apropos doc dir source find-doc]]
+   [clojure.repl.deps :refer :all]
+   [clojure.tools.namespace.repl :refer [refresh]]
+   [eftest.runner :as eftest]))
+
+(defn run-tests
+  ([]          (run-tests "src" "test"))
+  ([& symbols] (eftest/run-tests (eftest/find-tests symbols) {:capture-output? false})))
