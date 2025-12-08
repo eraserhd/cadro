@@ -14,4 +14,7 @@
         :output-dir "public/assets/app/js"
         :asset-path "/assets/app/js"
         :modules {:main {:entries [net.eraserhead.arbor.webui]
-                         :init-fn net.eraserhead.arbor.webui/start}}}}}
+                         :init-fn net.eraserhead.arbor.webui/start}}}
+  :test {:target :node-test
+         :output-to "target/node-tests.js"
+         :autorun true}}}
