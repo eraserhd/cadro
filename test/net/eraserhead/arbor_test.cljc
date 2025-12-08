@@ -3,4 +3,4 @@
   [clojure.test :refer [deftest is]]))
 
 (deftest t-foo
-  (is (= 4 (+ 2 5))))
+  (is (= 4 (+ 2 2))))

@@ -12,5 +12,5 @@ $ clj -M:dev:shadow-cljs watch app
 Run tests:
 
 ----
-$ rep '(user/run-tests)'
+$ rep '(refresh) (run-tests)'
 ----
