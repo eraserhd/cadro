@@ -3,7 +3,7 @@
 
 == Development
 
-Start the REPLs and build everything.
+Start the REPLs and build everything for debug.
 
 ----
 $ clj -M:dev:shadow-cljs watch app
@@ -13,4 +13,11 @@ Run tests:
 
 ----
 $ rep '(refresh) (run-tests)'
+----
+
+Testing on tablet:
+
+----
+$ clj -M:shadow-cljs release app
+$ npx cap run android
 ----
