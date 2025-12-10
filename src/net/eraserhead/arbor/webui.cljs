@@ -4,9 +4,18 @@
    [reagent.dom.client :as rdc]
    [re-frame.core :as rf]))
 
+(defn- legend []
+  [:div.floating-card.legend
+   [:h1 "Legend"]
+   [:ul
+    [:li "one"]
+    [:li "two"]
+    [:li "three"]]
+   [:div.controls
+    [:button "+"]]])
+
 (defn- arbor []
-  [:div {:style {:width "25%", :height "100%"}}
-   "hello"])
+  [legend])
 
 (defonce root (rdc/create-root (js/document.getElementById "app")))
 

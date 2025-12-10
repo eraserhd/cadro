@@ -6,6 +6,11 @@
 
     <title>Arbor</title>
     <style>
+        :root {
+          --floating-card-color: #1a1a1a;
+          --floating-card-border-color: #555;
+        }
+
         * {
           margin: 0;
           padding: 0;
@@ -19,8 +24,47 @@
         }
 
         body {
-          background: #1a1a1a;
+          background: black;
           color: #ffffff;
+        }
+
+        .floating-card {
+          /* filter: drop-shadow(1px 1px 2px gray); */
+          background: var(--floating-card-color);
+          margin: 5pt;
+          padding: 15pt;
+          border: solid 1px var(--floating-card-border-color);
+          border-radius: 7pt;
+        }
+
+        .legend {
+          float: left;
+          /* width: 25%; */
+          /* height: 100%; */
+        }
+
+        .legend h1 {
+          font-size: 120%;
+          padding-bottom: 10pt;
+        
+        }
+
+        .legend li {
+          list-style-type: none;
+        }
+
+        .controls {
+          margin: 4pt;
+          text-align: center;
+          padding-top: 10pt;
+        }
+
+        button {
+          color: white;
+          background-color: blue;
+          border: solid 1px var(--floating-card-border-color);
+          border-radius: 6pt;
+          padding: 5pt;
         }
     </style>
   </head>
