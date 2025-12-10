@@ -15,7 +15,8 @@
     [:button "+"]]])
 
 (defn- arbor []
-  [legend])
+  [:<>
+   [legend]])
 
 (defonce root (rdc/create-root (js/document.getElementById "app")))
 
