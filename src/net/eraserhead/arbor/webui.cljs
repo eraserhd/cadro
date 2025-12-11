@@ -10,13 +10,17 @@
    [:ul
     [:li "one"]
     [:li "two"]
-    [:li "three"]]
-   [:div.controls
-    [:button.icon "+"]]])
+    [:li "three"]]])
+
+(defn- command-bar []
+  [:div.floating-card.command-bar
+   [:button.icon "+"]
+   [:button.icon "s"]])
 
 (defn- arbor []
   [:<>
-   [legend]])
+   [legend]
+   [command-bar]])
 
 (defonce root (rdc/create-root (js/document.getElementById "app")))
 

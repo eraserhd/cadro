@@ -31,7 +31,7 @@
         }
 
         .floating-card {
-          /* filter: drop-shadow(1px 1px 2px gray); */
+          position: fixed;
           background: var(--floating-card-color);
           margin: 5pt;
           padding: 15pt;
@@ -46,19 +46,17 @@
         }
 
         .legend {
-          float: left;
-          /* width: 25%; */
-          /* height: 100%; */
+          left: 0;
         }
 
         .legend li {
           list-style-type: none;
         }
 
-        .controls {
-          margin: 4pt;
-          text-align: center;
-          padding-top: 10pt;
+        .command-bar {
+          bottom: 0;
+          left: 50%;
+          transform: translate(-50%);
         }
 
         button {
@@ -68,6 +66,8 @@
           border-radius: 5pt;
           padding: 5pt;
           height: 30px;
+          margin-left: 2px;
+          margin-right: 2px;
         }
 
         button.icon {
