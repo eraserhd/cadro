@@ -12,7 +12,7 @@
     [:li "two"]
     [:li "three"]]
    [:div.controls
-    [:button "+"]]])
+    [:button.icon "+"]]])
 
 (defn- arbor []
   [:<>

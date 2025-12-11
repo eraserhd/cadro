@@ -9,8 +9,8 @@
         :root {
           --floating-card-color: #1a1a1a;
           --floating-card-border-color: #555;
-          --button-background: #24ac9c;
-          --button-background-hover: color-mix(in srgb, var(--button-background) 90%, white);
+          --button-background: rgb(110, 86, 207);
+          --button-background-hover: rgb(125, 102, 217);
         }
 
         * {
@@ -65,8 +65,13 @@
           color: white;
           background-color: var(--button-background);
           border: none;
-          border-radius: 6pt;
+          border-radius: 5pt;
           padding: 5pt;
+          height: 30px;
+        }
+
+        button.icon {
+          width: 30px;
         }
 
         button:hover {
