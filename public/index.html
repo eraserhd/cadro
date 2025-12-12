@@ -10,7 +10,9 @@
           --floating-card-color: #1a1a1a;
           --floating-card-border-color: #555;
           --button-background: rgb(110, 86, 207);
-          --button-background-hover: rgb(125, 102, 217);
+
+          --button-background-rgb: 125, 102, 217;
+          --button-background-hover: rgb(var(--button-background-rgb));
         }
 
         * {
@@ -28,6 +30,16 @@
         body {
           background: black;
           color: #ffffff;
+        }
+
+        button:focus, input:focus {
+          outline: none;
+          box-shadow: 0 0 4px 3px rgba(var(--button-background-rgb), 0.6);
+        }
+
+        ::selection {
+          background: var(--button-background);
+          color: white;
         }
 
         .floating-card {
@@ -97,20 +109,33 @@
           padding: 15pt;
         }
 
+        dialog::backdrop {
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(3px);
+        }
+
         dialog h1 {
           font-size: 120%;
           padding-bottom: 10pt;
         }
 
         dialog h2 {
+          margin-top: 5px;
           font-size: 100%;
         }
 
         .settings .machine {
-          margin: 5pt;
+          margin: 5pt 0 5pt 0;
           padding: 15pt;
           border: solid 1px var(--floating-card-border-color);
           border-radius: 7pt;
+        }
+
+        .settings .machine-commands {
+          margin-top: 3ex;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
         }
     </style>
   </head>
