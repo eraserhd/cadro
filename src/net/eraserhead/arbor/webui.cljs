@@ -47,13 +47,13 @@
         [:i.fa-solid.fa-gear]]
        [:dialog.settings {:ref #(reset! dialog %),
                           :closedby "any"}
-        [:h1 "Settings"]
-        [:h2 "Machines"]
+        [:h1 [:i.fa-solid.fa-gear] " Settings"]
+        [:h2 "Machines"
+          [:button.icon.new-machine {:on-click #(rf/dispatch [::events/new-machine])} [:i.fa-solid.fa-plus]]]
         (into [:<>]
               (map (fn [machine]
                      [machine-card machine]))
-              @(rf/subscribe [::machines]))
-        [:button.new-machine {:on-click #(rf/dispatch [::events/new-machine])} "New Machine"]]])))
+              @(rf/subscribe [::machines]))]])))
 
 (defn- command-bar []
   [:div.floating-card.command-bar
