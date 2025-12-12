@@ -13,14 +13,26 @@
 (s/def ::db (s/keys :req [::loci ::focus]))
 
 (def empty-db
+  "A db with no loci in it."
   {::loci  {},
    ::focus nil})
 
-(defn add
+(defn get
+  "Retrieves a loci from the db by id."
+  [db id]
+  (get-in db [::loci id]))
+
+(defn focused
+  "Retrieves the focused loci from the db."
+  [{:keys [::focus], :as db}]
+  (get db focus))
+
+(defn add-top-level
+  "Adds a new loci to the db and focuses it."
   [db {:keys [::id], :as locus}]
   {:pre [(s/assert ::db db)
          (s/assert ::locus locus)]}
-  (assoc-in db [::loci id] locus))
-
-(defn get [db id]
-  (get-in db [::loci id]))
+  (let [locus (assoc locus ::previous (focused db))]
+    (-> db
+      (assoc-in [::loci id] locus)
+      (assoc ::focus id))))
