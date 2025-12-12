@@ -24,7 +24,8 @@
   [:div.floating-card.legend
    [:h1 "Legend"]
    (into [:ul]
-         (map (fn [{:keys [::loci/name]}]
+         (map (fn [{:keys [::loci/id ::loci/name]}]
+                ^{:key (str id)}
                 [:li name]))
          @(rf/subscribe [::machines]))])
 
@@ -50,7 +51,8 @@
         [:h1 [:i.fa-solid.fa-gear] " Settings"]
         [:h2 "Machines"]
         (into [:<>]
-              (map (fn [machine]
+              (map (fn [{:keys [::loci/id], :as machine}]
+                     ^{:key (str id)}
                      [machine-card machine]))
               @(rf/subscribe [::machines]))
         [:div.machine-commands
