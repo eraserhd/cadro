@@ -41,4 +41,26 @@
       (is (= id1 (::loci/id (loci/focused db)))
           "focus did not change after the first conj")
       (is (= #{id1 id2} (into #{} (map ::loci/id) (loci/top-level db)))
-          "all added loci are in the top-level query"))))
+          "all added loci are in the top-level query")))
+  (testing "adding child loci"
+    (let [id1 #uuid "dd5e99e7-5d84-4f29-8ba6-dc403aa5021a",
+          id2 #uuid "36bfbea5-9a6b-47d9-8d92-d3a555ee2410"
+          locus1 {::loci/id id1, ::loci/parent nil, ::loci/name "Foo"}
+          locus2 {::loci/id id2, ::loci/parent id1, ::loci/name "Bar"}
+          db (-> loci/empty-db
+               (loci/conj locus1)
+               (loci/conj locus2))]
+      (is (= {::loci/id id1
+              ::loci/parent nil
+              ::loci/name "Foo"}
+             (loci/get db id1))
+          "locus1 is stored")
+      (is (= {::loci/id id2
+              ::loci/parent id1
+              ::loci/name "Bar"}
+             (loci/get db id2))
+          "locus2 is stored")
+      (is (= id1 (::loci/id (loci/focused db)))
+          "focus did not change after the first conj")
+      (is (= #{id1} (into #{} (map ::loci/id) (loci/top-level db)))
+          "child loci are in the top-level query"))))
