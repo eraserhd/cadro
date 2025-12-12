@@ -1,5 +1,5 @@
 (ns net.eraserhead.arbor.loci
- (:refer-clojure :exclude [get])
+ (:refer-clojure :exclude [get update])
  (:require
   [clojure.spec.alpha :as s]))
 
@@ -27,12 +27,20 @@
   [{:keys [::focus], :as db}]
   (get db focus))
 
+(defn update
+  "Apply f to the locus in the database with id.
+
+  Preserves invariants about focus and order."
+  [db id f & args]
+  {:pre [(s/assert ::db db)
+         (s/assert ::id id)]}
+  (-> db
+    (update-in [::loci id] f)
+    (assoc ::focus id)))
+
 (defn add-top-level
   "Adds a new loci to the db and focuses it."
   [db {:keys [::id], :as locus}]
   {:pre [(s/assert ::db db)
          (s/assert ::locus locus)]}
-  (let [locus (assoc locus ::previous (focused db))]
-    (-> db
-      (assoc-in [::loci id] locus)
-      (assoc ::focus id))))
+  (update db id (constantly locus)))
