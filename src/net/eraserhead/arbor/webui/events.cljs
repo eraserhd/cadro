@@ -1,31 +1,22 @@
 (ns net.eraserhead.arbor.webui.events
   (:require
-   [cljs.reader]
    [net.eraserhead.arbor :as arbor]
    [net.eraserhead.arbor.loci :as loci]
+   [net.eraserhead.arbor.webui.storage :as storage]
    [re-frame.core :as rf]))
-
-(defn- try-read-string [s]
-  (try
-   (cljs.reader/read-string s)
-   (catch js/Error e
-     nil)))
 
 (rf/reg-event-db
  ::initialize
  (fn [_ _]
-   (or (some-> js/localStorage
-               (.getItem "db")
-               try-read-string)
+   (or (storage/load-db)
        arbor/initial-state)))
 
-;; Persist app-db to localStorage all the time
 (rf/reg-global-interceptor
   (rf/->interceptor
-    :id :persist
+    :id :persist-db-to-localStorage
     :after (fn [context]
              (when-let [db (rf/get-effect context :db)]
-               (.setItem js/localStorage "db" (pr-str db)))
+               (storage/store-db db))
              context)))
 
 (rf/reg-event-db
