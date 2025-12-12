@@ -19,4 +19,4 @@
 (rf/reg-event-db
  ::update-machine
  (fn [app-db [_ id k v]]
-   app-db))
+   (update app-db ::loci/db loci/update id #(assoc % k v))))

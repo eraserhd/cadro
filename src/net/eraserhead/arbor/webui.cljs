@@ -23,10 +23,10 @@
 (defn- legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   [:ul
-    [:li "one"]
-    [:li "two"]
-    [:li "three"]]])
+   (into [:ul]
+         (map (fn [{:keys [::loci/name]}]
+                [:li name]))
+         @(rf/subscribe [::machines]))])
 
 (defn- add-datum-command []
   [:button.icon [:i.fa-solid.fa-plus]])

@@ -52,7 +52,7 @@
          (s/assert ::id id)]
    :post [(s/assert ::db %)]}
   (cond-> db
-    true         (update-in [::loci id] f)
+    true         (update-in [::loci id] #(apply f % args))
     (nil? focus) (assoc ::focus id)))
 
 (defn conj
