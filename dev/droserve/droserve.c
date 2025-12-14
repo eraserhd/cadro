@@ -15,7 +15,6 @@
  *
  */
 #include <errno.h>
-#include <fcntl.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -115,48 +114,6 @@ int register_profile(struct spp_data *spp, GDBusProxy *proxy)
 }
 
 gboolean
-server_read_data (gpointer user_data) {
-	char buf[1024] = { 0 };
-	int bytes_read;
-	int opts = 0;
-	struct spp_data *spp = user_data;
-	
-	printf("server_read_data called\n");
-
-	// set socket for blocking IO
-	fcntl(spp->sock_fd, F_SETFL, opts);
-	opts = fcntl(spp->sock_fd, F_GETFL);
-	if (opts < 0) {
-		perror("fcntl(F_GETFL)");
-		exit(EXIT_FAILURE);
-	}
-
-	opts &= ~O_NONBLOCK;
-	
-	if (fcntl(spp->sock_fd, F_SETFL,opts) < 0) {
-		perror("fcntl(F_SETFL)");
-		exit(EXIT_FAILURE);
-	}
-
-	// read data from the client
-	bytes_read = read(spp->sock_fd, buf, sizeof(buf));
-	if ( bytes_read > 0 ) {
-		printf("received [%s]\n", buf);
-	} else {
-		printf("error reading from client [%d] %s\n", errno, strerror(errno));
-	}
-
-	// close connection
-	close(spp->sock_fd);
-
-	// all done!
-	g_main_loop_quit(spp->loop);
-
-	// make this a one-shot
-	return false;
-}
-
-gboolean
 send_position (gpointer user_data) {
 	int status;
 	struct spp_data *spp = user_data;
@@ -227,10 +184,8 @@ on_handle_new_connection (OrgBluezProfile1 *interface,
 	// finished with method call; no reply sent
 	g_dbus_method_invocation_return_value(invocation, NULL);
 
+	// Continuously send position
 	g_timeout_add(500, send_position, spp);
-
-	// g_idle_add(server_read_data, spp);
-	//g_idle_add(send_position, spp);
 
 	return TRUE;
 }
@@ -249,7 +204,7 @@ int main(int argc, char *argv[])
 	spp->x = 500;
 	spp->y = 500;
 	spp->z = 500;
-	
+
 	conn = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, &error);
 	g_assert_no_error (error);
 
