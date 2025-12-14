@@ -162,11 +162,10 @@ send_position (gpointer user_data) {
 	struct spp_data *spp = user_data;
 	char buffer[512];
 
-	sprintf(buffer, "X:%ld,Y:%ld,Z:%ld\n", spp->x, spp->y, spp->z);
-	
+	sprintf(buffer, "X%ld;Y%ld;Z%ld;\n", spp->x, spp->y, spp->z);
 	status = write(spp->sock_fd, buffer, strlen(buffer));
 	if (status < 0) {
-		perror("client: write to socket failed!\n");
+		perror("write");
 	}
 
 	return G_SOURCE_CONTINUE;
@@ -228,14 +227,7 @@ on_handle_new_connection (OrgBluezProfile1 *interface,
 	// finished with method call; no reply sent
 	g_dbus_method_invocation_return_value(invocation, NULL);
 
-
-	char buffer[512];
-	sprintf(buffer, "X%ld;Y%ld;Z%ld;\n", spp->x, spp->y, spp->z);
-
-	int status = write(spp->sock_fd, buffer, strlen(buffer));
-	if (status < 0) {
-		perror("write");
-	}
+	g_timeout_add(500, send_position, spp);
 
 	// g_idle_add(server_read_data, spp);
 	//g_idle_add(send_position, spp);
