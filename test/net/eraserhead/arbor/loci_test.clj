@@ -6,8 +6,8 @@
 
 (deftest t-empty-db
   (is (s/valid? ::loci/db loci/empty-db))
-  (is (nil? (loci/focused loci/empty-db))
-      "An empty database should be the only one with no focused locus."))
+  (is (nil? (loci/origin loci/empty-db))
+      "An empty database should be the only one with no origin locus."))
 
 (deftest t-conj
   (testing "adding first loci"
@@ -16,8 +16,8 @@
           singlet (loci/conj loci/empty-db locus)]
       (is (= id (::loci/id (loci/get singlet id)))
           "can retrieve stored loci")
-      (is (= id (::loci/id (loci/focused singlet)))
-          "added loci is focused")
+      (is (= id (::loci/id (loci/origin singlet)))
+          "added loci is the origin")
       (is (= [id] (map ::loci/id (loci/top-level singlet)))
           "it appears as top-level query")))
   (testing "adding subsequent top-level loci"
@@ -38,8 +38,8 @@
               ::loci/name "Bar"}
              (loci/get db id2))
           "locus2 is stored")
-      (is (= id1 (::loci/id (loci/focused db)))
-          "focus did not change after the first conj")
+      (is (= id1 (::loci/id (loci/origin db)))
+          "origin did not change after the first conj")
       (is (= #{id1 id2} (into #{} (map ::loci/id) (loci/top-level db)))
           "all added loci are in the top-level query")))
   (testing "adding child loci"
@@ -60,7 +60,7 @@
               ::loci/name "Bar"}
              (loci/get db id2))
           "locus2 is stored")
-      (is (= id1 (::loci/id (loci/focused db)))
-          "focus did not change after the first conj")
+      (is (= id1 (::loci/id (loci/origin db)))
+          "origin did not change after the first conj")
       (is (= #{id1} (into #{} (map ::loci/id) (loci/top-level db)))
           "child loci are in the top-level query"))))
