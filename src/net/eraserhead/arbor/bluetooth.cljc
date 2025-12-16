@@ -28,6 +28,6 @@
         devices (->> device-list
                      (filter (comp new-ids ::id))
                      (reduce (fn [devices {:keys [::id], :as new-device}]
-                               (assoc devices id new-device))
+                               (assoc devices id (assoc new-device ::status :disconnected)))
                              devices))]
     {:db (assoc db ::devices devices)}))
