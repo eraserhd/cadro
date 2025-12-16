@@ -31,9 +31,11 @@
   [:div.floating-card.legend
    [:h1 "Legend"]
    (into [:ul]
-         (map (fn [{:keys [::loci/id ::loci/name]}]
+         (map (fn [{:keys [::loci/id ::loci/name ::loci/origin?]}]
                 ^{:key (str id)}
-                [:li name]))
+                [:li {:class [(when origin?
+                                "origin")]}
+                 name]))
          @(rf/subscribe [::loci]))])
 
 (defn- add-datum-command []
