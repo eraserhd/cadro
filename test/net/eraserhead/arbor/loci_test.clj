@@ -64,3 +64,21 @@
           "origin did not change after the first conj")
       (is (= #{id1} (into #{} (map ::loci/id) (loci/top-level db)))
           "child loci are in the top-level query"))))
+
+(deftest t-tree
+  (let [id1 #uuid "dd5e99e7-5d84-4f29-8ba6-dc403aa5021a",
+        id2 #uuid "36bfbea5-9a6b-47d9-8d92-d3a555ee2410"
+        locus1 {::loci/id id1, ::loci/parent nil, ::loci/name "Foo"}
+        locus2 {::loci/id id2, ::loci/parent id1, ::loci/name "Bar"}
+        db (-> loci/empty-db
+             (loci/conj locus1)
+             (loci/conj locus2))]
+    (is (= [{::loci/id id1
+             ::loci/name "Foo"
+             ::loci/parent nil
+             ::loci/children
+             [{::loci/id id2
+               ::loci/name "Bar"
+               ::loci/parent id1
+               ::loci/children []}]}]
+           (loci/tree db)))))
