@@ -1,7 +1,8 @@
 (ns net.eraserhead.arbor.bluetooth
   (:require
    [clojure.set :as set]
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [clojure.string :as str]))
 
 (s/def ::id string?)
 (s/def ::name string?)
@@ -50,3 +51,26 @@
                          (into [] (drop (- (count log) 100) log))
                          log)))]
     (update db ::log append-log event)))
+
+(defn- pad [s n]
+  (apply str (concat s (repeat (- n (count s)) \space))))
+(defn- hex-char [i]
+  (get "0123456789abcdef" (mod i 16)))
+(defn- hex-int [i]
+  (str (hex-char (quot i 16))
+       (hex-char (mod i 16))))
+(defn- format-hex [s]
+  (->> s
+       (partition-all 16)
+       (map (fn [cs]
+              (let [hex-part  (->> cs
+                                   (map int)
+                                   (map hex-int)
+                                   (str/join " "))
+                    text-part (apply str cs)]
+                (str (pad hex-part (dec (* 16 3))) "   " text-part))))
+       (str/join "\n")))
+
+(defn log-received
+  [db device-id event-data]
+  (log-event db device-id "received" (format-hex event-data)))

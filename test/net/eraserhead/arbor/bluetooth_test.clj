@@ -68,3 +68,11 @@
                   (get ::bt/log))]
       (is (= 100 (count log))))))
 
+(deftest t-log-received
+  (testing "log-received formats data in a nice hex dump"
+    (let [data (-> {}
+                   (bt/log-received "00:00:01" "Hello, world!  This is a test.")
+                   (get-in [::bt/log 0 ::bt/event-data]))]
+      (is (= (str "48 65 6c 6c 6f 2c 20 77 6f 72 6c 64 21 20 20 54   Hello, world!  T\n"
+                  "68 69 73 20 69 73 20 61 20 74 65 73 74 2e         his is a test.")
+             data)))))
