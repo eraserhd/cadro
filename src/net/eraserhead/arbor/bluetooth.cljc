@@ -15,6 +15,11 @@
 (s/def ::db (s/keys :opt [::devices]))
 (s/def ::effects (s/keys :req-un [::db]))
 
+(s/def ::event-type string?)
+(s/def ::event-data string?)
+(s/def ::log-event (s/keys :req [::id ::event-type ::event-data]))
+(s/def ::log (s/coll-of ::log-event))
+
 (defn device-list-arrived
   "When a new device list arrives, add new devices and remove missing devices
   from our internal device map, while keeping state of existing devices."
