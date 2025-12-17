@@ -43,10 +43,23 @@
  (fn [_ _]
    {::bt/fetch-device-list nil}))
 
+(defn log-event
+  [db device-id event-type data]
+  ;;FIXME: actually store to log
+  (js/console.log (str device-id " " event-type " " data))
+  db)
+
+(rf/reg-event-db
+ ::bt/log-event
+ (fn [db [_ device-id event-type data]]
+   (log-event db device-id event-type data)))
+
 (rf/reg-event-db
  ::bt/set-status
  (fn [db [_ device-id status]]
-   (assoc-in db [::bt/devices device-id ::bt/status] status)))
+   (-> db
+     (assoc-in [::bt/devices device-id ::bt/status] status)
+     (log-event device-id "set-status" status))))
 
 (rf/reg-fx
  ::bt/connect
@@ -62,9 +75,9 @@
        @bt-impl
        interface-id
        (fn [data]
-         (js/console.log (str "received: " data)))
+         (rf/dispatch [::bt/log-event device-id "received" data]))
        (fn [error]
-         (js/alert (str "subscribeRawData error: " error)))))
+         (rf/dispatch [::bt/log-event device-id "subscribeRawData error" error]))))
     (fn [error]
       (rf/dispatch [::bt/set-status device-id :disconnected])
       (js/alert (str "Unable to connect: " error))))))
