@@ -102,7 +102,7 @@
          btui/device-log-icon]
         [settings-command]]
        (when @log-visible?
-         [btui/log-viewer])])))
+         [btui/device-log])])))
 
 (defn- arbor []
   [:<>

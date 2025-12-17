@@ -65,7 +65,7 @@
 
 (def device-log-icon [:i.fa-solid.fa-ruler-combined])
 
-(defn log-viewer []
+(defn device-log []
   [:div.floating-card.log
    [:h1 device-log-icon " Device Log"]
    [:div.log-scroll
