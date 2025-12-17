@@ -52,20 +52,22 @@
  ::bt/connect
  (fn connect* [device-id]
    (rf/dispatch [::bt/set-status device-id :connecting])
-   (.connect @bt-impl
-             device-id
-             interface-id
-             (fn []
-               (rf/dispatch [::bt/set-status device-id :connected])
-               (.subscribeRawData @bt-impl
-                                  interface-id
-                                  (fn [data]
-                                    (js/console.log (str "received: " data)))
-                                  (fn [error]
-                                    (js/alert (str "subscribeRawData error: " error)))))
-             (fn [error]
-               (rf/dispatch [::bt/set-status device-id :disconnected])
-               (js/alert (str "Unable to connect: " error))))))
+   (.connect
+    @bt-impl
+    device-id
+    interface-id
+    (fn []
+      (rf/dispatch [::bt/set-status device-id :connected])
+      (.subscribeRawData
+       @bt-impl
+       interface-id
+       (fn [data]
+         (js/console.log (str "received: " data)))
+       (fn [error]
+         (js/alert (str "subscribeRawData error: " error)))))
+    (fn [error]
+      (rf/dispatch [::bt/set-status device-id :disconnected])
+      (js/alert (str "Unable to connect: " error))))))
 
 (rf/reg-event-fx
  ::bt/connect
