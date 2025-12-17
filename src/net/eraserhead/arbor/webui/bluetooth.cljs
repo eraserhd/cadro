@@ -61,6 +61,8 @@
      (assoc-in [::bt/devices device-id ::bt/status] status)
      (log-event device-id "set-status" status))))
 
+(def ^:private decoder (js/TextDecoder. "ascii"))
+
 (rf/reg-fx
  ::bt/connect
  (fn connect* [device-id]
@@ -73,12 +75,15 @@
       (rf/dispatch [::bt/set-status device-id :connected])
       (.subscribeRawData
        @bt-impl
+       device-id
        interface-id
-       (fn [data]
-         (rf/dispatch [::bt/log-event device-id "received" data]))
+       (fn [raw-data]
+         (let [data (.decode decoder (js/Uint8Array. raw-data))]
+           (rf/dispatch [::bt/log-event device-id "received" data])))
        (fn [error]
          (rf/dispatch [::bt/log-event device-id "subscribeRawData error" error]))))
     (fn [error]
+      (rf/dispatch [::bt/log-event device-id "connect error" error])
       (rf/dispatch [::bt/set-status device-id :disconnected])
       (js/alert (str "Unable to connect: " error))))))
 
