@@ -43,23 +43,22 @@
  (fn [_ _]
    {::bt/fetch-device-list nil}))
 
-(defn log-event
-  [db device-id event-type data]
-  ;;FIXME: actually store to log
-  (js/console.log (str device-id " " event-type " " data))
-  db)
-
 (rf/reg-event-db
  ::bt/log-event
  (fn [db [_ device-id event-type data]]
-   (log-event db device-id event-type data)))
+   (bt/log-event db device-id event-type data)))
+
+(rf/reg-event-db
+ ::bt/log-received
+ (fn [db [_ device-id data]]
+   (bt/log-received db device-id data)))
 
 (rf/reg-event-db
  ::bt/set-status
  (fn [db [_ device-id status]]
    (-> db
      (assoc-in [::bt/devices device-id ::bt/status] status)
-     (log-event device-id "set-status" status))))
+     (bt/log-event device-id "set-status" status))))
 
 (def ^:private decoder (js/TextDecoder. "ascii"))
 
@@ -79,7 +78,7 @@
        interface-id
        (fn [raw-data]
          (let [data (.decode decoder (js/Uint8Array. raw-data))]
-           (rf/dispatch [::bt/log-event device-id "received" data])))
+           (rf/dispatch [::bt/log-received device-id data])))
        (fn [error]
          (rf/dispatch [::bt/log-event device-id "subscribeRawData error" error]))))
     (fn [error]
