@@ -61,7 +61,10 @@
         [:label {:for "device"} "Device"]
         (into [:select {:name          "device"
                         :default-value (or device "none")
-                        :on-change     #(rf/dispatch [::events/update-machine id ::loci/device (.. % -target -value)])}
+                        :on-change     (fn [e]
+                                         (let [value (.. e -target -value)]
+                                           (rf/dispatch [::events/update-machine id ::loci/device value])
+                                           (rf/dispatch [::bt/connect value])))}
                (device-option "none" "--None--")]
               (map (fn [[id {:keys [::bt/name]}]]
                      (device-option id name)))

@@ -4,8 +4,9 @@
    [re-frame.core :as rf]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))
 
+(def ^:private interface-id "00001101-0000-1000-8000-00805f9b34fb")
 
-(def bt-impl (atom bt-browser))
+(def ^:private bt-impl (atom bt-browser))
 
 (.addEventListener js/document "deviceready"
   (fn []
@@ -41,3 +42,26 @@
  ::bt/fetch-device-list
  (fn [_ _]
    {::bt/fetch-device-list nil}))
+
+(rf/reg-event-db
+ ::bt/set-status
+ (fn [db [_ device-id status]]
+   (assoc-in db [::bt/devices device-id ::bt/status] status)))
+
+(rf/reg-fx
+ ::bt/connect
+ (fn connect* [device-id]
+   (rf/dispatch [::bt/set-status device-id :connecting])
+   (.connect @bt-impl
+             device-id
+             interface-id
+             (fn []
+               (rf/dispatch [::bt/set-status device-id :connected]))
+             (fn [error]
+               (rf/dispatch [::bt/set-status device-id :disconnected])
+               (js/alert (str "Unable to connect: " error))))))
+
+(rf/reg-event-fx
+ ::bt/connect
+ (fn [_ [_ device-id]]
+   {::bt/connect device-id}))
