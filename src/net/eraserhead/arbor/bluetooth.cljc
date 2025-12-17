@@ -75,7 +75,12 @@
                                    (map char-code)
                                    (map hex-byte)
                                    (str/join " "))
-                    text-part (apply str cs)]
+                    text-part (->> cs
+                                   (map (fn [ch]
+                                          (if (<= 0x20 (char-code ch) 0x7e)
+                                            ch
+                                            ".")))
+                                   (apply str))]
                 (str (pad hex-part (dec (* 16 3))) "   " text-part))))
        (str/join "\n")))
 
