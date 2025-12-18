@@ -78,11 +78,32 @@
              data)))))
 
 (deftest t-process-recieved
-  (testing ""
+  (testing "parses and stores received axes"
     (let [db (-> {::bt/devices {"00:00:01" {}}}
                  (bt/process-received "00:00:01" "X150;Y250;Z350;T72;\n"))]
-      (is (= {::bt/devices {"00:00:01" {::bt/axes {"X" 150
+      (is (= {::bt/devices {"00:00:01" {::bt/receive-buffer ""
+                                        ::bt/axes {"X" 150
                                                    "Y" 250
                                                    "Z" 350
-                                                   "T" 72}}}}
-             db)))))
+                                                   "T" 72}}}
+              ::bt/log [{::bt/id         "00:00:01",
+                         ::bt/event-type "received",
+                         ::bt/event-data (str "58 31 35 30 3b 59 32 35 30 3b 5a 33 35 30 3b 54   X150;Y250;Z350;T\n"
+                                              "37 32 3b 0a                                       72;.")}]}
+             db))))
+  (testing "works correctly if data was received in any size chunk"
+    (doseq [:let [data "X150;Y250;Z350;T72;\n"]
+            i (range (count data))
+            :let [part-a (subs data 0 i)
+                  part-b (subs data i)]]
+      (let [db (-> {::bt/devices {"00:00:01" {}}}
+                   (bt/process-received "00:00:01" part-a)
+                   (bt/process-received "00:00:01" part-b)
+                   (dissoc ::bt/log))]
+        (is (= {::bt/devices {"00:00:01" {::bt/receive-buffer ""
+                                          ::bt/axes {"X" 150
+                                                     "Y" 250
+                                                     "Z" 350
+                                                     "T" 72}}}}
+               db))))))
+    

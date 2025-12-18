@@ -95,13 +95,14 @@
   [db device-id event-data]
   (let [to-process         (-> (str (get-in db [::devices device-id ::receive-buffer] "")
                                     event-data)
-                               (str/replace #"[;\s]+" ";"))
+                               (str/replace #"[;\s]+" ";")
+                               (str/replace #"^;+" ""))
         [to-process items] (loop [to-process to-process
                                   items      {}]
                              (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
                                (recur left (assoc items axis (* value-str 1.0)))
                                [to-process items]))]
-    (reduce (fn [db [axis value]]
-              (assoc-in db [::devices device-id ::axes axis] value))
-            db
-            items)))
+    (-> db
+      (log-received device-id event-data)
+      (assoc-in [::devices device-id ::receive-buffer] to-process)
+      (update-in [::devices device-id ::axes] merge items))))
