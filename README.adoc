@@ -9,10 +9,10 @@ Start the nREPLs and build everything for debug.
 $ npx shadow-cljs watch app
 ----
 
-Connect to the REPL:
+Connect to the CLJS REPL:
 
 ----
-$ clj -T:repl
+$ npx shadow-cljs cljs-repl app
 ----
 
 Run tests:
