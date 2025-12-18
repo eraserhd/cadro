@@ -1,21 +1,18 @@
 ;; shadow-cljs configuration
-{:source-paths
- ["src"]
-
- ;; Use deps.edn
- :dependencies
- [[reagent/reagent "2.0.1"]
-  [re-frame/re-frame "1.4.3"]]
- 
- :dev-http
- {4242 "public"}
- 
- :nrepl
- {:port 40823}
+{:source-paths ["src" "test"]
+ :dependencies [[reagent/reagent "2.0.1"]
+                [re-frame/re-frame "1.4.3"]]
+ :dev-http     {4242 "public"
+                4243 "target/browser-test"}
+ :nrepl        {:port 40823}
 
  :builds
  {:app {:target :browser
         :output-dir "public/assets/app/js"
         :asset-path "/assets/app/js"
         :modules {:main {:entries [net.eraserhead.arbor.webui]
-                         :init-fn net.eraserhead.arbor.webui/start}}}}}
+                         :init-fn net.eraserhead.arbor.webui/start}}}
+
+  :test {:target :node-test
+         :output-to "target/node-tests.js"
+         :autorun true}}}
