@@ -95,6 +95,8 @@
   (let [log-visible? (r/atom false)]
     (fn []
       [:<>
+       [:div.floating-card.axes
+        [:h1 "Axes"]]
        [:div.floating-card.command-bar
         [add-datum-command]
         [:button.icon {:on-click (fn [_]
