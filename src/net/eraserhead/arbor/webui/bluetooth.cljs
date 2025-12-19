@@ -83,9 +83,9 @@
    (bt/log-event db device-id event-type data)))
 
 (rf/reg-event-db
- ::bt/log-received
+ ::bt/process-received
  (fn [db [_ device-id data]]
-   (bt/log-received db device-id data)))
+   (bt/process-received db device-id data)))
 
 (rf/reg-event-db
  ::bt/set-status
@@ -112,7 +112,7 @@
        interface-id
        (fn [raw-data]
          (let [data (.decode decoder (js/Uint8Array. raw-data))]
-           (rf/dispatch [::bt/log-received device-id data])))
+           (rf/dispatch [::bt/process-received device-id data])))
        (fn [error]
          (rf/dispatch [::bt/log-event device-id "subscribeRawData error" error]))))
     (fn [error]
