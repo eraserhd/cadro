@@ -28,6 +28,13 @@
  (fn [loci-db _]
    (loci/top-level loci-db)))
 
+(rf/reg-sub
+ ::origin-stack
+ (fn [_ _]
+   [(rf/subscribe [::loci/db])])
+ (fn [loci-db _]
+   (loci/origin-stack loci-db)))
+
 (defn- legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
@@ -38,6 +45,19 @@
                                 "origin")]}
                  name]))
          @(rf/subscribe [::loci]))])
+
+(defn- axes-card []
+  (fn []
+    (let [[{:keys [::loci/device]}] @(rf/subscribe [::origin-stack])
+          devices                   @(rf/subscribe [::bt/devices])
+          axes                      (get-in devices [device ::bt/axes])]
+      (into [:div.floating-card.axes
+             [:h1 "Axes"]]
+            (map (fn [[axis-name axis-value]]
+                   [:div.axis
+                    [:div.name axis-name]
+                    [:div.value axis-value]]))
+            axes))))
 
 (defn- add-datum-command []
   [:button.icon [:i.fa-solid.fa-plus]])
@@ -95,8 +115,7 @@
   (let [log-visible? (r/atom false)]
     (fn []
       [:<>
-       [:div.floating-card.axes
-        [:h1 "Axes"]]
+       [axes-card]
        [:div.floating-card.command-bar
         [add-datum-command]
         [:button.icon {:on-click (fn [_]
