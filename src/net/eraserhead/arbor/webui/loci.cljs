@@ -56,8 +56,20 @@
      (assoc-in [::scale/devices device-id ::scale/status] status)
      (scale/log-event device-id "set-status" (str status)))))
 
-(def device-log-icon [:i.fa-solid.fa-ruler-combined])
 
+(defn legend []
+  [:div.floating-card.legend
+   [:h1 "Legend"]
+   (into [:ul]
+         (map (fn [{:keys [::loci/id ::loci/name ::loci/origin?]}]
+                ^{:key (str id)}
+                [:li {:class [(when origin?
+                                "origin")]}
+                 name]))
+         @(rf/subscribe [::loci/tree]))])
+
+
+(def device-log-icon [:i.fa-solid.fa-ruler-combined])
 (defn device-log []
   [:div.floating-card.device-log
    [:h1 device-log-icon " Device Log"]

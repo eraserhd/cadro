@@ -18,17 +18,6 @@
  (fn [loci-db _]
    (loci/origin-stack loci-db)))
 
-(defn- legend []
-  [:div.floating-card.legend
-   [:h1 "Legend"]
-   (into [:ul]
-         (map (fn [{:keys [::loci/id ::loci/name ::loci/origin?]}]
-                ^{:key (str id)}
-                [:li {:class [(when origin?
-                                "origin")]}
-                 name]))
-         @(rf/subscribe [::loci/tree]))])
-
 (defn- axes-card []
   (fn []
     (let [[{:keys [::loci/device]}] @(rf/subscribe [::origin-stack])
@@ -111,7 +100,7 @@
 
 (defn- arbor []
   [:<>
-   [legend]
+   [lociui/legend]
    [command-bar]])
 
 (defonce root (rdc/create-root (js/document.getElementById "app")))
