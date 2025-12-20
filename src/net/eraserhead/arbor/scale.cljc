@@ -1,4 +1,4 @@
-(ns net.eraserhead.arbor.bluetooth
+(ns net.eraserhead.arbor.scale
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]

@@ -1,7 +1,7 @@
 (ns net.eraserhead.arbor.webui
   (:require
    [net.eraserhead.arbor.loci :as loci]
-   [net.eraserhead.arbor.bluetooth :as bt]
+   [net.eraserhead.arbor.scale :as scale]
    [net.eraserhead.arbor.webui.bluetooth :as btui]
    [net.eraserhead.arbor.webui.events :as events]
    [net.eraserhead.arbor.webui.loci :as lociui]
@@ -45,8 +45,8 @@
 (defn- axes-card []
   (fn []
     (let [[{:keys [::loci/device]}] @(rf/subscribe [::origin-stack])
-          devices                   @(rf/subscribe [::bt/devices])
-          axes                      (get-in devices [device ::bt/axes])]
+          devices                   @(rf/subscribe [::scale/devices])
+          axes                      (get-in devices [device ::scale/axes])]
       (into [:div.floating-card.axes
              [:h1 "Axes"]]
             (map (fn [[axis-name axis-value]]
@@ -81,18 +81,18 @@
                         :on-change     (fn [e]
                                          (let [value (.. e -target -value)]
                                            (rf/dispatch [::events/update-machine id ::loci/device value])
-                                           (rf/dispatch [::bt/connect value])))}
+                                           (rf/dispatch [::btui/connect value])))}
                (device-option "none" "--None--")]
-              (map (fn [[id {:keys [::bt/name]}]]
+              (map (fn [[id {:keys [::scale/name]}]]
                      (device-option id name)))
-              @(rf/subscribe [::bt/devices]))]])))
+              @(rf/subscribe [::scale/devices]))]])))
 
 (defn- settings-command []
   (let [dialog (r/atom nil)]
     (fn settings-command* []
       [:<>
        [:button.icon {:on-click #(do
-                                   (rf/dispatch [::bt/fetch-device-list])
+                                   (rf/dispatch [::btui/fetch-device-list])
                                    (.showModal @dialog))}
         [:i.fa-solid.fa-gear]]
        [:dialog.settings {:ref #(reset! dialog %),
