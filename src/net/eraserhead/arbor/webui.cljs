@@ -12,20 +12,6 @@
    ["@fortawesome/fontawesome-free/js/all.js"]))
 
 (rf/reg-sub
- ::loci
- (fn [_ _]
-   [(rf/subscribe [::loci/db])])
- (fn [loci-db _]
-   (loci/tree loci-db)))
-
-(rf/reg-sub
- ::machines
- (fn [_ _]
-   [(rf/subscribe [::loci/db])])
- (fn [loci-db _]
-   (loci/top-level loci-db)))
-
-(rf/reg-sub
  ::origin-stack
  (fn [_ _]
    [(rf/subscribe [::loci/db])])
@@ -41,7 +27,7 @@
                 [:li {:class [(when origin?
                                 "origin")]}
                  name]))
-         @(rf/subscribe [::loci]))])
+         @(rf/subscribe [::loci/tree]))])
 
 (defn- axes-card []
   (fn []
@@ -104,7 +90,7 @@
               (map (fn [{:keys [::loci/id], :as machine}]
                      ^{:key (str id)}
                      [machine-card machine]))
-              @(rf/subscribe [::machines]))
+              @(rf/subscribe [::loci/top-level]))
         [:div.machine-commands
          [:button.icon.new-machine {:on-click #(rf/dispatch [::events/new-machine])}
           [:i.fa-solid.fa-plus]]]]])))

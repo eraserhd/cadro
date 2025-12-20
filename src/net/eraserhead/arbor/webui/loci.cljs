@@ -10,6 +10,20 @@
    (::loci/db app-db)))
 
 (rf/reg-sub
+ ::loci/tree
+ (fn [_ _]
+   [(rf/subscribe [::loci/db])])
+ (fn [loci-db _]
+   (loci/tree loci-db)))
+
+(rf/reg-sub
+ ::loci/top-level
+ (fn [_ _]
+   [(rf/subscribe [::loci/db])])
+ (fn [loci-db _]
+   (loci/top-level loci-db)))
+
+(rf/reg-sub
  ::scale/devices
  (fn [_ _]
    [(rf/subscribe [::loci/db])])
