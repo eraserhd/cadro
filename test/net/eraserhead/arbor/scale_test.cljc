@@ -1,9 +1,13 @@
 (ns net.eraserhead.arbor.scale-test
   (:require
+   [clojure.spec.alpha :as s]
    [clojure.test :refer [deftest testing is]]
    [net.eraserhead.arbor.scale :as scale]))
 
 (deftest t-device-list-arrived
+  (is s/*compile-asserts*)
+  (is (s/check-asserts?)
+      "need to be checking specs during test runs")
   (testing "new devices found, and they start disconnected"
     (let [devices (-> (scale/device-list-arrived {:db {}}
                                                  [::scale/device-list-arrived
@@ -49,7 +53,7 @@
                                                  [::scale/device-list-arrived
                                                   [{::scale/id "00:00:01"
                                                     ::scale/name "Bar"
-                                                    ::address "00:00:01"}]])
+                                                    ::scale/address "00:00:01"}]])
                       (get-in [:db ::scale/devices]))]
       (is (= :connected (get-in devices ["00:00:01" ::scale/status]))))))
 

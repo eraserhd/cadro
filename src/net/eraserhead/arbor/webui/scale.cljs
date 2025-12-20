@@ -32,7 +32,7 @@
  (fn [db [_ device-id status]]
    (-> db
      (assoc-in [::scale/devices device-id ::scale/status] status)
-     (scale/log-event device-id "set-status" status))))
+     (scale/log-event device-id "set-status" (str status)))))
 
 (def device-log-icon [:i.fa-solid.fa-ruler-combined])
 

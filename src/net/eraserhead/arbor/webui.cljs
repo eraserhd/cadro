@@ -1,5 +1,6 @@
 (ns net.eraserhead.arbor.webui
   (:require
+   [clojure.spec.alpha :as s]
    [net.eraserhead.arbor.loci :as loci]
    [net.eraserhead.arbor.scale :as scale]
    [net.eraserhead.arbor.webui.bluetooth :as btui]
@@ -131,5 +132,7 @@
 (defonce root (rdc/create-root (js/document.getElementById "app")))
 
 (defn ^:dev/after-load start []
+  (when ^boolean goog.DEBUG
+    (s/check-asserts true))
   (rf/dispatch-sync [::events/initialize])
   (rdc/render root [arbor]))

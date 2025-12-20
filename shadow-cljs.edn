@@ -15,4 +15,5 @@
 
   :test {:target :node-test
          :output-to "target/node-tests.js"
-         :autorun true}}}
+         :autorun true
+         :main net.eraserhead.arbor.test-main/main}}}

@@ -8,7 +8,11 @@
 (s/def ::name string?)
 (s/def ::address string?)
 
-(s/def ::device (s/keys :req [::id ::name ::address]))
+(s/def ::axis string?)
+(s/def ::position number?)
+(s/def ::axes (s/map-of ::axis ::position))
+
+(s/def ::device (s/keys :req [::id ::name ::address] :opt [::axes]))
 (s/def ::devices (s/map-of ::id ::device))
 (s/def ::device-list (s/coll-of ::device))
 
