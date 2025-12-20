@@ -1,12 +1,7 @@
 (ns net.eraserhead.arbor.webui.scale
   (:require
    [re-frame.core :as rf]
-   [net.eraserhead.arbor.scale :as scale]))
-
-(rf/reg-sub
- ::scale/devices
- (fn [{:keys [::scale/devices]} _]
-   devices))
+   [net.eraserhead.arbor.loci.scale :as scale]))
 
 (rf/reg-event-fx ::scale/device-list-arrived scale/device-list-arrived)
 

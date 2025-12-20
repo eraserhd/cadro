@@ -2,7 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [net.eraserhead.arbor.loci :as loci]
-   [net.eraserhead.arbor.scale :as scale]
+   [net.eraserhead.arbor.loci.scale :as scale]
    [net.eraserhead.arbor.webui.bluetooth :as btui]
    [net.eraserhead.arbor.webui.events :as events]
    [net.eraserhead.arbor.webui.loci :as lociui]

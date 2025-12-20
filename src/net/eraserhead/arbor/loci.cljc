@@ -2,7 +2,7 @@
  (:refer-clojure :exclude [conj get update])
  (:require
   [clojure.spec.alpha :as s]
-  [net.eraserhead.arbor.scale :as scale]))
+  [net.eraserhead.arbor.loci.scale :as scale]))
 
 (s/def ::id uuid?)
 (s/def ::name string?)

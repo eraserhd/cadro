@@ -1,6 +1,6 @@
 (ns net.eraserhead.arbor.webui.bluetooth
   (:require
-   [net.eraserhead.arbor.scale :as scale]
+   [net.eraserhead.arbor.loci.scale :as scale]
    [re-frame.core :as rf]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))
 

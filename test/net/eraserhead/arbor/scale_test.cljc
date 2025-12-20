@@ -2,7 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [clojure.test :refer [deftest testing is]]
-   [net.eraserhead.arbor.scale :as scale]))
+   [net.eraserhead.arbor.loci.scale :as scale]))
 
 (deftest t-device-list-arrived
   (is s/*compile-asserts*)

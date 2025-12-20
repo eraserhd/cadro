@@ -1,4 +1,4 @@
-(ns net.eraserhead.arbor.scale
+(ns net.eraserhead.arbor.loci.scale
   (:require
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
