@@ -1,7 +1,8 @@
 (ns net.eraserhead.arbor.loci
  (:refer-clojure :exclude [conj get update])
  (:require
-  [clojure.spec.alpha :as s]))
+  [clojure.spec.alpha :as s]
+  [net.eraserhead.arbor.scale :as scale]))
 
 (s/def ::id uuid?)
 (s/def ::name string?)

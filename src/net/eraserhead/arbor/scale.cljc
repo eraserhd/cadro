@@ -86,7 +86,7 @@
                 (str (pad hex-part (dec (* 16 3))) "   " text-part))))
        (str/join "\n")))
 
-(defn log-received
+(defn- log-received
   "Log received data in hex format."
   [db device-id event-data]
   (log-event db device-id "received" (format-hex event-data)))
