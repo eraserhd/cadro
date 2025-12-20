@@ -57,8 +57,7 @@
                    [:div.axis
                     [:div.name axis-name]
                     [:div.value axis-value]
-                    [:button.icon [:i.fa-solid.fa-bookmark]]
-                    [:button.icon [:i.fa-regular.fa-bookmark]]]))
+                    [:button.icon [:i.fa-solid.fa-location-pin]]]))
             axes))))
 
 (defn- add-datum-command []
