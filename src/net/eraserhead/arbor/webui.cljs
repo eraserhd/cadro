@@ -11,11 +11,6 @@
    ["@fortawesome/fontawesome-free/js/all.js"]))
 
 (rf/reg-sub
- ::loci/db
- (fn [app-db _]
-   (::loci/db app-db)))
-
-(rf/reg-sub
  ::loci
  (fn [_ _]
    [(rf/subscribe [::loci/db])])
