@@ -118,10 +118,10 @@
         [add-datum-command]
         [:button.icon {:on-click (fn [_]
                                    (swap! log-visible? #(not %)))}
-         btui/device-log-icon]
+         scaleui/device-log-icon]
         [settings-command]]
        (when @log-visible?
-         [btui/device-log])])))
+         [scaleui/device-log])])))
 
 (defn- arbor []
   [:<>

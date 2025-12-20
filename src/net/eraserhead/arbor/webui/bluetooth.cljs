@@ -49,20 +49,6 @@
  (fn [_ _]
    {::fetch-device-list nil}))
 
-(def device-log-icon [:i.fa-solid.fa-ruler-combined])
-
-(defn device-log []
-  [:div.floating-card.device-log
-   [:h1 device-log-icon " Device Log"]
-   [:div.log-scroll
-    [:table
-     [:thead
-       [:tr [:th "Device"] [:th "Event"] [:th "Data"]]]
-     (into [:tbody]
-           (map (fn [{:keys [::scale/name ::scale/event-type ::scale/event-data]}]
-                  [:tr [:td name] [:td event-type] [:td [:pre event-data]]]))
-           @(rf/subscribe [::scale/log]))]]])
-
 (def ^:private decoder (js/TextDecoder. "ascii"))
 
 (rf/reg-fx
