@@ -13,7 +13,6 @@
         :modules {:main {:entries [net.eraserhead.arbor.webui]
                          :init-fn net.eraserhead.arbor.webui/start}}}
 
-  :test {:target :node-test
-         :output-to "target/node-tests.js"
-         :autorun true
-         :main net.eraserhead.arbor.test-main/main}}}
+  :test {:target :browser-test
+         :test-dir "target/browser-test"
+         :runner-ns cadro.test-runner}}}
