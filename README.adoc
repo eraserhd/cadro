@@ -58,3 +58,7 @@ Device 78:D6:DC:C1:BA:22 Lenovo Tab M10 Plus 3rd Gen
 This prevents needing to allow the connection every time.
 
 From this point forward, just `droserve` should be necessary.
+
+== Resources
+
+* https://github.com/Aggebitter/TouchDRO-Simulator-on-ESP32[TouchDRO-Simulator-on-ESP32]
