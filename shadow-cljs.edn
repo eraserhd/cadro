@@ -13,7 +13,9 @@
         :output-dir "public/assets/app/js"
         :asset-path "/assets/app/js"
         :modules {:main {:entries [cadro.main]
-                         :init-fn cadro.main/start}}}
+                         :init-fn cadro.main/start}}
+        :devtools {:preloads [cadro.user]
+                   :repl-init-ns cadro.user}}
 
   :test {:target :browser-test
          :test-dir "target/browser-test"
