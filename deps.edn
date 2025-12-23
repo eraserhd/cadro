@@ -1,2 +1,11 @@
-{:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.12.1"}}}
+{:paths ["src"]
+ :deps {org.clojure/clojure   {:mvn/version "1.12.1"}
+        thheller/shadow-cljs  {:mvn/version "3.3.2"}
+        reagent/reagent       {:mvn/version "2.0.1"}
+        re-frame/re-frame     {:mvn/version "1.4.3"}
+        datascript/datascript {:mvn/version "1.7.8"}
+
+        ;; PR to fix support for datascript 1.6+
+        denistakeda/posh      {:git/url "https://github.com/psagers/posh"
+                               ;:git/tag "datascript-1.6"
+                               :git/sha "675d2a085012f44a2ff1229b2c51554146052e91"}}}
