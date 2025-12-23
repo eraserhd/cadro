@@ -3,6 +3,7 @@
    [cadro.db :as db]
    [cadro.model.locus :as locus]
    [cadro.model.object :as object]
+   [cadro.ui.locus :as locusui]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
    ["@fortawesome/fontawesome-free/js/all.js"]))
@@ -23,12 +24,14 @@
                ::object/display-name]
     :id      eid}))
 
-(re-posh/reg-event-ds
+(re-posh/reg-event-fx
  ::new-machine
- (fn [ds _]
-   [{::object/id           (random-uuid)
-     ::object/display-name "New Machine"
-     ::locus/offset        {"x" 42}}]))
+ (fn [{:keys [ds]} _]
+   (let [id (random-uuid)]
+     {:transact [{::object/id           id
+                  ::object/display-name "New Machine"
+                  ::locus/offset        {"x" 42}}]
+      ::locusui/edit [::object/id id]})))
 
 (def new-machine-icon [:i.fa-solid.fa-plug-circle-plus])
 (defn new-machine-button []
