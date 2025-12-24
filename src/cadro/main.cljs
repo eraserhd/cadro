@@ -1,6 +1,8 @@
 (ns cadro.main
   (:require
    [cadro.db]
+   [cadro.model.object]
+   [cadro.model.locus]
    [cadro.ui.legend]
    [cadro.ui.locus]
    [clojure.spec.alpha :as s]
@@ -16,4 +18,5 @@
 (defn ^:dev/after-load start []
   (when ^boolean goog.DEBUG
     (s/check-asserts true))
+  (cadro.db/connect!)
   (rdc/render root [cadro]))

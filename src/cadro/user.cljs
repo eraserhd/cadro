@@ -7,9 +7,9 @@
 (defn q
   "Query the app database."
   [expr & args]
-  (apply d/q expr @db/conn args))
+  (apply d/q expr @db/*conn* args))
 
 (defn transact
   "Transact data to the db."
   [& args]
-  (apply d/transact db/conn args))
+  (apply d/transact db/*conn* args))
