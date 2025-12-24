@@ -8,13 +8,6 @@
 
 (def ^:private locus-to-edit (ra/atom nil))
 
-(re-posh/reg-sub
- ::details
- (fn [_ [_ eid]]
-   {:type    :pull
-    :pattern '[::object/display-name]
-    :id      eid}))
-
 (defn edit-panel []
   (fn []
     (when-let [eid @locus-to-edit]
