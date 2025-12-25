@@ -12,6 +12,7 @@
 (defn edit-panel []
   (fn []
     (when-let [eid @locus-to-edit]
+      ^{:key (str eid)}
       [panel/panel {:title "Edit Locus"
                     :class "locus-edit-panel"
                     :on-close #(reset! locus-to-edit nil)}

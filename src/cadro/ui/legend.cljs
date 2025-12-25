@@ -34,6 +34,11 @@
                   ::locus/offset        {"x" 42}}]
       ::locusui/edit [::object/id id]})))
 
+(re-posh/reg-event-fx
+ ::edit-locus
+ (fn [_ [_ eid]]
+   {::locusui/edit eid}))
+
 (def new-machine-icon [:i.fa-solid.fa-plug-circle-plus])
 (defn new-machine-button []
   [:button.icon.new-machine
@@ -42,8 +47,10 @@
 
 (defn legend-key [eid]
   (let [{:keys [::object/id ::object/display-name]} @(re-posh/subscribe [::locus eid])]
+    ^{:key (str id)}
     [:li [tappable/tappable {:on-tap #(println "tapped")
-                             :on-press #(println "pressed")}
+                             :on-press
+                             #(rf/dispatch [::edit-locus [::object/id id]])}
           display-name]]))
 
 (defn legend []

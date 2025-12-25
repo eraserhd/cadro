@@ -15,7 +15,6 @@
        :component-did-mount
        (fn [this]
          (when-let [button @button-ref]
-           (prn :settingup)
            (let [hammer (Hammer/Manager. button)]
              (r/set-state this {:hammer hammer})
              (when on-tap
@@ -28,5 +27,4 @@
        :component-will-unmount
        (fn [this]
          (when-let [{:keys [hammer]} (r/state this)]
-           (prn :destroy)
            (.destroy hammer)))})))
