@@ -11,6 +11,7 @@
        (fn []
          (into [:button {:ref #(reset! button-ref %)}]
                args))
+
        :component-did-mount
        (fn [this]
          (when-let [button @button-ref]
