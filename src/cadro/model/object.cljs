@@ -8,7 +8,7 @@
 (s/def ::id uuid?)
 (s/def ::display-name string?)
 
-(defmethod db/model-schema ::object []
+(db/register-schema!
   {::id
    {:db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity}

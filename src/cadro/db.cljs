@@ -3,17 +3,15 @@
    [datascript.core :as d]
    [re-posh.core :as re-posh]))
 
-(defmulti model-schema
-  "Registration of schema."
-  #(throw (ex-info "This is used for registration and shouldn't actually be called." {})))
+(def ^:private schema-atom (atom {}))
+
+(defn register-schema! [subschema]
+  (swap! schema-atom merge subschema))
 
 (defn schema
   "Retrieves all registered schema."
   []
-  (->> (methods model-schema)
-       vals
-       (map #(%))
-       (reduce merge)))
+  @schema-atom)
 
 (def ^:dynamic *conn* nil)
 
