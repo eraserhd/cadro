@@ -12,14 +12,10 @@
                        (on-close)))]
     (r/create-class
      {:component-did-mount
-      (fn []
-        (prn :installing)
-        (.addEventListener js/document "keydown" on-keydown))
+      #(.addEventListener js/document "keydown" on-keydown)
 
       :component-will-unmount
-      (fn []
-        (prn :removing)
-        (.removeEventListener js/document "keydown" on-keydown))
+       #(.removeEventListener js/document "keydown" on-keydown)
 
       :reagent-render
       (fn []
