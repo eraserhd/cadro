@@ -1,6 +1,5 @@
 ;; shadow-cljs configuration
 {:deps         true
- :source-paths ["src" "test"]
  :dev-http     {4242 "public"
                 4243 "target/browser-test"}
  :nrepl        {:port 40823}
