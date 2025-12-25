@@ -1,5 +1,5 @@
 {
-  description = "Arbor - Manual DRO rethought";
+  description = "Cadro - Manual DRO rethought";
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs";
