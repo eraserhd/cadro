@@ -41,7 +41,7 @@
 
 (defn legend-key [eid]
   (let [{:keys [::object/id ::object/display-name]} @(re-posh/subscribe [::locus eid])]
-    [:li display-name]))
+    [:li [:button display-name]]))
 
 (defn legend []
   [:div.floating-card.legend
