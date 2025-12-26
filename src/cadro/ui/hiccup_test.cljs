@@ -12,8 +12,8 @@
 
 (deftest t-wrap-content
   (testing "merging props"
-    (are [expect props input] (= expect (h/wrap-content props input))
-      [:a {:b "f"} [:c]]         {}       [:a {:b "f"} [:c]]
-      [:a {:b "f", :d 42} [:c]]  {:d 42}  [:a {:b "f"} [:c]]
-      [:a {:b "q"} [:c]]         {:b "q"} [:a {:b "f"} [:c]]
-      [:a {:b "q"} [:c]]         {:b "q"} [:a [:c]])))
+    (are [input props expect] (= expect (h/wrap-content props input))
+      [:a {:b "f"} [:c]] {}       #_=> [:a {:b "f"} [:c]]
+      [:a {:b "f"} [:c]] {:d 42}  #_=> [:a {:b "f", :d 42} [:c]]
+      [:a {:b "f"} [:c]] {:b "q"} #_=> [:a {:b "q"} [:c]]
+      [:a [:c]]          {:b "q"} #_=> [:a {:b "q"} [:c]])))
