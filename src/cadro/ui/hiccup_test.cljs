@@ -7,4 +7,5 @@
   (testing "merging props"
     (are [expect props input] (= expect (h/wrap-content props input))
       [:a {:b "f"} [:c]]         {}       [:a {:b "f"} [:c]]
-      [:a {:b "f", :d 42} [:c]]  {:d 42}  [:a {:b "f"} [:c]])))
+      [:a {:b "f", :d 42} [:c]]  {:d 42}  [:a {:b "f"} [:c]]
+      [:a {:b "q"} [:c]]         {:b "q"} [:a {:b "f"} [:c]])))
