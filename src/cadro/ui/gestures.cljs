@@ -1,5 +1,6 @@
 (ns cadro.ui.gestures
   (:require
+   [cadro.ui.hiccup :as h]
    [reagent.core :as r]
    ["hammerjs" :as Hammer]))
 
@@ -32,14 +33,9 @@
         hammer-ref (atom nil)]
     (r/create-class
      {:reagent-render
-      (fn [props [wrapped-type & wrapped-args]]
+      (fn [props form]
         (reset! props-ref props)
-        (let [[wrapped-props & wrapped-args] (if (map? (first wrapped-args))
-                                               wrapped-args
-                                               (cons {} wrapped-args))
-              wrapped-props (merge wrapped-props
-                                   {:ref #(reset! node-ref %)})]
-          (into [wrapped-type wrapped-props] wrapped-args)))
+        (h/merge-props form {:ref #(reset! node-ref %)}))
 
       :component-did-mount
       (fn [this]

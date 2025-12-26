@@ -8,8 +8,8 @@
 
 (defn panel
   [{:keys [title on-close class]} & content]
-  [gestures/wrap {:on-swipedown on-close}
-   [cadro.ui.keys/keys {:on-keys {"Escape" on-close}}
+  [cadro.ui.keys/keys {:on-keys {"Escape" on-close}}
+   [gestures/wrap {:on-swipedown on-close}
     [:div.floating-card {:class class}
      [:div.header
       [:h1 title]
