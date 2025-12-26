@@ -12,3 +12,10 @@
 
 (s/def ::offset (s/map-of string? number?))
 (s/def ::origin ::locus)
+
+(defn new-machine-tx []
+  (let [id (random-uuid)]
+    {:id [::object/id id]
+     :tx [{::object/id           id
+           ::object/display-name "New Machine"
+           ::offset              {"x" 42}}]}))

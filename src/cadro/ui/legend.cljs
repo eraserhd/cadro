@@ -28,11 +28,9 @@
 (re-posh/reg-event-fx
  ::new-machine
  (fn [{:keys [ds]} _]
-   (let [id (random-uuid)]
-     {:transact [{::object/id           id
-                  ::object/display-name "New Machine"
-                  ::locus/offset        {"x" 42}}]
-      ::locusui/edit [::object/id id]})))
+   (let [{:keys [id tx]} (locus/new-machine-tx)]
+     {:transact tx
+      ::locusui/edit id})))
 
 (re-posh/reg-event-fx
  ::edit-locus
