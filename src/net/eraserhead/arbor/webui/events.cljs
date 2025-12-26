@@ -2,7 +2,6 @@
   (:require
    [net.eraserhead.arbor :as arbor]
    [net.eraserhead.arbor.loci :as loci]
-   [net.eraserhead.arbor.webui.storage :as storage]
    [re-frame.core :as rf]))
 
 (rf/reg-fx
@@ -17,16 +16,7 @@
 (rf/reg-event-db
  ::initialize
  (fn [_ _]
-   (or (storage/load-db)
-       arbor/initial-state)))
-
-(rf/reg-global-interceptor
-  (rf/->interceptor
-    :id :persist-db-to-localStorage
-    :after (fn [context]
-             (when-let [db (rf/get-effect context :db)]
-               (storage/store-db db))
-             context)))
+   nil))
 
 (rf/reg-event-fx
  ::new-machine

@@ -2,7 +2,9 @@
   (:require
    [datascript.core :as d]
    [datascript.conn :as dconn]
-   [re-posh.core :as re-posh]))
+   [re-frame.core :as rf]
+   [re-posh.core :as re-posh]
+   [re-posh.db :as re-posh.db]))
 
 (defonce ^:dynamic *conn* nil)
 (def ^:private schema-atom (atom {}))
@@ -20,6 +22,10 @@
     (dconn/reset-schema! *conn* @schema-atom))
   nil)
 
+(defn- persist-to-localStorage
+  [{:keys [db-after]}]
+  (.setItem js/localStorage "db" (js/JSON.stringify (d/serializable db-after))))
+
 (defn connect!
   "Creates a database connection with all registered schema.
 
@@ -29,6 +35,7 @@
   (when-not *conn*
     (let [conn (d/create-conn (schema))]
       (re-posh/connect! conn)
+      (d/listen! conn :persist-to-localStorage persist-to-localStorage)
       (set! *conn* conn)))
   *conn*)
 
