@@ -35,14 +35,13 @@
   "Input element for an object attribute in the datastore."
   [{:keys [eid attr], :as props}]
   (let [value (re-posh/subscribe [::value eid attr])]
-    (fn []
-      [:<>
-       (when-let [lbl (:label props)]
-         (label {:eid eid
-                 :attr attr
-                 :label lbl}))
-       [:input {:id (control-name eid attr)
-                :default-value @value
-                :on-blur (fn [e]
-                           (let [value (.. e -target -value)]
-                             (rf/dispatch [::set-value eid attr value])))}]])))
+    [:<>
+     (when-let [lbl (:label props)]
+       (label {:eid eid
+               :attr attr
+               :label lbl}))
+     [:input {:id (control-name eid attr)
+              :default-value @value
+              :on-blur (fn [e]
+                         (let [value (.. e -target -value)]
+                           (rf/dispatch [::set-value eid attr value])))}]]))
