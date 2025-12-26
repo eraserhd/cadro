@@ -14,7 +14,7 @@
 (s/def ::origin ::locus)
 
 (defn new-machine-tx []
-  (let [id (random-uuid)]
+  (let [id (db/squuid)]
     {:id [::object/id id]
      :tx [{::object/id           id
            ::object/display-name "New Machine"

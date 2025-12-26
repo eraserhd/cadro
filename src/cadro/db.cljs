@@ -31,3 +31,5 @@
       (re-posh/connect! conn)
       (set! *conn* conn)))
   *conn*)
+
+(def squuid d/squuid)
