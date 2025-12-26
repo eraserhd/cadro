@@ -3,8 +3,8 @@
    [cadro.ui.hiccup :as h]
    [clojure.test :refer [deftest testing are]]))
 
-(deftest t-normalize
-  (are [input expect] (= expect (h/normalize input))
+(deftest t-normalize1
+  (are [input expect] (= expect (h/normalize1 input))
       [:a]              #_=> [:a {}]
       [:a {}]           #_=> [:a {}]
       [:a [:b]]         #_=> [:a {} [:b]]
@@ -15,5 +15,5 @@
     (are [expect props input] (= expect (h/wrap-content props input))
       [:a {:b "f"} [:c]]         {}       [:a {:b "f"} [:c]]
       [:a {:b "f", :d 42} [:c]]  {:d 42}  [:a {:b "f"} [:c]]
-      [:a {:b "q"} [:c]]         {:b "q"} [:a {:b "f"} [:c]])))
-      ;[:a {:b "q"} [:c]]         {:b "q"} [:a [:c]])))
+      [:a {:b "q"} [:c]]         {:b "q"} [:a {:b "f"} [:c]]
+      [:a {:b "q"} [:c]]         {:b "q"} [:a [:c]])))
