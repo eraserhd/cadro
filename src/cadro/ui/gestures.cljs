@@ -44,15 +44,6 @@
             (let [hammer (make-hammer node props)]
               (r/set-state this {:hammer hammer})))))
 
-      :component-did-update
-      (fn [this]
-        (when-let [hammer (:hammer (r/state this))]
-          (.destroy hammer))
-        (when-let [node @node-ref]
-          (when-let [props @props-ref]
-            (let [hammer (make-hammer node props)]
-              (r/set-state this {:hammer hammer})))))
-
       :component-will-unmount
       (fn [this]
         (when-let [hammer (:hammer (r/state this))]

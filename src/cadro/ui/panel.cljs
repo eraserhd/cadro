@@ -2,9 +2,11 @@
   (:require
    [cadro.ui.gestures :as gestures]
    [cadro.ui.keys]
-   [reagent.core :as r]))
+   [reagent.core :as r]
+   ["@fortawesome/react-fontawesome" :as fa]
+   ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
-(def close-icon [:i.fa-solid.fa-xmark])
+(def close-icon [:> fa/FontAwesomeIcon {:icon faSolid/faXmark}])
 
 (defn panel
   [{:keys [title on-close class]} & content]

@@ -7,7 +7,8 @@
    [cadro.ui.locus :as locusui]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
-   ["@fortawesome/fontawesome-free/js/all.js"]))
+   ["@fortawesome/react-fontawesome" :as fa]
+   ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
 
 (re-posh/reg-sub
@@ -22,7 +23,8 @@
  (fn [_ [_ eid]]
    {:type    :pull
     :pattern '[::object/id
-               ::object/display-name]
+               ::object/display-name
+               ::locus/_reference]
     :id      eid}))
 
 (re-posh/reg-event-fx
@@ -42,18 +44,24 @@
  (fn [_ [_ eid]]
    {::locusui/edit eid}))
 
-(def new-machine-icon [:i.fa-solid.fa-plug-circle-plus])
+(def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
   [:button.icon.new-machine
    {:on-click #(rf/dispatch [::new-machine])}
    new-machine-icon])
 
 (defn legend-key [eid]
-  (let [{:keys [::object/id ::object/display-name]} @(re-posh/subscribe [::locus eid])]
-    ^{:key (str id)}
-    [:li [gestures/wrap {:on-tap #(rf/dispatch [::set-reference [::object/id id]])
-                         :on-press #(rf/dispatch [::edit-locus [::object/id id]])}
-          [:button display-name]]]))
+  (let [{:keys [::object/id
+                ::object/display-name
+                ::locus/_reference]}
+        @(re-posh/subscribe [::locus eid])]
+     [gestures/wrap {:on-tap   #(rf/dispatch [::set-reference [::object/id id]])
+                     :on-press #(rf/dispatch [::edit-locus [::object/id id]])}
+      [:button
+       (if _reference
+         [:> fa/FontAwesomeIcon {:icon faSolid/faLocationCrosshairs}]
+         [:> fa/FontAwesomeIcon {:icon faSolid/faCircleDot}])
+       display-name]]))
 
 (defn legend []
   [:div.floating-card.legend
@@ -61,6 +69,6 @@
    (into [:ul]
          (map (fn [dbid]
                 ^{:key (str dbid)}
-                [legend-key dbid]))
-         @(re-posh/subscribe [::loci-tree]))
+                [:li [legend-key dbid]])
+           @(re-posh/subscribe [::loci-tree])))
    [new-machine-button]])
