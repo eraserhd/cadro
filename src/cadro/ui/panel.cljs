@@ -19,6 +19,7 @@
      [:div.header
       [:h1 title]
       [:button.close
-       {:on-click on-close}
+       {:type "button",
+        :on-click on-close}
        close-icon]]
      (into [:form] content)]]])

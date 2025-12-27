@@ -36,6 +36,11 @@
     :pattern scale-pull
     :ids      eids}))
 
+(rf/reg-event-fx
+ ::connect-clicked
+ (fn [_ [_ device-id]]
+   {::bt/connect device-id}))
+
 (defn edit-panel []
   (when-let [eid @locus-to-edit]
     ^{:key (str eid)}
@@ -72,7 +77,8 @@
 
                       (:disconnected)
                       [:button.btn
-                       {:on-click #(rf/dispatch [::bt/connect [::object/id id]])}
+                       {:type     "button"
+                        :on-click #(rf/dispatch [::connect-clicked [::object/id id]])}
                        "Connect"]
 
                       (:connecting)

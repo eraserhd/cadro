@@ -22,3 +22,7 @@
   [device-id status]
   {:pre [(s/assert ::status status)]}
   [[:db/add device-id ::status status]])
+
+(defn data-received-tx
+  [ds device-id data]
+  [])

@@ -41,7 +41,6 @@
                               [?obj ::scale-controller/status ?status]]
                             ds)
                       (into #{}))]
-     (prn :existing existing)
      (->> device-list
           (map (fn [{:keys [::scale-controller/address], :as scale-controller}]
                  (cond-> scale-controller
@@ -68,47 +67,54 @@
    {::fetch-device-list nil}))
 
 (re-posh/reg-event-ds
- ::connecting
+ ::connect-requested
  (fn [ds [_ device-id]]
    (scale-controller/set-status-tx device-id :connecting)))
 
 (re-posh/reg-event-ds
- ::connected
+ ::connect-completed
  (fn [ds [_ device-id]]
    (scale-controller/set-status-tx device-id :connected)))
 
 (re-posh/reg-event-ds
- ::disconnected
+ ::connect-failed
  (fn [ds [_ device-id]]
+  ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
+  ;   (js/alert (str "Unable to connect: " error))]
    (scale-controller/set-status-tx device-id :disconnected)))
+
+(re-posh/reg-event-ds
+ ::data-received
+ (fn [ds [_ device-id data]]
+   (scale-controller/data-received-tx ds device-id data)))
+
+(re-posh/reg-event-ds
+ ::subscription-error-received
+ (fn [ds [_ device-id error]]
+   ;     (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error])]
+   ;FIXME:
+   []))
 
 (def ^:private decoder (js/TextDecoder. "ascii"))
 
 (rf/reg-fx
  ::connect
  (fn connect* [device-id]
-   (rf/dispatch [::connecting device-id])
+   (rf/dispatch [::connect-requested device-id])
    (.connect
     @bt-impl
     device-id
     interface-id
     (fn []
-      (rf/dispatch [::connected device-id])
+      (rf/dispatch [::connect-completed device-id])
       (.subscribeRawData
        @bt-impl
        device-id
        interface-id
        (fn [raw-data]
          (let [data (.decode decoder (js/Uint8Array. raw-data))]
-           (rf/dispatch [::scale-controller/process-received device-id data])))
+           (rf/dispatch [::data-received device-id data])))
        (fn [error]
-         (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error]))))
+         (rf/dispatch [::subscription-error-received device-id error]))))
     (fn [error]
-      (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
-      (rf/dispatch [::disconnected device-id])
-      (js/alert (str "Unable to connect: " error))))))
-
-(rf/reg-event-fx
- ::connect
- (fn [_ [_ device-id]]
-   {::connect device-id}))
+      (rf/dispatch [::connect-failed device-id error])))))
