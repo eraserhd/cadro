@@ -27,7 +27,7 @@
     :on-press
     :on-swipedown
   "
-  [props [wrapped-type & wrapped-args]]
+  [props form]
   (let [node-ref   (atom nil)
         props-ref  (atom props)
         hammer-ref (atom nil)]

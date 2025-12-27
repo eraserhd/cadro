@@ -1,4 +1,8 @@
 (ns cadro.model.locus
+  "Model of loci, or positions (potentially with transformations).
+
+  The object with ident ::global has a ::reference attribute which defines
+  the current global reference locus for displaying coordinates."
   (:require
    [cadro.db :as db]
    [cadro.model.object :as object]
