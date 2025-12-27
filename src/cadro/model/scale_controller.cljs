@@ -19,10 +19,10 @@
                                         ::status]))
 
 (defn set-status-tx
-  [device-id status]
+  [controller-id status]
   {:pre [(s/assert ::status status)]}
-  [[:db/add device-id ::status status]])
+  [[:db/add controller-id ::status status]])
 
 (defn data-received-tx
-  [ds device-id data]
+  [ds controller-id data]
   [])
