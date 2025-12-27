@@ -5,10 +5,10 @@
    [clojure.spec.alpha :as s]))
 
 (db/register-schema!
- {::address {:db/cardinality :db.cardinality/one}})
+ {::address {:db/cardinality :db.cardinality/one}
+  ::status  {:db/cardinality :db.cardinality/one}})
 
 (s/def ::address string?)
-(s/def ::connected? boolean?)
 (s/def ::status #{:disconnected
                   :connecting
                   :connected})
@@ -17,3 +17,8 @@
                                         ::object/display-name
                                         ::address
                                         ::status]))
+
+(defn set-status-tx
+  [device-id status]
+  {:pre [(s/assert ::status status)]}
+  [[:db/add device-id ::status status]])

@@ -70,17 +70,17 @@
 (re-posh/reg-event-ds
  ::connecting
  (fn [ds [_ device-id]]
-   [[:db/add device-id ::scale-controller/status :connecting]]))
+   (scale-controller/set-status-tx device-id :connecting)))
 
 (re-posh/reg-event-ds
  ::connected
  (fn [ds [_ device-id]]
-   [[:db/add device-id ::scale-controller/status :connected]]))
+   (scale-controller/set-status-tx device-id :connected)))
 
 (re-posh/reg-event-ds
  ::disconnected
  (fn [ds [_ device-id]]
-   [[:db/add device-id ::scale-controller/status :disconnected]]))
+   (scale-controller/set-status-tx device-id :disconnected)))
 
 (def ^:private decoder (js/TextDecoder. "ascii"))
 
