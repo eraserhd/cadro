@@ -120,8 +120,21 @@
           list-style-type: none;
         }
 
-        .legend .origin {
-          background-color: var(--button-background);
+        button.locus {
+          display: flex;
+          align-items: center;
+          gap: 0.25em;
+        }
+
+        button.locus > svg {
+          width: 1em;
+          flex-shrink: 0;
+        }
+
+        button.locus.non-reference::before {
+          content: "";
+          width: 1em;
+          display: inline-block;
         }
 
         .command-bar {

@@ -57,10 +57,13 @@
         @(re-posh/subscribe [::locus eid])]
      [gestures/wrap {:on-tap   #(rf/dispatch [::set-reference [::object/id id]])
                      :on-press #(rf/dispatch [::edit-locus [::object/id id]])}
-      [:button
-       (if _reference
-         [:> fa/FontAwesomeIcon {:icon faSolid/faLocationCrosshairs}]
-         [:> fa/FontAwesomeIcon {:icon faSolid/faCircleDot}])
+      [:button.locus {:class [(if _reference
+                                "reference"
+                                "non-reference")]}
+       [:> fa/FontAwesomeIcon {:icon (if _reference
+                                       faSolid/faLocationCrosshairs
+                                       nil)
+                               :fixedWidth true}]
        display-name]]))
 
 (defn legend []
