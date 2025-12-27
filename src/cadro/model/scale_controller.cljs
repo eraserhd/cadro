@@ -8,7 +8,9 @@
  {::address {:db/cardinality :db.cardinality/one}})
 
 (s/def ::address string?)
+(s/def ::connected? boolean?)
 
 (s/def ::scale-controller (s/keys :req [::object/id
                                         ::object/display-name
-                                        ::address]))
+                                        ::address
+                                        ::connected?]))
