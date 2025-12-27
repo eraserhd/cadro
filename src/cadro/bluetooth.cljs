@@ -56,33 +56,33 @@
  (fn [_ _]
    {::fetch-device-list nil}))
 
-;(def ^:private decoder (js/TextDecoder. "ascii"))
+(def ^:private decoder (js/TextDecoder. "ascii"))
 
-;(rf/reg-fx
-; ::connect
-; (fn connect* [device-id]
-;   (rf/dispatch [::scale/set-status device-id :connecting])
-;   (.connect
-;    @bt-impl
-;    device-id
-;    interface-id
-;    (fn []
-;      (rf/dispatch [::scale/set-status device-id :connected])
-;      (.subscribeRawData
-;       @bt-impl
-;       device-id
-;       interface-id
-;       (fn [raw-data]
-;         (let [data (.decode decoder (js/Uint8Array. raw-data))]
-;           (rf/dispatch [::scale/process-received device-id data])))
-;       (fn [error]
-;         (rf/dispatch [::scale/log-event device-id "subscribeRawData error" error]))))
-;    (fn [error]
-;      (rf/dispatch [::scale/log-event device-id "connect error" error])
-;      (rf/dispatch [::scale/set-status device-id :disconnected])
-;      (js/alert (str "Unable to connect: " error))))))
+(rf/reg-fx
+ ::connect
+ (fn connect* [device-id]
+   (rf/dispatch [::scale-controller/set-status device-id :connecting])
+   (.connect
+    @bt-impl
+    device-id
+    interface-id
+    (fn []
+      (rf/dispatch [::scale-controller/set-status device-id :connected])
+      (.subscribeRawData
+       @bt-impl
+       device-id
+       interface-id
+       (fn [raw-data]
+         (let [data (.decode decoder (js/Uint8Array. raw-data))]
+           (rf/dispatch [::scale-controller/process-received device-id data])))
+       (fn [error]
+         (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error]))))
+    (fn [error]
+      (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
+      (rf/dispatch [::scale-controller/set-status device-id :disconnected])
+      (js/alert (str "Unable to connect: " error))))))
 
-;(rf/reg-event-fx
-; ::connect
-; (fn [_ [_ device-id]]
-;   {::connect device-id}))
+(rf/reg-event-fx
+ ::connect
+ (fn [_ [_ device-id]]
+   {::connect device-id}))
