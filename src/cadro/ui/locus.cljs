@@ -22,9 +22,9 @@
   '[::object/id
     ::object/display-name
     ::scale-controller/address
-    {::scale/_device [::object/id
-                      ::object/display-name
-                      ::scale/raw-value]}])
+    {::scale/_controller [::object/id
+                          ::object/display-name
+                          ::scale/raw-value]}])
 
 (re-posh/reg-sub
  ::scales
@@ -48,7 +48,7 @@
            (map (fn [{:keys [::object/id
                              ::object/display-name
                              ::scale-controller/address
-                             ::scale/_device]}]
+                             ::scale/_controller]}]
                   ^{:key (str id)}
                   [:li.scale-controller
                    [:span.name display-name] " " [:span.address "(" address ")"]
@@ -62,7 +62,7 @@
                                  [:label {:for (str id)}
                                   [:span.name display-name]
                                   [:span.value raw-value]]]))
-                         _device)]))
+                         _controller)]))
            @(re-posh/subscribe [::scales]))]))
 
 (rf/reg-fx

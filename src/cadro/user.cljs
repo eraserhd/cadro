@@ -16,7 +16,7 @@
 (defn transact
   "Transact data to the db."
   [& args]
-  (apply d/transact db/*conn* args))
+  @(apply d/transact db/*conn* args))
 
 (defn entity
   "Retrieve and entity."
