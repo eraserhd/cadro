@@ -8,7 +8,8 @@
    [datascript.core :as d]))
 
 (db/register-schema!
- {::address {:db/cardinality :db.cardinality/one}
+ {::address {:db/cardinality :db.cardinality/one
+             :db/unique      :db.unique/identity}
   ::status  {:db/cardinality :db.cardinality/one}})
 
 (s/def ::address string?)
@@ -26,18 +27,21 @@
   {:pre [(s/assert ::status status)]}
   [[:db/add controller-id ::status status]])
 
-(defn controller-list-arrived-tx
+(defn add-controllers-tx
   [ds device-list]
-  (let [existing (->> (d/q '[:find [?addr ...]
-                             :where
-                             [?obj ::address ?addr]
-                             [?obj ::status ?status]]
-                           ds)
-                     (into #{}))]
+  (let [addr->controller (into {}
+                               (map (juxt ::address identity))
+                               (d/q '[:find (pull ?obj [::object/id ::address ::status])
+                                      :where [?obj ::address]]
+                                    ds))]
     (->> device-list
          (map (fn [{:keys [::address], :as scale-controller}]
-                (cond-> scale-controller
-                  (not (contains? existing address)) (assoc ::status :disconnected)))))))
+                (let [{:keys [::object/id ::status]} (get addr->controller address)
+                      new-status                     (or status :disconnected)
+                      new-id                         (or id (db/squuid))]
+                  (assoc scale-controller
+                         ::object/id new-id
+                         ::status    new-status)))))))
 
 (defn data-received-tx
   [ds controller-id data]

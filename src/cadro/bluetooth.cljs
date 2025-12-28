@@ -35,7 +35,7 @@
 (re-posh/reg-event-ds
  ::device-list-arrived
  (fn [ds [_ device-list]]
-   (scale-controller/controller-list-arrived-tx ds device-list)))
+   (scale-controller/add-controllers-tx ds device-list)))
 
 (rf/reg-fx
  ::fetch-device-list
@@ -44,8 +44,7 @@
           (fn [devices]
             (let [device-list (into []
                                     (map (fn [device]
-                                           {::object/id                (.-id device)
-                                            ::object/display-name      (.-name device)
+                                           {::object/display-name      (.-name device)
                                             ::scale-controller/address (.-address device)}))
                                     devices)]
               (rf/dispatch [::device-list-arrived device-list])))
