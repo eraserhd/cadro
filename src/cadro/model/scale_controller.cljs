@@ -25,6 +25,8 @@
                                         ::status]
                                   :opt [::receive-buffer]))
 
+(s/def :cadro.model.scale/controller ::scale-controller)
+
 (defn set-status-tx
   [controller-id status]
   {:pre [(s/assert ::status status)]}

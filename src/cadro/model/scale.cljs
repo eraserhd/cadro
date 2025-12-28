@@ -9,7 +9,8 @@
  {::controller {:db/cardinality :db.cardinality/one
                 :db/valueType :db.type/ref}})
 
-(s/def ::controller :cadro.model.scale-controller/scale-controller)
+;Defined in scale-controller for dependency issue
+;(s/def ::controller :cadro.model.scale-controller/scale-controller)
 (s/def ::raw-value number?)
 
 (s/def ::scale (s/keys :req [::object/id
