@@ -31,7 +31,7 @@
   [ds controller-list]
   (let [addr->controller (into {}
                                (map (juxt ::address identity))
-                               (d/q '[:find (pull ?obj [::object/id ::address ::status])
+                               (d/q '[:find [(pull ?obj [::object/id ::address ::status]) ...]
                                       :where [?obj ::address]]
                                     ds))]
     (map (fn [{:keys [::address], :as scale-controller}]

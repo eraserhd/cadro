@@ -38,4 +38,6 @@
     (is (uuid? (::object/id c2))
         "It creates a UUID for 'HC-06'.")
     (is (= "Nexus 7 Renamed" (::object/display-name c1'))
-        "It updates a name when a new one is received.")))
+        "It updates a name when a new one is received.")
+    (is (= (::object/id c1) (::object/id c1'))
+        "It does not update a UUID.")))
