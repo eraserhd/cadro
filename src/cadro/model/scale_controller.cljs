@@ -34,14 +34,14 @@
                                (d/q '[:find (pull ?obj [::object/id ::address ::status])
                                       :where [?obj ::address]]
                                     ds))]
-    (->> controller-list
-         (map (fn [{:keys [::address], :as scale-controller}]
-                (let [{:keys [::object/id ::status]} (get addr->controller address)
-                      new-status                     (or status :disconnected)
-                      new-id                         (or id (db/squuid))]
-                  (assoc scale-controller
-                         ::object/id new-id
-                         ::status    new-status)))))))
+    (map (fn [{:keys [::address], :as scale-controller}]
+           (let [{:keys [::object/id ::status]} (get addr->controller address)
+                 new-status                     (or status :disconnected)
+                 new-id                         (or id (db/squuid))]
+             (assoc scale-controller
+                    ::object/id new-id
+                    ::status    new-status)))
+         controller-list)))
 
 (defn data-received-tx
   [ds controller-id data]
