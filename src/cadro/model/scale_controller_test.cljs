@@ -68,4 +68,6 @@
            (->> (::scale/_controller controller)
                 (map #(select-keys % [::object/display-name ::scale/raw-value]))
                 (into #{})))
-        "It creates scales and stores raw values on receipt.")))
+        "It creates scales and stores raw values on receipt.")
+    (is (every? (comp uuid? ::object/id) (::scale/_controller controller))
+        "Every new scale is assigned a uuid.")))

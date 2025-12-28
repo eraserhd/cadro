@@ -66,7 +66,8 @@
                                            controller-id)]
     (->> new-scale-values
          (map (fn [[display-name value]]
-                {::object/display-name         display-name
+                {::object/id                   (db/squuid)
+                 ::object/display-name         display-name
                  :cadro.model.scale/raw-value  value
                  :cadro.model.scale/controller controller-id})))))
 
