@@ -20,5 +20,5 @@
   [ds controller-id scale-name value]
   [{::object/id                   (db/squuid)
     ::object/display-name         scale-name
-    :cadro.model.scale/raw-value  value
-    :cadro.model.scale/controller controller-id}])
+    ::raw-value  value
+    ::controller controller-id}])
