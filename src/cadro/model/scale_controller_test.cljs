@@ -2,6 +2,7 @@
   (:require
    [cadro.db :as db]
    [cadro.model.object :as object]
+   [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [clojure.test :refer [deftest is]]
    [datascript.core :as d]))
@@ -41,3 +42,31 @@
         "It updates a name when a new one is received.")
     (is (= (::object/id c1) (::object/id c1'))
         "It does not update a UUID.")))
+
+(defn- after-receives
+  [& receives]
+  (let [controller-id [::scale-controller/address "00:00:01"]
+        conn          (d/create-conn (db/schema))
+        tx            (scale-controller/add-controllers-tx @conn [{::object/display-name "HC-06"
+                                                                   ::scale-controller/address "00:00:01"}])
+        _             (d/transact! conn tx)
+        _             (doseq [data receives]
+                        (let [tx (scale-controller/add-received-data-tx @conn controller-id data)]
+                          (d/transact! conn tx)))]
+    (d/entity @conn controller-id)))
+
+(deftest t-add-received-data-tx
+  (let [controller (after-receives "X150;Y250;Z350;T72;\n")
+        scales     (->> (::scale/_controller controller)
+                        (map #(select-keys % [::object/display-name ::scale/raw-value]))
+                        (into #{}))]
+    (is (= #{{::object/display-name "X"
+              ::scale/raw-value 150}
+             {::object/display-name "Y"
+              ::scale/raw-value 250}
+             {::object/display-name "Z"
+              ::scale/raw-value 350}
+             {::object/display-name "T"
+              ::scale/raw-value 72}}
+           scales)
+        "It creates scales and stores raw values on receipt.")))

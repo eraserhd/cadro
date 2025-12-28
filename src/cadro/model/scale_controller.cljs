@@ -30,7 +30,7 @@
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
-         (s/coll-of (s/keys :req [::object/display-name ::address]))]}
+         (s/assert (s/coll-of (s/keys :req [::object/display-name ::address])) controller-list)]}
   (let [addr->controller (into {}
                                (map (juxt ::address identity))
                                (d/q '[:find [(pull ?obj [::object/id ::address ::status]) ...]
@@ -47,7 +47,45 @@
 
 (defn add-received-data-tx
   [ds controller-id data]
-  [])
+  (let [to-process                    (-> data
+                                          (str/replace #"[;\s]+" ";")
+                                          (str/replace #"^;+" ""))
+        [to-process new-scale-values] (loop [to-process       to-process
+                                             new-scale-values {}]
+                                        (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
+                                          (recur left (assoc new-scale-values axis (* value-str 1.0)))
+                                          [to-process new-scale-values]))
+        #_#_
+        asdf                          (d/q '[:find ?display-name ?id
+                                             :in $ ?controller
+                                             :where
+                                             [?e ::object/id ?id]
+                                             [?e ::object/display-name ?display-name]
+                                             [?e :cadro.model.scale/controller ?controller]]
+                                           ds
+                                           controller-id)]
+    (->> new-scale-values
+         (map (fn [[display-name value]]
+                {::object/display-name         display-name
+                 :cadro.model.scale/raw-value  value
+                 :cadro.model.scale/controller controller-id})))))
+
+;(defn process-received
+;  [db device-id event-data]
+;  (let [to-process         (-> (str (get-in db [::devices device-id ::receive-buffer] "")
+;                                    event-data)
+;                               (str/replace #"[;\s]+" ";")
+;                               (str/replace #"^;+" ""))
+;        [to-process items] (loop [to-process to-process
+;                                  items      {}]
+;                             (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
+;                               (recur left (assoc items axis (* value-str 1.0)))
+;                               [to-process items]))]
+;    (-> db
+;      (log-received device-id event-data)
+;      (assoc-in [::devices device-id ::receive-buffer] to-process)
+;      (update-in [::devices device-id ::axes] merge items))))
+
 
 ;(s/def ::event-type string?)
 ;(s/def ::event-data string?)
@@ -99,19 +137,3 @@
 ;  "Log received data in hex format."
 ;  [db device-id event-data]
 ;  (log-event db device-id "received" (format-hex event-data)))
-
-;(defn process-received
-;  [db device-id event-data]
-;  (let [to-process         (-> (str (get-in db [::devices device-id ::receive-buffer] "")
-;                                    event-data)
-;                               (str/replace #"[;\s]+" ";")
-;                               (str/replace #"^;+" ""))
-;        [to-process items] (loop [to-process to-process
-;                                  items      {}]
-;                             (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
-;                               (recur left (assoc items axis (* value-str 1.0)))
-;                               [to-process items]))]
-;    (-> db
-;      (log-received device-id event-data)
-;      (assoc-in [::devices device-id ::receive-buffer] to-process)
-;      (update-in [::devices device-id ::axes] merge items))))
