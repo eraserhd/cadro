@@ -29,6 +29,8 @@
 
 (defn add-controllers-tx
   [ds controller-list]
+  {:pre [(d/db? ds)
+         (s/coll-of (s/keys :req [::object/display-name ::address]))]}
   (let [addr->controller (into {}
                                (map (juxt ::address identity))
                                (d/q '[:find [(pull ?obj [::object/id ::address ::status]) ...]
