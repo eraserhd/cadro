@@ -2,6 +2,7 @@
   (:require
    [cadro.db :as db]
    [cadro.model.object :as object]
+   [cadro.model.scale :as scale]
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
@@ -61,15 +62,12 @@
                                              :where
                                              [?e ::object/id ?id]
                                              [?e ::object/display-name ?display-name]
-                                             [?e :cadro.model.scale/controller ?controller]]
+                                             [?e ::scale/controller ?controller]]
                                            ds
                                            controller-id)]
     (->> new-scale-values
-         (map (fn [[display-name value]]
-                {::object/id                   (db/squuid)
-                 ::object/display-name         display-name
-                 :cadro.model.scale/raw-value  value
-                 :cadro.model.scale/controller controller-id})))))
+         (mapcat (fn [[scale-name value]]
+                   (scale/upsert-scale-value-tx controller-id scale-name value))))))
 
 ;(defn process-received
 ;  [db device-id event-data]
