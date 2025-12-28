@@ -45,7 +45,7 @@
                     ::status    new-status)))
          controller-list)))
 
-(defn data-received-tx
+(defn add-received-data-tx
   [ds controller-id data]
   [])
 

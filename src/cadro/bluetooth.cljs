@@ -71,7 +71,7 @@
 (re-posh/reg-event-ds
  ::data-received
  (fn [ds [_ device-id data]]
-   (scale-controller/data-received-tx ds device-id data)))
+   (scale-controller/add-received-data-tx ds device-id data)))
 
 (re-posh/reg-event-ds
  ::subscription-error-received
