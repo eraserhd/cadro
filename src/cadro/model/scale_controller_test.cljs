@@ -6,7 +6,7 @@
    [clojure.test :refer [deftest is]]
    [datascript.core :as d]))
 
-(deftest t-add-controllers
+(deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
         tx   (scale-controller/add-controllers-tx @conn [{::object/display-name      "Nexus 7"
                                                           ::scale-controller/address "00:00:01"}
