@@ -56,9 +56,9 @@
                                         (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
                                           (recur left (assoc new-scale-values axis (* value-str 1.0)))
                                           [to-process new-scale-values]))]
-    (->> new-scale-values
-         (mapcat (fn [[scale-name value]]
-                   (scale/upsert-scale-value-tx ds controller-id scale-name value))))))
+    (mapcat (fn [[scale-name value]]
+              (scale/upsert-scale-value-tx ds controller-id scale-name value))
+            new-scale-values)))
 
 ;(s/def ::event-type string?)
 ;(s/def ::event-data string?)

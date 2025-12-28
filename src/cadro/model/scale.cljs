@@ -2,7 +2,8 @@
   (:require
    [cadro.db :as db]
    [cadro.model.object :as object]
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [datascript.core :as d]))
 
 (db/register-schema!
  {::controller {:db/cardinality :db.cardinality/one
@@ -18,7 +19,17 @@
 
 (defn upsert-scale-value-tx
   [ds controller-id scale-name value]
-  [{::object/id                   (db/squuid)
-    ::object/display-name         scale-name
-    ::raw-value  value
-    ::controller controller-id}])
+  (let [name->id (->> (d/q '[:find ?name ?id
+                             :in $ ?controller
+                             :where
+                             [?e ::object/id ?id]
+                             [?e ::object/display-name ?name]
+                             [?e ::controller ?controller]]
+                           ds
+                           controller-id)
+                      (into {}))]
+    [{::object/id           (or (get name->id scale-name)
+                                (db/squuid))
+      ::object/display-name scale-name
+      ::raw-value           value
+      ::controller          controller-id}]))

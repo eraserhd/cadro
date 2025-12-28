@@ -72,4 +72,11 @@
     (is (every? (comp uuid? ::object/id) (::scale/_controller controller))
         "Every new scale is assigned a uuid.")
     (is (= 4 (count (map ::object/id (::scale/_controller controller))))
-        "The new uuids are unique.")))
+        "The new uuids are unique."))
+  (let [controller (after-receives "X150;\n" "X152;\n")]
+    (is (= #{{::object/display-name "X"
+              ::scale/raw-value 152}}
+           (->> (::scale/_controller controller)
+                (map #(select-keys % [::object/display-name ::scale/raw-value]))
+                (into #{})))
+        "It updates existing scale values.")))
