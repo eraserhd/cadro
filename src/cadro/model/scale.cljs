@@ -17,7 +17,7 @@
                              ::raw-value]))
 
 (defn upsert-scale-value-tx
-  [controller-id scale-name value]
+  [ds controller-id scale-name value]
   [{::object/id                   (db/squuid)
     ::object/display-name         scale-name
     :cadro.model.scale/raw-value  value
