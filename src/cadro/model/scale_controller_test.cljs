@@ -4,7 +4,7 @@
    [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
-   [clojure.test :refer [deftest is]]
+   [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
 
 (deftest t-add-controllers-tx
@@ -79,4 +79,22 @@
            (->> (::scale/_controller controller)
                 (map #(select-keys % [::object/display-name ::scale/raw-value]))
                 (into #{})))
-        "It updates existing scale values.")))
+        "It updates existing scale values."))
+  (testing "partial receives"
+    (doseq [:let [full-data "X150;Y250;Z350;T72;\n"]
+            i (range (count full-data))]
+      (let [a          (subs full-data 0 i)
+            b          (subs full-data i)
+            controller (after-receives a b)]
+        (is (= #{{::object/display-name "X"
+                  ::scale/raw-value 150}
+                 {::object/display-name "Y"
+                  ::scale/raw-value 250}
+                 {::object/display-name "Z"
+                  ::scale/raw-value 350}
+                 {::object/display-name "T"
+                  ::scale/raw-value 72}}
+               (->> (::scale/_controller controller)
+                    (map #(select-keys % [::object/display-name ::scale/raw-value]))
+                    (into #{})))
+            (str "It correctly processes '" a "' then '" b "'."))))))

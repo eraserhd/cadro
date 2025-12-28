@@ -17,11 +17,13 @@
 (s/def ::status #{:disconnected
                   :connecting
                   :connected})
+(s/def ::receive-buffer string?)
 
 (s/def ::scale-controller (s/keys :req [::object/id
                                         ::object/display-name
                                         ::address
-                                        ::status]))
+                                        ::status]
+                                  :opt [::receive-buffer]))
 
 (defn set-status-tx
   [controller-id status]
@@ -48,7 +50,8 @@
 
 (defn add-received-data-tx
   [ds controller-id data]
-  (let [to-process                    (-> data
+  (let [to-process                    (-> (str (::receive-buffer (d/entity ds controller-id))
+                                               data)
                                           (str/replace #"[;\s]+" ";")
                                           (str/replace #"^;+" ""))
         [to-process new-scale-values] (loop [to-process       to-process
@@ -56,9 +59,11 @@
                                         (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
                                           (recur left (assoc new-scale-values axis (* value-str 1.0)))
                                           [to-process new-scale-values]))]
-    (mapcat (fn [[scale-name value]]
-              (scale/upsert-scale-value-tx ds controller-id scale-name value))
-            new-scale-values)))
+    (concat
+      [[:db/add controller-id ::receive-buffer to-process]]
+      (mapcat (fn [[scale-name value]]
+                (scale/upsert-scale-value-tx ds controller-id scale-name value))
+              new-scale-values))))
 
 ;(s/def ::event-type string?)
 ;(s/def ::event-data string?)
