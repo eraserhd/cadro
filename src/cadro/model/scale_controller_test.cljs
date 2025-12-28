@@ -70,4 +70,6 @@
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
     (is (every? (comp uuid? ::object/id) (::scale/_controller controller))
-        "Every new scale is assigned a uuid.")))
+        "Every new scale is assigned a uuid.")
+    (is (= 4 (count (map ::object/id (::scale/_controller controller))))
+        "The new uuids are unique.")))
