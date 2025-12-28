@@ -56,10 +56,7 @@
     (d/entity @conn controller-id)))
 
 (deftest t-add-received-data-tx
-  (let [controller (after-receives "X150;Y250;Z350;T72;\n")
-        scales     (->> (::scale/_controller controller)
-                        (map #(select-keys % [::object/display-name ::scale/raw-value]))
-                        (into #{}))]
+  (let [controller (after-receives "X150;Y250;Z350;T72;\n")]
     (is (= #{{::object/display-name "X"
               ::scale/raw-value 150}
              {::object/display-name "Y"
@@ -68,5 +65,7 @@
               ::scale/raw-value 350}
              {::object/display-name "T"
               ::scale/raw-value 72}}
-           scales)
+           (->> (::scale/_controller controller)
+                (map #(select-keys % [::object/display-name ::scale/raw-value]))
+                (into #{})))
         "It creates scales and stores raw values on receipt.")))
