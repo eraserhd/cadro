@@ -52,6 +52,8 @@
 
 (defn add-received-data-tx
   [ds controller-id data]
+  {:pre [(d/db? ds)
+         (string? data)]}
   (let [to-process                    (-> (str (::receive-buffer (d/entity ds controller-id))
                                                data)
                                           (str/replace #"[;\s]+" ";")

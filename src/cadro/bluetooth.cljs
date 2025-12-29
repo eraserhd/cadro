@@ -5,32 +5,29 @@
    [datascript.core :as d]
    [re-posh.core :as re-posh]
    [re-frame.core :as rf]
+   ["@capacitor/core" :refer [Capacitor]]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))
 
 (def ^:private interface-id "00001101-0000-1000-8000-00805f9b34fb")
 
 (def ^:private ^:dynamic fake-subscribeRawData-reply "X500;Y500;Z500;\n")
-(def ^:private bt-impl
-  (atom
-   (let [fake-impl bt-browser]
-     ;; Browser fake is not plumbed correctly for subscribeRawData
-     (set! (.-subscribeRawData fake-impl)
-           (fn [device-id interface-id success failure]
-             (let [encoder (js/TextEncoder. "ascii")]
-               (js/window.setInterval
-                (fn []
-                  (let [data (.encode encoder fake-subscribeRawData-reply)]
-                    (success data)))
-                500))))
-     fake-impl)))
+(set! (.-subscribeRawData bt-browser)
+      (fn [device-id interface-id success failure]
+        (let [encoder (js/TextEncoder. "ascii")]
+          (js/window.setInterval
+           (fn []
+             (let [data (.encode encoder fake-subscribeRawData-reply)]
+               (success data)))
+           500))))
 
-(.addEventListener js/document "deviceready"
-  (fn []
-    (if-let [impl js/bluetoothClassicSerial]
-      (do
-        (js/console.log "found cordova bluetooth serial implementation")
-        (reset! bt-impl js/bluetoothClassicSerial))
-      (js/console.log "using fallback (fake) bluetooth serial implementation"))))
+(def ^:private bt-impl
+  (if (= "web" (.getPlatform Capacitor))
+    (do
+      (js/console.log "using fake fallback bluetooth serial implementation")
+      bt-browser)
+    (do
+      (js/console.log "found Cordova bluetooth serial implementation")
+      js/bluetoothClassicSerial)))
 
 (re-posh/reg-event-ds
  ::device-list-arrived
@@ -40,7 +37,7 @@
 (rf/reg-fx
  ::fetch-device-list
  (fn fetch-device-list* []
-   (.list @bt-impl
+   (.list bt-impl
           (fn [devices]
             (let [device-list (into []
                                     (map (fn [device]
@@ -87,13 +84,13 @@
  (fn connect* [device-id]
    (rf/dispatch [::connect-requested device-id])
    (.connect
-    @bt-impl
+    bt-impl
     device-id
     interface-id
     (fn []
       (rf/dispatch [::connect-completed device-id])
       (.subscribeRawData
-       @bt-impl
+       bt-impl
        device-id
        interface-id
        (fn [raw-data]
