@@ -4,6 +4,7 @@
    [cadro.model.scale-controller :as scale-controller]
    [datascript.core :as d]
    [re-posh.core :as re-posh]
+   [re-posh.db :as re-posh.db]
    [re-frame.core :as rf]
    ["@capacitor/core" :refer [Capacitor]]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))
@@ -60,7 +61,7 @@
 
 (re-posh/reg-event-ds
  ::connect-failed
- (fn [ds [_ device-id]]
+ (fn [ds [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
    (scale-controller/set-status-tx device-id :disconnected)))
@@ -83,20 +84,22 @@
  ::connect
  (fn connect* [device-id]
    (rf/dispatch [::connect-requested device-id])
-   (.connect
-    bt-impl
-    device-id
-    interface-id
-    (fn []
-      (rf/dispatch [::connect-completed device-id])
-      (.subscribeRawData
-       bt-impl
-       device-id
-       interface-id
-       (fn [raw-data]
-         (let [data (.decode decoder (js/Uint8Array. raw-data))]
-           (rf/dispatch [::data-received device-id data])))
-       (fn [error]
-         (rf/dispatch [::subscription-error-received device-id error]))))
-    (fn [error]
-      (rf/dispatch [::connect-failed device-id error])))))
+   (let [device-address (scale-controller/address @@re-posh.db/store device-id)]
+     (.connect
+      bt-impl
+      device-address
+      interface-id
+      (fn []
+        (rf/dispatch [::connect-completed device-id])
+        (.subscribeRawData
+         bt-impl
+         device-address
+         interface-id
+         (fn [raw-data]
+           (let [data (.decode decoder (js/Uint8Array. raw-data))]
+             (rf/dispatch [::data-received device-id data])))
+         (fn [error]
+           (rf/dispatch [::subscription-error-received device-id error]))))
+      (fn [error]
+        (rf/dispatch [::connect-failed device-id error])
+        (js/alert (str "Unable to connect: " error)))))))
