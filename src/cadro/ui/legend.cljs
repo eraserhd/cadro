@@ -28,26 +28,26 @@
     :id      eid}))
 
 (re-posh/reg-event-fx
- ::new-machine
+ ::new-machine-tapped
  (fn [{:keys [ds]} _]
    (let [{:keys [id tx]} (locus/new-machine-tx)]
      {:transact tx
       ::locusui/edit id})))
 
 (re-posh/reg-event-ds
- ::set-reference
+ ::locus-tapped
  (fn [ds [_ eid]]
    (locus/set-reference-tx eid)))
 
 (re-posh/reg-event-fx
- ::edit-locus
+ ::locus-longpressed
  (fn [_ [_ eid]]
    {::locusui/edit eid}))
 
 (def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
   [:button.icon.new-machine
-   {:on-click #(rf/dispatch [::new-machine])}
+   {:on-click #(rf/dispatch [::new-machine-tapped])}
    new-machine-icon])
 
 (defn legend-key [eid]
@@ -55,8 +55,8 @@
                 ::object/display-name
                 ::locus/_reference]}
         @(re-posh/subscribe [::locus eid])]
-     [gestures/wrap {:on-tap   #(rf/dispatch [::set-reference [::object/id id]])
-                     :on-press #(rf/dispatch [::edit-locus [::object/id id]])}
+     [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::object/id id]])
+                     :on-press #(rf/dispatch [::locus-longpressed [::object/id id]])}
       [:button.locus {:class [(if _reference
                                 "reference"
                                 "non-reference")]}
