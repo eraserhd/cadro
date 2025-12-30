@@ -69,8 +69,12 @@
   (rf/dispatch [::edit-panel-mounted])
   (fn []
     (when-let [locus-id @locus-to-edit]
-      (let [scales @(re-posh/subscribe [::scales])
-            locus  @(re-posh/subscribe [::locus locus-id])]
+      (let [scales            @(re-posh/subscribe [::scales])
+            locus             @(re-posh/subscribe [::locus locus-id])
+            associated-scales (->> (::locus/locus-scale locus)
+                                   (map ::scale/scale)
+                                   (map ::object/id)
+                                   (into #{}))]
         ^{:key (str locus-id)}
         [panel/panel {:title "Edit Locus"
                       :class "locus-edit-panel"
@@ -98,6 +102,7 @@
                                        [:li.scale
                                         [:input {:id        (str scale-id)
                                                  :type      "checkbox"
+                                                 :checked   (contains? associated-scales scale-id)
                                                  :on-change (fn [e]
                                                               (rf/dispatch
                                                                [::scale-checkbox-changed
