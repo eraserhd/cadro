@@ -46,6 +46,12 @@
  (fn [_ _]
    {::bt/fetch-device-list nil}))
 
+(re-posh/reg-event-ds
+ ::scale-checkbox-changed
+ (fn [ds [_ controller-id scale-id checked?]]
+   (prn :changed controller-id scale-id checked?)
+   []))
+
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
   (fn []
@@ -59,25 +65,31 @@
                      :label "Display Name"}]
        [:h2 "Scales"]
        (into [:ul.scale-controllers]
-             (map (fn [{:keys [::object/id
-                               ::object/display-name
+             (map (fn [{controller-id ::object/id
+                        :keys [::object/display-name
                                ::scale-controller/address
                                ::scale-controller/status
                                ::scale/_controller]}]
-                    ^{:key (str id)}
+                    ^{:key (str controller-id)}
                     [:li.scale-controller
                      [:span.name display-name] " " [:span.address "(" address ")"]
                      [:div.scales
                       (case status
                         (:connected)
                         (into [:ul.scales]
-                              (map (fn [{:keys [::object/id
-                                                ::object/display-name
+                              (map (fn [{scale-id ::object/id
+                                         :keys [::object/display-name
                                                 ::scale/raw-value]}]
                                      [:li.scale
-                                      [:input {:id (str id)
-                                               :type "checkbox"}]
-                                      [:label {:for (str id)}
+                                      [:input {:id        (str scale-id)
+                                               :type      "checkbox"
+                                               :on-change (fn [e]
+                                                            (rf/dispatch
+                                                             [::scale-checkbox-changed
+                                                              [::object/id controller-id]
+                                                              [::object/id scale-id]
+                                                              (.. e -target -checked)]))}]
+                                      [:label {:for (str scale-id)}
                                        [:span.name display-name]
                                        [:span.value raw-value]]]))
                               _controller)
@@ -85,7 +97,7 @@
                         (:disconnected)
                         [:button.btn
                          {:type     "button"
-                          :on-click #(rf/dispatch [::connect-clicked [::object/id id]])}
+                          :on-click #(rf/dispatch [::connect-clicked [::object/id controller-id]])}
                          "Connect"]
 
                         (:connecting)
