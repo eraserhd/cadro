@@ -63,7 +63,8 @@
  ::scale-checkbox-changed
  (fn [ds [_ locus-id scale-id checked?]]
    (if checked?
-     (locus/associate-scale-tx ds locus-id scale-id))))
+     (locus/associate-scale-tx ds locus-id scale-id)
+     (locus/dissociate-scale-tx ds locus-id scale-id))))
 
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
