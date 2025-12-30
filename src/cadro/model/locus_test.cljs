@@ -1,10 +1,10 @@
 (ns cadro.model.locus-test
   (:require
-   [cadro.db :as db]
    [cadro.model.locus :as locus]
    [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
+   [cadro.testing.db :as tdb]
    [clojure.test :refer [deftest is]]
    [datascript.core :as d]))
 
@@ -22,7 +22,7 @@
     (boolean result)))
 
 (deftest t-associate-scale-tx
-  (let [conn            (d/create-conn (db/schema))
+  (let [conn            (tdb/conn)
         tx              (scale-controller/add-controllers-tx @conn [{::object/display-name      "HC-01"
                                                                      ::scale-controller/address "00:00:01"}])
         _               (d/transact! conn tx)
