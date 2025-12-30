@@ -25,12 +25,14 @@
   (s/and
    ::object/object
    (s/keys :req [::offset]
-           :opt [::origin])))
+           :opt [::origin
+                 ::scale-assoc])))
 
 (s/def ::offset (s/map-of string? number?))
 (s/def ::origin ::locus)
 
-(s/def ::scale-assoc (s/keys :req [::scale/scale]))
+(s/def ::scale-assoc
+  (s/coll-of (s/keys :req [::scale/scale])))
 
 (s/def ::reference ::locus)
 (s/def ::global (s/keys :opt [::reference]))

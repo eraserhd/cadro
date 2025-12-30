@@ -36,7 +36,7 @@
                              @conn)
         {:keys [id tx]} (locus/new-machine-tx)
         _               (d/transact! conn tx)
-        db1              @conn
+        db1             @conn
         tx              (locus/associate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
         db2             @conn
