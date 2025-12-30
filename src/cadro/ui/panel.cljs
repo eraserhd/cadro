@@ -22,4 +22,5 @@
        {:type "button",
         :on-click on-close}
        close-icon]]
-     (into [:form] content)]]])
+     (into [:form {:on-submit #(.preventDefault %)}]
+           content)]]])

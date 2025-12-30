@@ -84,8 +84,7 @@
 
                         (:disconnected)
                         [:button.btn
-                         {:type     "button"
-                          :on-click #(rf/dispatch [::connect-clicked [::object/id id]])}
+                         {:on-click #(rf/dispatch [::connect-clicked [::object/id id]])}
                          "Connect"]
 
                         (:connecting)
