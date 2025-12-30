@@ -1,6 +1,7 @@
 (ns cadro.ui.locus
   (:require
    [cadro.bluetooth :as bt]
+   [cadro.model.locus :as locus]
    [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
@@ -48,19 +49,19 @@
 
 (re-posh/reg-event-ds
  ::scale-checkbox-changed
- (fn [ds [_ controller-id scale-id checked?]]
-   (prn :changed controller-id scale-id checked?)
-   []))
+ (fn [ds [_ locus-id scale-id checked?]]
+   (if checked?
+     (locus/associate-scale-tx ds locus-id scale-id))))
 
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
   (fn []
-    (when-let [eid @locus-to-edit]
-      ^{:key (str eid)}
+    (when-let [locus-id @locus-to-edit]
+      ^{:key (str locus-id)}
       [panel/panel {:title "Edit Locus"
                     :class "locus-edit-panel"
                     :on-close #(reset! locus-to-edit nil)}
-       [input/input {:eid  eid
+       [input/input {:id   (str locus-id)
                      :attr ::object/display-name
                      :label "Display Name"}]
        [:h2 "Scales"]
@@ -86,7 +87,7 @@
                                                :on-change (fn [e]
                                                             (rf/dispatch
                                                              [::scale-checkbox-changed
-                                                              [::object/id controller-id]
+                                                              locus-id
                                                               [::object/id scale-id]
                                                               (.. e -target -checked)]))}]
                                       [:label {:for (str scale-id)}
