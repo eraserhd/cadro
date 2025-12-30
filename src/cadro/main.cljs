@@ -4,6 +4,7 @@
    [cadro.db]
    [cadro.model.object]
    [cadro.model.locus]
+   [cadro.ui.axes]
    [cadro.ui.legend]
    [cadro.ui.locus]
    [clojure.spec.alpha :as s]
@@ -15,7 +16,8 @@
 (defn cadro []
   [:<>
    [cadro.ui.legend/legend]
-   [cadro.ui.locus/edit-panel]])
+   [cadro.ui.locus/edit-panel]
+   [cadro.ui.axes/axes-panel]])
 
 (rf/reg-event-fx
  ::initialize
