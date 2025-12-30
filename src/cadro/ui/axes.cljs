@@ -20,7 +20,8 @@
 (defn axes-panel []
   (let [reference (::locus/reference @(rf/subscribe [::reference]))
         axes      (->> (::locus/scale-assoc reference)
-                       (map ::scale/scale))]
+                       (map ::scale/scale)
+                       (sort-by ::object/display-name))]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::object/display-name
