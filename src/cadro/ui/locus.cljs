@@ -37,6 +37,18 @@
     :pattern scale-pull
     :ids      eids}))
 
+(def locus-pull
+  '[{::locus/locus-scale
+     [{::scale/scale
+       [::object/id]}]}])
+
+(re-posh/reg-sub
+ ::locus
+ (fn [_ [_ locus-id]]
+   {:type    :pull
+    :pattern locus-pull
+    :id      locus-id}))
+
 (rf/reg-event-fx
  ::connect-clicked
  (fn [_ [_ device-id]]
@@ -57,55 +69,56 @@
   (rf/dispatch [::edit-panel-mounted])
   (fn []
     (when-let [locus-id @locus-to-edit]
-      ^{:key (str locus-id)}
-      [panel/panel {:title "Edit Locus"
-                    :class "locus-edit-panel"
-                    :on-close #(reset! locus-to-edit nil)}
-       [input/input {:eid  locus-id
-                     :attr ::object/display-name
-                     :label "Display Name"}]
-       [:h2 "Scales"]
-       (into [:ul.scale-controllers]
-             (map (fn [{controller-id ::object/id
-                        :keys [::object/display-name
-                               ::scale-controller/address
-                               ::scale-controller/status
-                               ::scale/_controller]}]
-                    ^{:key (str controller-id)}
-                    [:li.scale-controller
-                     [:span.name display-name] " " [:span.address "(" address ")"]
-                     [:div.scales
-                      (case status
-                        (:connected)
-                        (into [:ul.scales]
-                              (map (fn [{scale-id ::object/id
-                                         :keys [::object/display-name
-                                                ::scale/raw-value]}]
-                                     [:li.scale
-                                      [:input {:id        (str scale-id)
-                                               :type      "checkbox"
-                                               :on-change (fn [e]
-                                                            (rf/dispatch
-                                                             [::scale-checkbox-changed
-                                                              locus-id
-                                                              [::object/id scale-id]
-                                                              (.. e -target -checked)]))}]
-                                      [:label {:for (str scale-id)}
-                                       [:span.name display-name]
-                                       [:span.value raw-value]]]))
-                              _controller)
+      (let [scales @(re-posh/subscribe [::scales])]
+        ^{:key (str locus-id)}
+        [panel/panel {:title "Edit Locus"
+                      :class "locus-edit-panel"
+                      :on-close #(reset! locus-to-edit nil)}
+         [input/input {:eid  locus-id
+                       :attr ::object/display-name
+                       :label "Display Name"}]
+         [:h2 "Scales"]
+         (into [:ul.scale-controllers]
+               (map (fn [{controller-id ::object/id
+                          :keys [::object/display-name
+                                 ::scale-controller/address
+                                 ::scale-controller/status
+                                 ::scale/_controller]}]
+                      ^{:key (str controller-id)}
+                      [:li.scale-controller
+                       [:span.name display-name] " " [:span.address "(" address ")"]
+                       [:div.scales
+                        (case status
+                          (:connected)
+                          (into [:ul.scales]
+                                (map (fn [{scale-id ::object/id
+                                           :keys [::object/display-name
+                                                  ::scale/raw-value]}]
+                                       [:li.scale
+                                        [:input {:id        (str scale-id)
+                                                 :type      "checkbox"
+                                                 :on-change (fn [e]
+                                                              (rf/dispatch
+                                                               [::scale-checkbox-changed
+                                                                locus-id
+                                                                [::object/id scale-id]
+                                                                (.. e -target -checked)]))}]
+                                        [:label {:for (str scale-id)}
+                                         [:span.name display-name]
+                                         [:span.value raw-value]]]))
+                                _controller)
 
-                        (:disconnected)
-                        [:button.btn
-                         {:type     "button"
-                          :on-click #(rf/dispatch [::connect-clicked [::object/id controller-id]])}
-                         "Connect"]
+                          (:disconnected)
+                          [:button.btn
+                           {:type     "button"
+                            :on-click #(rf/dispatch [::connect-clicked [::object/id controller-id]])}
+                           "Connect"]
 
-                        (:connecting)
-                        [:p "Connecting..."]
+                          (:connecting)
+                          [:p "Connecting..."]
 
-                        [:p "Unknown status??"])]]))
-             @(re-posh/subscribe [::scales]))])))
+                          [:p "Unknown status??"])]]))
+               scales)]))))
 
 (rf/reg-event-fx
  ::edit-panel-opened
