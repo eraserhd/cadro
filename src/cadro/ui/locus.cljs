@@ -61,7 +61,7 @@
       [panel/panel {:title "Edit Locus"
                     :class "locus-edit-panel"
                     :on-close #(reset! locus-to-edit nil)}
-       [input/input {:id   (str locus-id)
+       [input/input {:eid  locus-id
                      :attr ::object/display-name
                      :label "Display Name"}]
        [:h2 "Scales"]
