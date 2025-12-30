@@ -1,18 +1,19 @@
 (ns cadro.model.scale-controller-test
   (:require
+   [cadro.db :as db]
    [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
-   [cadro.testing.db :as tdb]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
 
 (deftest t-add-controllers-tx
-  (let [conn (tdb/conn
-              #(scale-controller/add-controllers-tx % [{::object/display-name      "Nexus 7"
-                                                        ::scale-controller/address "00:00:01"}
-                                                       {::object/display-name      "HC-06"
-                                                        ::scale-controller/address "02:03:04"}]))
+  (let [conn (d/create-conn (db/schema))
+        tx   (scale-controller/add-controllers-tx @conn [{::object/display-name      "Nexus 7"
+                                                          ::scale-controller/address "00:00:01"}
+                                                         {::object/display-name      "HC-06"
+                                                          ::scale-controller/address "02:03:04"}])
+        _    (d/transact! conn tx)
         pull [::object/id
               ::object/display-name
               ::scale-controller/address
@@ -45,11 +46,13 @@
 (defn- after-receives
   [& receives]
   (let [controller-id [::scale-controller/address "00:00:01"]
-        conn          (apply tdb/conn
-                             #(scale-controller/add-controllers-tx % [{::object/display-name "HC-06"
-                                                                       ::scale-controller/address "00:00:01"}])
-                             (for [data receives]
-                               #(scale-controller/add-received-data-tx % controller-id data)))]
+        conn          (d/create-conn (db/schema))
+        tx            (scale-controller/add-controllers-tx @conn [{::object/display-name "HC-06"
+                                                                   ::scale-controller/address "00:00:01"}])
+        _             (d/transact! conn tx)
+        _             (doseq [data receives]
+                        (let [tx (scale-controller/add-received-data-tx @conn controller-id data)]
+                          (d/transact! conn tx)))]
     (d/entity @conn controller-id)))
 
 (deftest t-add-received-data-tx

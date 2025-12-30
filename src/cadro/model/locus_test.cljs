@@ -22,19 +22,21 @@
     (boolean result)))
 
 (deftest t-associate-scale-tx
-  (let [conn            (tdb/conn
-                         #(scale-controller/add-controllers-tx % [{::object/display-name      "HC-01"
-                                                                   ::scale-controller/address "00:00:01"}])
-                         #(scale-controller/add-received-data-tx % [::scale-controller/address "00:00:01"] "X150;"))
-        {:keys [id tx]} (locus/new-machine-tx)
+  (let [conn            (tdb/conn)
+        tx              (scale-controller/add-controllers-tx @conn [{::object/display-name      "HC-01"
+                                                                     ::scale-controller/address "00:00:01"}])
         _               (d/transact! conn tx)
-        db              @conn
+        tx              (scale-controller/add-received-data-tx @conn [::scale-controller/address "00:00:01"] "X150;")
+        _               (d/transact! conn tx)
         scale-id        (d/q '[:find ?scale .
                                :where
                                [?scale ::object/display-name "X"]
                                [?scale ::scale/controller ?controller]
                                [?controller ::scale-controller/address "00:00:01"]]
                              @conn)
+        {:keys [id tx]} (locus/new-machine-tx)
+        _               (d/transact! conn tx)
+        db              @conn
         tx              (locus/associate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
         db'             @conn]

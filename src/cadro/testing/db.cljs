@@ -5,8 +5,4 @@
 
 (defn conn
   [& args]
-  (let [conn (d/create-conn (db/schema))]
-    (doseq [f args]
-      (let [tx (f @conn)]
-        (d/transact! conn tx)))
-    conn))
+  (d/create-conn (db/schema)))
