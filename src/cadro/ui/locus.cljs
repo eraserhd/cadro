@@ -38,7 +38,7 @@
     :ids      eids}))
 
 (def locus-pull
-  '[{::locus/locus-scale
+  '[{::locus/scale-assoc
      [{::scale/scale
        [::object/id]}]}])
 
@@ -92,7 +92,7 @@
     (when-let [locus-id @locus-to-edit]
       (let [scales            @(re-posh/subscribe [::scales])
             locus             @(re-posh/subscribe [::locus locus-id])
-            associated-scales (->> (::locus/locus-scale locus)
+            associated-scales (->> (::locus/scale-assoc locus)
                                    (map ::scale/scale)
                                    (map ::object/id)
                                    (into #{}))]

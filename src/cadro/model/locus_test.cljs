@@ -13,7 +13,7 @@
   (let [result (d/q '[:find ?assoc-id .
                       :in $ ?locus-id ?axis-name
                       :where
-                      [?locus-id ::locus/locus-scale ?assoc-id]
+                      [?locus-id ::locus/scale-assoc ?assoc-id]
                       [?assoc-id ::scale/scale ?scale-id]
                       [?scale-id ::object/display-name ?axis-name]]
                     db
