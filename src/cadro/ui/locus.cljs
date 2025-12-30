@@ -66,6 +66,26 @@
      (locus/associate-scale-tx ds locus-id scale-id)
      (locus/dissociate-scale-tx ds locus-id scale-id))))
 
+(defn scale-controls
+  [locus-id
+   {scale-id ::object/id
+    :keys [::object/display-name
+           ::scale/raw-value]}
+   associated-scales]
+  [:li.scale
+   [:input {:id        (str scale-id)
+            :type      "checkbox"
+            :checked   (contains? associated-scales scale-id)
+            :on-change (fn [e]
+                         (rf/dispatch
+                          [::scale-checkbox-changed
+                           locus-id
+                           [::object/id scale-id]
+                           (.. e -target -checked)]))}]
+   [:label {:for (str scale-id)}
+    [:span.name display-name]
+    [:span.value raw-value]]])
+
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
   (fn []
@@ -97,22 +117,8 @@
                         (case status
                           (:connected)
                           (into [:ul.scales]
-                                (map (fn [{scale-id ::object/id
-                                           :keys [::object/display-name
-                                                  ::scale/raw-value]}]
-                                       [:li.scale
-                                        [:input {:id        (str scale-id)
-                                                 :type      "checkbox"
-                                                 :checked   (contains? associated-scales scale-id)
-                                                 :on-change (fn [e]
-                                                              (rf/dispatch
-                                                               [::scale-checkbox-changed
-                                                                locus-id
-                                                                [::object/id scale-id]
-                                                                (.. e -target -checked)]))}]
-                                        [:label {:for (str scale-id)}
-                                         [:span.name display-name]
-                                         [:span.value raw-value]]]))
+                                (map (fn [scale]
+                                       [scale-controls locus-id scale associated-scales]))
                                 _controller)
 
                           (:disconnected)
