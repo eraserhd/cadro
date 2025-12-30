@@ -7,6 +7,8 @@
 
 (db/register-schema!
  {::controller {:db/cardinality :db.cardinality/one
+                :db/valueType :db.type/ref}
+  ::scale      {:db/cardinality :db.cardinality/one
                 :db/valueType :db.type/ref}})
 
 ;Defined in scale-controller for dependency issue

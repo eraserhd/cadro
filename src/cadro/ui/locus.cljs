@@ -69,7 +69,8 @@
   (rf/dispatch [::edit-panel-mounted])
   (fn []
     (when-let [locus-id @locus-to-edit]
-      (let [scales @(re-posh/subscribe [::scales])]
+      (let [scales @(re-posh/subscribe [::scales])
+            locus  @(re-posh/subscribe [::locus locus-id])]
         ^{:key (str locus-id)}
         [panel/panel {:title "Edit Locus"
                       :class "locus-edit-panel"
