@@ -58,3 +58,17 @@
     [{:db/id locus-id
       ::locus-scale {::object/id (or id (d/squuid))
                      ::scale/scale scale-id}}]))
+
+(defn dissociate-scale-tx
+  [ds locus-id scale-id]
+  (let [locus-scale (d/q '[:find ?e .
+                           :in $ ?locus-id ?scale-id
+                           :where
+                           [?locus-id ::locus-scale ?e]
+                           [?e ::scale/scale ?scale-id]
+                           [?e ::object/id ?id]]
+                         ds
+                         locus-id
+                         scale-id)]
+    (when locus-scale
+      [[:db/retractEntity locus-scale]])))

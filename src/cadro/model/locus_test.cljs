@@ -21,7 +21,7 @@
                     axis-name)]
     (boolean result)))
 
-(deftest t-associate-scale-tx
+(deftest t-associate-dissociate-scale-tx
   (let [conn            (d/create-conn (db/schema))
         tx              (scale-controller/add-controllers-tx @conn [{::object/display-name      "HC-01"
                                                                      ::scale-controller/address "00:00:01"}])
@@ -36,9 +36,17 @@
                              @conn)
         {:keys [id tx]} (locus/new-machine-tx)
         _               (d/transact! conn tx)
-        db              @conn
+        db1              @conn
         tx              (locus/associate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
-        db'             @conn]
-    (is (not (associated? db id "X")))
-    (is (associated? db' id "X"))))
+        db2             @conn
+        tx              (locus/associate-scale-tx @conn id scale-id)
+        _               (d/transact! conn tx)
+        db3             @conn
+        tx              (locus/dissociate-scale-tx @conn id scale-id)
+        _               (d/transact! conn tx)
+        db4             @conn]
+    (is (not (associated? db1 id "X")))
+    (is (associated? db2 id "X"))
+    (is (associated? db3 id "X"))
+    (is (not (associated? db4 id "X")))))
