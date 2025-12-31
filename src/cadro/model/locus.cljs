@@ -1,20 +1,11 @@
 (ns cadro.model.locus
-  "Model of loci, or positions (potentially with transformations).
-
-  The object with ident ::global has a ::reference attribute which defines
-  the current global reference locus for displaying coordinates."
+  "Model of loci, or positions (potentially with transformations)."
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
    [cadro.model.scale :as scale]
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
-
-(def global ::global)
-
-(db/register-schema!
-  {::reference   {:db/valueType :db.type/ref
-                  :db/cardinality :db.cardinality/one}})
 
 (s/def ::locus
  (s/keys :req [::model/id
@@ -23,9 +14,6 @@
                ::model/spans]))
 
 (s/def ::offset (s/map-of string? number?))
-
-(s/def ::reference ::locus)
-(s/def ::global (s/keys :opt [::reference]))
 
 (defn set-reference-tx
   [ds reference-id]
