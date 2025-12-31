@@ -10,11 +10,10 @@
 
 (defn- associated?
   [db locus-id axis-name]
-  (let [result (d/q '[:find ?assoc-id .
+  (let [result (d/q '[:find ?scale-id .
                       :in $ ?locus-id ?axis-name
                       :where
-                      [?locus-id ::locus/scale-assoc ?assoc-id]
-                      [?assoc-id ::scale/scale ?scale-id]
+                      [?locus-id ::model/spans ?scale-id]
                       [?scale-id ::model/display-name ?axis-name]]
                     db
                     locus-id

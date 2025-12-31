@@ -16,23 +16,17 @@
   {::origin      {:db/valueType :db.type/ref
                   :db/cardinality :db.cardinality/one}
    ::reference   {:db/valueType :db.type/ref
-                  :db/cardinality :db.cardinality/one}
-   ::scale-assoc {:db/valueType :db.type/ref
-                  :db/cardinality :db.cardinality/many
-                  :db/isComponent true}})
+                  :db/cardinality :db.cardinality/one}})
 
 (s/def ::locus
  (s/keys :req [::model/id
                ::offset]
          :opt [::model/display-name
                ::origin
-               ::scale-assoc]))
+               ::model/spans]))
 
 (s/def ::offset (s/map-of string? number?))
 (s/def ::origin ::locus)
-
-(s/def ::scale-assoc
-  (s/coll-of (s/keys :req [::scale/scale])))
 
 (s/def ::reference ::locus)
 (s/def ::global (s/keys :opt [::reference]))
@@ -52,29 +46,8 @@
 
 (defn associate-scale-tx
   [ds locus-id scale-id]
-  (let [id (d/q '[:find ?id .
-                  :in $ ?locus-id ?scale-id
-                  :where
-                  [?locus-id ::scale-assoc ?e]
-                  [?e ::scale/scale ?scale-id]
-                  [?e ::model/id ?id]]
-                ds
-                locus-id
-                scale-id)]
-    [{:db/id locus-id
-      ::scale-assoc {::model/id (or id (d/squuid))
-                     ::scale/scale scale-id}}]))
+  [[:db/add locus-id ::model/spans scale-id]])
 
 (defn dissociate-scale-tx
   [ds locus-id scale-id]
-  (let [scale-assoc (d/q '[:find ?e .
-                           :in $ ?locus-id ?scale-id
-                           :where
-                           [?locus-id ::scale-assoc ?e]
-                           [?e ::scale/scale ?scale-id]
-                           [?e ::model/id ?id]]
-                         ds
-                         locus-id
-                         scale-id)]
-    (when scale-assoc
-      [[:db/retractEntity scale-assoc]])))
+  [[:db/retract locus-id ::model/spans scale-id]])

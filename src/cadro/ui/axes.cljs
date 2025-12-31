@@ -11,16 +11,14 @@
  (fn [ds _]
    {:type    :pull
     :pattern '[{::locus/reference
-                [{::locus/scale-assoc
-                  [{::scale/scale
-                    [::model/display-name
-                     ::scale/raw-value]}]}]}]
+                [{::model/spans
+                  [::model/display-name
+                   ::scale/raw-value]}]}]
     :id      ::locus/global}))
 
 (defn axes-panel []
   (let [reference (::locus/reference @(rf/subscribe [::reference]))
-        axes      (->> (::locus/scale-assoc reference)
-                       (map ::scale/scale)
+        axes      (->> (::model/spans reference)
                        (sort-by ::model/display-name))]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
