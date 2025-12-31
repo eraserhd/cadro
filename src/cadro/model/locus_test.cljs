@@ -33,7 +33,7 @@
                                [?scale ::scale/controller ?controller]
                                [?controller ::scale-controller/address "00:00:01"]]
                              @conn)
-        {:keys [id tx]} (locus/new-machine-tx)
+        {:keys [id tx]} (locus/new-machine-tx @conn)
         _               (d/transact! conn tx)
         db1             @conn
         tx              (locus/associate-scale-tx @conn id scale-id)

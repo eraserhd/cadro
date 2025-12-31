@@ -24,20 +24,21 @@
    {:type    :pull
     :pattern '[::model/id
                ::model/display-name
-               ::locus/_reference]
+               ::model/reference?]
     :id      eid}))
 
 (re-posh/reg-event-fx
  ::new-machine-tapped
- (fn [{:keys [ds]} _]
-   (let [{:keys [id tx]} (locus/new-machine-tx)]
+ [(re-posh/inject-cofx :ds)]
+ (fn [{:keys [ds], :as all} _]
+   (let [{:keys [id tx]} (locus/new-machine-tx ds)]
      {:transact tx
       ::locusui/edit id})))
 
 (re-posh/reg-event-ds
  ::locus-tapped
  (fn [ds [_ eid]]
-   (locus/set-reference-tx eid)))
+   (locus/set-reference-tx ds eid)))
 
 (re-posh/reg-event-fx
  ::locus-longpressed
@@ -53,14 +54,14 @@
 (defn legend-key [eid]
   (let [{:keys [::model/id
                 ::model/display-name
-                ::locus/_reference]}
+                ::model/reference?]}
         @(re-posh/subscribe [::locus eid])]
      [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
                      :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
-      [:button.locus {:class [(if _reference
+      [:button.locus {:class [(if reference?
                                 "reference"
                                 "non-reference")]}
-       [:> fa/FontAwesomeIcon {:icon (if _reference
+       [:> fa/FontAwesomeIcon {:icon (if reference?
                                        faSolid/faLocationCrosshairs
                                        nil)
                                :fixedWidth true}]
