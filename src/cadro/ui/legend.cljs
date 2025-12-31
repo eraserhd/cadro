@@ -11,14 +11,18 @@
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
 
+(def loci-tree-q
+  '[:find [?eid ...]
+    :where
+    [?eid ::model/transforms]
+    #_ ;; FIXME: I think posh can't analyze this part?
+    (not [_ ::model/transforms ?eid])])
+
 (re-posh/reg-sub
  ::loci-tree
  (fn [_ _]
    {:type  :query
-    :query '[:find [?eid ...]
-             :where
-             [?eid ::model/transforms]
-             (not [_ ::model/transforms ?eid])]}))
+    :query loci-tree-q}))
 
 (re-posh/reg-sub
  ::locus

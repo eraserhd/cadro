@@ -13,7 +13,10 @@
    {:db/cardinality :db.cardinality/many
     :db/valueType   :db.type/ref}
    ::reference?
-   {:db/cardinality :db.cardinality/one}})
+   {:db/cardinality :db.cardinality/one}
+   ::transforms
+   {:db/cardinality :db.cardinality/many
+    :db/valueType   :db.type/ref}})
 
 ;; All objects should have an id?
 (s/def ::id uuid?)
