@@ -2,7 +2,7 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.db]
-   [cadro.model.object]
+   [cadro.model]
    [cadro.model.locus]
    [cadro.ui.axes]
    [cadro.ui.legend]

@@ -1,6 +1,6 @@
 (ns cadro.bluetooth
   (:require
-   [cadro.model.object :as object]
+   [cadro.model :as model]
    [cadro.model.scale-controller :as scale-controller]
    [datascript.core :as d]
    [re-posh.core :as re-posh]
@@ -42,7 +42,7 @@
           (fn [devices]
             (let [device-list (into []
                                     (map (fn [device]
-                                           {::object/display-name      (.-name device)
+                                           {::model/display-name       (.-name device)
                                             ::scale-controller/address (.-address device)}))
                                     devices)]
               (rf/dispatch [::device-list-arrived device-list])))

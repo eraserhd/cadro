@@ -1,7 +1,7 @@
 (ns cadro.model.scale-controller
   (:require
    [cadro.db :as db]
-   [cadro.model.object :as object]
+   [cadro.model :as model]
    [cadro.model.scale :as scale]
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
@@ -19,8 +19,8 @@
                   :connected})
 (s/def ::receive-buffer string?)
 
-(s/def ::scale-controller (s/keys :req [::object/id
-                                        ::object/display-name
+(s/def ::scale-controller (s/keys :req [::model/id
+                                        ::model/display-name
                                         ::address
                                         ::status]
                                   :opt [::receive-buffer]))
@@ -39,18 +39,18 @@
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
-         (s/assert (s/coll-of (s/keys :req [::object/display-name ::address])) controller-list)]}
+         (s/assert (s/coll-of (s/keys :req [::model/display-name ::address])) controller-list)]}
   (let [addr->controller (into {}
                                (map (juxt ::address identity))
-                               (d/q '[:find [(pull ?obj [::object/id ::address ::status]) ...]
+                               (d/q '[:find [(pull ?obj [::model/id ::address ::status]) ...]
                                       :where [?obj ::address]]
                                     ds))]
     (map (fn [{:keys [::address], :as scale-controller}]
-           (let [{:keys [::object/id ::status]} (get addr->controller address)
+           (let [{:keys [::model/id ::status]} (get addr->controller address)
                  new-status                     (or status :disconnected)
                  new-id                         (or id (db/squuid))]
              (assoc scale-controller
-                    ::object/id new-id
+                    ::model/id new-id
                     ::status    new-status)))
          controller-list)))
 

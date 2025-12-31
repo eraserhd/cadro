@@ -5,7 +5,7 @@
   the current global reference locus for displaying coordinates."
   (:require
    [cadro.db :as db]
-   [cadro.model.object :as object]
+   [cadro.model :as model]
    [cadro.model.scale :as scale]
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
@@ -22,11 +22,11 @@
                   :db/isComponent true}})
 
 (s/def ::locus
-  (s/and
-   ::object/object
-   (s/keys :req [::offset]
-           :opt [::origin
-                 ::scale-assoc])))
+ (s/keys :req [::model/id
+               ::offset]
+         :opt [::model/display-name
+               ::origin
+               ::scale-assoc]))
 
 (s/def ::offset (s/map-of string? number?))
 (s/def ::origin ::locus)
@@ -43,12 +43,12 @@
 
 (defn new-machine-tx []
   (let [id (db/squuid)]
-    {:id [::object/id id]
+    {:id [::model/id id]
      :tx (concat
-          [{::object/id           id
-            ::object/display-name "New Machine"
+          [{::model/id           id
+            ::model/display-name "New Machine"
             ::offset              {"x" 42}}]
-          (set-reference-tx [::object/id id]))}))
+          (set-reference-tx [::model/id id]))}))
 
 (defn associate-scale-tx
   [ds locus-id scale-id]
@@ -57,12 +57,12 @@
                   :where
                   [?locus-id ::scale-assoc ?e]
                   [?e ::scale/scale ?scale-id]
-                  [?e ::object/id ?id]]
+                  [?e ::model/id ?id]]
                 ds
                 locus-id
                 scale-id)]
     [{:db/id locus-id
-      ::scale-assoc {::object/id (or id (d/squuid))
+      ::scale-assoc {::model/id (or id (d/squuid))
                      ::scale/scale scale-id}}]))
 
 (defn dissociate-scale-tx
@@ -72,7 +72,7 @@
                            :where
                            [?locus-id ::scale-assoc ?e]
                            [?e ::scale/scale ?scale-id]
-                           [?e ::object/id ?id]]
+                           [?e ::model/id ?id]]
                          ds
                          locus-id
                          scale-id)]

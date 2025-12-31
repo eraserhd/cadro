@@ -1,8 +1,8 @@
 (ns cadro.ui.legend
   (:require
    [cadro.db :as db]
+   [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.object :as object]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.locus :as locusui]
    [re-frame.core :as rf]
@@ -22,8 +22,8 @@
  ::locus
  (fn [_ [_ eid]]
    {:type    :pull
-    :pattern '[::object/id
-               ::object/display-name
+    :pattern '[::model/id
+               ::model/display-name
                ::locus/_reference]
     :id      eid}))
 
@@ -51,12 +51,12 @@
    new-machine-icon])
 
 (defn legend-key [eid]
-  (let [{:keys [::object/id
-                ::object/display-name
+  (let [{:keys [::model/id
+                ::model/display-name
                 ::locus/_reference]}
         @(re-posh/subscribe [::locus eid])]
-     [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::object/id id]])
-                     :on-press #(rf/dispatch [::locus-longpressed [::object/id id]])}
+     [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
+                     :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
       [:button.locus {:class [(if _reference
                                 "reference"
                                 "non-reference")]}

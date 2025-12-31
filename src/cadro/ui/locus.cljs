@@ -1,8 +1,8 @@
 (ns cadro.ui.locus
   (:require
    [cadro.bluetooth :as bt]
+   [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [cadro.ui.input :as input]
@@ -21,12 +21,12 @@
              :where [?id ::scale-controller/address]]}))
 
 (def scale-pull
-  '[::object/id
-    ::object/display-name
+  '[::model/id
+    ::model/display-name
     ::scale-controller/address
     ::scale-controller/status
-    {::scale/_controller [::object/id
-                          ::object/display-name
+    {::scale/_controller [::model/id
+                          ::model/display-name
                           ::scale/raw-value]}])
 
 (re-posh/reg-sub
@@ -40,7 +40,7 @@
 (def locus-pull
   '[{::locus/scale-assoc
      [{::scale/scale
-       [::object/id]}]}])
+       [::model/id]}]}])
 
 (re-posh/reg-sub
  ::locus
@@ -68,8 +68,8 @@
 
 (defn scale-controls
   [locus-id
-   {scale-id ::object/id
-    :keys [::object/display-name
+   {scale-id ::model/id
+    :keys [::model/display-name
            ::scale/raw-value]}
    associated-scales]
   [:li.scale
@@ -80,7 +80,7 @@
                          (rf/dispatch
                           [::scale-checkbox-changed
                            locus-id
-                           [::object/id scale-id]
+                           [::model/id scale-id]
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
     [:span.name display-name]
@@ -94,19 +94,19 @@
             locus             @(re-posh/subscribe [::locus locus-id])
             associated-scales (->> (::locus/scale-assoc locus)
                                    (map ::scale/scale)
-                                   (map ::object/id)
+                                   (map ::model/id)
                                    (into #{}))]
         ^{:key (str locus-id)}
         [panel/panel {:title "Edit Locus"
                       :class "locus-edit-panel"
                       :on-close #(reset! locus-to-edit nil)}
          [input/input {:eid  locus-id
-                       :attr ::object/display-name
+                       :attr ::model/display-name
                        :label "Display Name"}]
          [:h2 "Scales"]
          (into [:ul.scale-controllers]
-               (map (fn [{controller-id ::object/id
-                          :keys [::object/display-name
+               (map (fn [{controller-id ::model/id
+                          :keys [::model/display-name
                                  ::scale-controller/address
                                  ::scale-controller/status
                                  ::scale/_controller]}]
@@ -124,7 +124,7 @@
                           (:disconnected)
                           [:button.btn
                            {:type     "button"
-                            :on-click #(rf/dispatch [::connect-clicked [::object/id controller-id]])}
+                            :on-click #(rf/dispatch [::connect-clicked [::model/id controller-id]])}
                            "Connect"]
 
                           (:connecting)

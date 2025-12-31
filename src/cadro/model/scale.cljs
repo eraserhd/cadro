@@ -1,7 +1,7 @@
 (ns cadro.model.scale
   (:require
    [cadro.db :as db]
-   [cadro.model.object :as object]
+   [cadro.model :as model]
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
 
@@ -15,8 +15,8 @@
 ;(s/def ::controller :cadro.model.scale-controller/scale-controller)
 (s/def ::raw-value number?)
 
-(s/def ::scale (s/keys :req [::object/id
-                             ::object/display-name
+(s/def ::scale (s/keys :req [::model/id
+                             ::model/display-name
                              ::controller
                              ::raw-value]))
 
@@ -25,14 +25,14 @@
   (let [name->id (->> (d/q '[:find ?name ?id
                              :in $ ?controller
                              :where
-                             [?e ::object/id ?id]
-                             [?e ::object/display-name ?name]
+                             [?e ::model/id ?id]
+                             [?e ::model/display-name ?name]
                              [?e ::controller ?controller]]
                            ds
                            controller-id)
                       (into {}))]
-    [{::object/id           (or (get name->id scale-name)
-                                (db/squuid))
-      ::object/display-name scale-name
-      ::raw-value           value
-      ::controller          controller-id}]))
+    [{::model/id           (or (get name->id scale-name)
+                               (db/squuid))
+      ::model/display-name scale-name
+      ::raw-value          value
+      ::controller         controller-id}]))

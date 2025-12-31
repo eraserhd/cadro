@@ -1,8 +1,8 @@
 (ns cadro.model.locus-test
   (:require
    [cadro.db :as db]
+   [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.object :as object]
    [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [clojure.test :refer [deftest is]]
@@ -15,7 +15,7 @@
                       :where
                       [?locus-id ::locus/scale-assoc ?assoc-id]
                       [?assoc-id ::scale/scale ?scale-id]
-                      [?scale-id ::object/display-name ?axis-name]]
+                      [?scale-id ::model/display-name ?axis-name]]
                     db
                     locus-id
                     axis-name)]
@@ -23,14 +23,14 @@
 
 (deftest t-associate-dissociate-scale-tx
   (let [conn            (d/create-conn (db/schema))
-        tx              (scale-controller/add-controllers-tx @conn [{::object/display-name      "HC-01"
+        tx              (scale-controller/add-controllers-tx @conn [{::model/display-name      "HC-01"
                                                                      ::scale-controller/address "00:00:01"}])
         _               (d/transact! conn tx)
         tx              (scale-controller/add-received-data-tx @conn [::scale-controller/address "00:00:01"] "X150;")
         _               (d/transact! conn tx)
         scale-id        (d/q '[:find ?scale .
                                :where
-                               [?scale ::object/display-name "X"]
+                               [?scale ::model/display-name "X"]
                                [?scale ::scale/controller ?controller]
                                [?controller ::scale-controller/address "00:00:01"]]
                              @conn)

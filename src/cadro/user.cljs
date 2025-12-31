@@ -1,8 +1,8 @@
 (ns ^:dev/always cadro.user
   (:require
    [cadro.db :as db]
+   [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.object :as object]
    [cadro.model.scale-controller :as scale-controller]
    [cadro.model.scale :as scale]
    [clojure.spec.alpha :as s]
