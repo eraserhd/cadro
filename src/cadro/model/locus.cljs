@@ -13,20 +13,16 @@
 (def global ::global)
 
 (db/register-schema!
-  {::origin      {:db/valueType :db.type/ref
-                  :db/cardinality :db.cardinality/one}
-   ::reference   {:db/valueType :db.type/ref
+  {::reference   {:db/valueType :db.type/ref
                   :db/cardinality :db.cardinality/one}})
 
 (s/def ::locus
  (s/keys :req [::model/id
                ::offset]
          :opt [::model/display-name
-               ::origin
                ::model/spans]))
 
 (s/def ::offset (s/map-of string? number?))
-(s/def ::origin ::locus)
 
 (s/def ::reference ::locus)
 (s/def ::global (s/keys :opt [::reference]))
