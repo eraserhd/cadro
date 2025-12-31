@@ -15,8 +15,10 @@
  ::loci-tree
  (fn [_ _]
    {:type  :query
-    :query '[:find [?id ...]
-             :where [?id ::locus/offset]]}))
+    :query '[:find [?eid ...]
+             :where
+             [?eid ::model/transforms]
+             (not [_ ::model/transforms ?eid])]}))
 
 (re-posh/reg-sub
  ::locus

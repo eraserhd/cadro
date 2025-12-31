@@ -7,14 +7,6 @@
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
 
-(s/def ::locus
- (s/keys :req [::model/id
-               ::offset]
-         :opt [::model/display-name
-               ::model/spans]))
-
-(s/def ::offset (s/map-of string? number?))
-
 (defn set-reference-tx
   [ds reference-id]
   (concat
@@ -35,7 +27,8 @@
      :tx (concat
           [{::model/id           id
             ::model/display-name "New Machine"
-            ::offset              {"x" 42}}]
+            ::model/transforms   [{::model/id (d/squuid)
+                                   ::model/position {}}]}]
           (set-reference-tx ds [::model/id id]))}))
 
 (defn associate-scale-tx

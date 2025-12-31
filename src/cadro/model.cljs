@@ -26,3 +26,9 @@
 
 ;; Is this the current reference point, used to computed displayed coordinates?
 (s/def ::reference? boolean?)
+
+;; A tranforms B if A is a Flarg and B is a point or Flarg that is affected by the transformation.
+(s/def ::transforms (s/coll-of (s/keys :req [::id])))
+
+;; A coordinate in N-dimensional space.
+(s/def ::position (s/map-of string? number?))
