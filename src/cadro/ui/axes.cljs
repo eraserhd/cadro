@@ -10,18 +10,14 @@
  ::reference-id
  (fn [ds _]
    {:type  :query
-    :query model/reference?-id-q}))
+    :query model/reference-id-q}))
 
 (re-posh/reg-sub
  ::reference
  :<- [::reference-id]
  (fn [reference-id _]
    {:type    :pull
-    :pattern '[::model/position
-               {::model/_transforms ...
-                ::model/spans
-                [::model/display-name
-                 ::model/raw-count]}]
+    :pattern model/reference-tree-pull
     :id      reference-id}))
 
 (defn axes-panel []

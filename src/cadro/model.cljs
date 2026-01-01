@@ -42,10 +42,17 @@
       [{:error "More than one entity tagged with ::model/reference?."
         :eids eids}])))
 
-(def reference?-id-q
+(def reference-id-q
   '[:find ?eid .
     :where
     [?eid ::reference? true]])
+
+(def reference-tree-pull
+  '[::position
+    {::_transforms ...
+     ::spans
+     [::display-name
+      ::raw-count]}])
 
 (defn set-reference?-tx
   [ds reference-id]
