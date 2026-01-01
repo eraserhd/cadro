@@ -22,14 +22,15 @@
 
 (defn new-machine-tx
   [ds]
-  (let [id (db/squuid)]
-    {:id [::model/id id]
+  (let [machine-id (db/squuid)
+        point-id   (db/squuid)]
+    {:id [::model/id machine-id]
      :tx (concat
-          [{::model/id           id
+          [{::model/id           machine-id
             ::model/display-name "New Machine"
-            ::model/transforms   [{::model/id (d/squuid)
+            ::model/transforms   [{::model/id point-id
                                    ::model/position {}}]}]
-          (set-reference-tx ds [::model/id id]))}))
+          (set-reference-tx ds [::model/id point-id]))}))
 
 (defn associate-scale-tx
   [ds locus-id scale-id]

@@ -44,3 +44,12 @@
 
 ;; A coordinate in N-dimensional space.
 (s/def ::position (s/map-of string? number?))
+(defmethod db/invariants ::reference?-has-position
+  [db]
+  (when-let [eids (seq (d/q '[:find [?eid ...]
+                              :where
+                              [?eid ::reference? true]
+                              (not [?eid ::position])]
+                            db))]
+    [{:error "::model/reference? point does not have ::model/position."
+      :eids eids}]))
