@@ -5,7 +5,6 @@
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]))
 
-
 (re-posh/reg-sub
  ::reference-id
  (fn [ds _]
@@ -21,8 +20,8 @@
     :id      reference-id}))
 
 (defn axes-panel []
-  (let [reference-tree @(rf/subscribe [::reference])
-        axes           (model/reference-axes reference-tree)]
+  (let [reference-tree @(rf/subscribe [::reference-tree])
+        axes           (model/root-path-axes reference-tree)]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/display-name
