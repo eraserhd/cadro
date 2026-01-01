@@ -47,7 +47,7 @@
     :where
     [?eid ::reference? true]])
 
-(def reference-tree-pull
+(def root-path-pull
   '[::position
     {::_transforms ...
      ::spans

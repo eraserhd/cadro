@@ -13,16 +13,16 @@
     :query model/reference-id-q}))
 
 (re-posh/reg-sub
- ::reference
+ ::reference-tree
  :<- [::reference-id]
  (fn [reference-id _]
    {:type    :pull
-    :pattern model/reference-tree-pull
+    :pattern model/root-path-pull
     :id      reference-id}))
 
 (defn axes-panel []
-  (let [reference @(rf/subscribe [::reference])
-        axes      (model/reference-axes reference)]
+  (let [reference-tree @(rf/subscribe [::reference])
+        axes           (model/reference-axes reference-tree)]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/display-name
