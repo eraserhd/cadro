@@ -29,6 +29,7 @@
           [{::model/id           machine-id
             ::model/display-name "New Machine"
             ::model/transforms   [{::model/id point-id
+                                   ::model/display-name "Origin"
                                    ::model/position {}}]}]
           (set-reference-tx ds [::model/id point-id]))}))
 

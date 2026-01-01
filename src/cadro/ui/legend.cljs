@@ -67,6 +67,7 @@
         (map (fn [{:keys [::model/id
                           ::model/display-name
                           ::model/reference?
+                          ::model/position
                           ::model/transforms]}]
                ^{:key (str id)}
                [:li
@@ -74,7 +75,9 @@
                                 :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
                  [:button.locus {:class [(if reference?
                                            "reference"
-                                           "non-reference")]}
+                                           "non-reference")
+                                         (when position
+                                           "point")]}
                   [:> fa/FontAwesomeIcon {:icon (if reference?
                                                   faSolid/faLocationCrosshairs
                                                   nil)

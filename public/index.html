@@ -48,6 +48,17 @@
           padding-bottom: 6px;
         }
 
+        ul { --list-depth: 0; }
+        ul ul { --list-depth: 1; }
+        ul ul ul { --list-depth: 2; }
+        ul ul ul ul { --list-depth: 3; }
+        ul ul ul ul ul { --list-depth: 4; }
+        ul ul ul ul ul ul { --list-depth: 5; }
+        ul ul ul ul ul ul ul { --list-depth: 6; }
+        ul ul ul ul ul ul ul ul { --list-depth: 7; }
+        ul ul ul ul ul ul ul ul ul { --list-depth: 8; }
+        ul ul ul ul ul ul ul ul ul ul { --list-depth: 9; }
+
         button {
           border: none;
           background: none;
@@ -196,10 +207,8 @@
         .legend li {
           list-style-type: none;
         }
-
-        .legend .controls {
-          display: flex;
-          padding-top: 10pt;
+        .legend li button.locus {
+          padding-left: calc(var(--list-depth) * 1.25rem);
         }
 
         button.locus {
@@ -217,6 +226,11 @@
           content: "";
           width: 1em;
           display: inline-block;
+        }
+
+        .legend .controls {
+          display: flex;
+          padding-top: 10pt;
         }
 
         .command-bar {
