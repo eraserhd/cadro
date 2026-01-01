@@ -22,10 +22,7 @@
 
 (defn axes-panel []
   (let [reference @(rf/subscribe [::reference])
-        axes      (->> (iterate (comp first ::model/_transforms) reference)
-                       (take-while some?)
-                       (mapcat ::model/spans)
-                       (sort-by ::model/display-name))]
+        axes      (model/reference-axes reference)]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/display-name

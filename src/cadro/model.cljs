@@ -54,6 +54,13 @@
      [::display-name
       ::raw-count]}])
 
+(defn reference-axes
+  [reference-tree]
+  (->> (iterate (comp first ::_transforms) reference-tree)
+       (take-while some?)
+       (mapcat ::spans)
+       (sort-by ::display-name)))
+
 (defn set-reference?-tx
   [ds reference-id]
   (concat
