@@ -5,18 +5,9 @@
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
 
-(db/register-schema!
- {::scale      {:db/cardinality :db.cardinality/one
-                :db/valueType :db.type/ref}})
-
 ;Defined in scale-controller for dependency issue
 ;(s/def ::controller :cadro.model.scale-controller/scale-controller)
 (s/def ::raw-value number?)
-
-(s/def ::scale (s/keys :req [::model/id
-                             ::model/display-name
-                             ::model/controller
-                             ::raw-value]))
 
 (defn upsert-scale-value-tx
   [ds controller-id scale-name value]
