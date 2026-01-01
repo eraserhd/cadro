@@ -9,6 +9,4 @@
         denistakeda/posh      {:git/url "https://github.com/psagers/posh"
                                ;:git/tag "datascript-1.6"
                                :git/sha "675d2a085012f44a2ff1229b2c51554146052e91"}
-        re-posh/re-posh       {:mvn/version "0.3.3"}
-
-        binaryage/devtools    {:mvn/version "1.0.7"}}}
+        re-posh/re-posh       {:mvn/version "0.3.3"}}}

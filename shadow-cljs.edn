@@ -10,8 +10,7 @@
         :asset-path "/assets/app/js"
         :modules {:main {:entries [cadro.main]
                          :init-fn cadro.main/start}}
-        :devtools {:preloads [devtools.preload
-                              cadro.user]
+        :devtools {:preloads [cadro.user]
                    :repl-init-ns cadro.user}}
 
   :test {:target :browser-test
