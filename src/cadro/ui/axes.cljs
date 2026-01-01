@@ -20,14 +20,18 @@
  :<- [::reference-id]
  (fn [reference-id _]
    {:type    :pull
-    :pattern '[{::model/spans
+    :pattern '[::model/position
+               {::model/_transforms ...
+                ::model/spans
                 [::model/display-name
                  ::scale/raw-value]}]
     :id      reference-id}))
 
 (defn axes-panel []
   (let [reference @(rf/subscribe [::reference])
-        axes      (->> (::model/spans reference)
+        axes      (->> (iterate (comp first ::model/_transforms) reference)
+                       (take-while some?)
+                       (mapcat ::model/spans)
                        (sort-by ::model/display-name))]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
