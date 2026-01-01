@@ -49,7 +49,8 @@
 (re-posh/reg-event-ds
  ::locus-tapped
  (fn [ds [_ eid]]
-   (model/set-reference?-tx ds eid)))
+   (when (::model/position (d/entity ds eid))
+     (model/set-reference?-tx ds eid))))
 
 (re-posh/reg-event-fx
  ::locus-longpressed
