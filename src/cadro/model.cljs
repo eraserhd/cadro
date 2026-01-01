@@ -72,3 +72,6 @@
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id]))
+
+;; A untranslated reading, as from a scale.
+(s/def ::raw-count number?)

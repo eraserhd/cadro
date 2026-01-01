@@ -5,10 +5,6 @@
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
 
-;Defined in scale-controller for dependency issue
-;(s/def ::controller :cadro.model.scale-controller/scale-controller)
-(s/def ::raw-value number?)
-
 (defn upsert-scale-value-tx
   [ds controller-id scale-name value]
   (let [name->id (->> (d/q '[:find ?name ?id
@@ -23,5 +19,5 @@
     [{::model/id           (or (get name->id scale-name)
                                (db/squuid))
       ::model/display-name scale-name
-      ::raw-value          value
-      ::model/controller         controller-id}]))
+      ::model/raw-count    value
+      ::model/controller   controller-id}]))

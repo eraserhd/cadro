@@ -24,7 +24,7 @@
                {::model/_transforms ...
                 ::model/spans
                 [::model/display-name
-                 ::scale/raw-value]}]
+                 ::model/raw-count]}]
     :id      reference-id}))
 
 (defn axes-panel []
@@ -36,8 +36,8 @@
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/display-name
-                            ::scale/raw-value]}]
+                            ::model/raw-count]}]
                  [:div.axis
                   [:div.name display-name]
-                  [:div.value raw-value]]))
+                  [:div.value raw-count]]))
           axes)))

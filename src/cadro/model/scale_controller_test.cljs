@@ -58,15 +58,15 @@
 (deftest t-add-received-data-tx
   (let [controller (after-receives "X150;Y250;Z350;T72;\n")]
     (is (= #{{::model/display-name "X"
-              ::scale/raw-value 150}
+              ::model/raw-count 150}
              {::model/display-name "Y"
-              ::scale/raw-value 250}
+              ::model/raw-count 250}
              {::model/display-name "Z"
-              ::scale/raw-value 350}
+              ::model/raw-count 350}
              {::model/display-name "T"
-              ::scale/raw-value 72}}
+              ::model/raw-count 72}}
            (->> (::model/_controller controller)
-                (map #(select-keys % [::model/display-name ::scale/raw-value]))
+                (map #(select-keys % [::model/display-name ::model/raw-count]))
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
     (is (every? (comp uuid? ::model/id) (::model/_controller controller))
@@ -75,9 +75,9 @@
         "The new uuids are unique."))
   (let [controller (after-receives "X150;\n" "X152;\n")]
     (is (= #{{::model/display-name "X"
-              ::scale/raw-value 152}}
+              ::model/raw-count 152}}
            (->> (::model/_controller controller)
-                (map #(select-keys % [::model/display-name ::scale/raw-value]))
+                (map #(select-keys % [::model/display-name ::model/raw-count]))
                 (into #{})))
         "It updates existing scale values."))
   (testing "partial receives"
@@ -87,14 +87,14 @@
             b          (subs full-data i)
             controller (after-receives a b)]
         (is (= #{{::model/display-name "X"
-                  ::scale/raw-value 150}
+                  ::model/raw-count 150}
                  {::model/display-name "Y"
-                  ::scale/raw-value 250}
+                  ::model/raw-count 250}
                  {::model/display-name "Z"
-                  ::scale/raw-value 350}
+                  ::model/raw-count 350}
                  {::model/display-name "T"
-                  ::scale/raw-value 72}}
+                  ::model/raw-count 72}}
                (->> (::model/_controller controller)
-                    (map #(select-keys % [::model/display-name ::scale/raw-value]))
+                    (map #(select-keys % [::model/display-name ::model/raw-count]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))

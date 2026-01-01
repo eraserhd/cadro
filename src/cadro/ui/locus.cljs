@@ -27,7 +27,7 @@
     ::scale-controller/status
     {::model/_controller [::model/id
                           ::model/display-name
-                          ::scale/raw-value]}])
+                          ::model/raw-count]}])
 
 (re-posh/reg-sub
  ::scales
@@ -69,7 +69,7 @@
   [locus-id
    {scale-id ::model/id
     :keys [::model/display-name
-           ::scale/raw-value]}
+           ::model/raw-count]}
    associated-scales]
   [:li.scale
    [:input {:id        (str scale-id)
@@ -83,7 +83,7 @@
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
     [:span.name display-name]
-    [:span.value raw-value]]])
+    [:span.value raw-count]]])
 
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
