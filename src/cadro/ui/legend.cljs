@@ -10,28 +10,32 @@
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
-
-(def loci-tree-q
+(def loci-eids-q
   '[:find [?eid ...]
     :where
     [?eid ::model/transforms]
-    #_ ;; FIXME: I think posh can't analyze this part?
     (not [_ ::model/transforms ?eid])])
 
 (re-posh/reg-sub
- ::loci-tree
+ ::loci-eids
  (fn [_ _]
    {:type  :query
-    :query loci-tree-q}))
+    :query loci-eids-q}))
+
+(def loci-pull
+  '[::model/id
+    ::model/display-name
+    ::model/reference?
+    ::model/position
+    {::model/transforms ...}])
 
 (re-posh/reg-sub
- ::locus
- (fn [_ [_ eid]]
-   {:type    :pull
-    :pattern '[::model/id
-               ::model/display-name
-               ::model/reference?]
-    :id      eid}))
+ ::loci
+ :<- [::loci-eids]
+ (fn [eids]
+   {:type    :pull-many
+    :pattern loci-pull
+    :ids     eids}))
 
 (re-posh/reg-event-fx
  ::new-machine-tapped
@@ -57,29 +61,32 @@
    {:on-click #(rf/dispatch [::new-machine-tapped])}
    new-machine-icon])
 
-(defn legend-key [eid]
-  (let [{:keys [::model/id
-                ::model/display-name
-                ::model/reference?]}
-        @(re-posh/subscribe [::locus eid])]
-     [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
-                     :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
-      [:button.locus {:class [(if reference?
-                                "reference"
-                                "non-reference")]}
-       [:> fa/FontAwesomeIcon {:icon (if reference?
-                                       faSolid/faLocationCrosshairs
-                                       nil)
-                               :fixedWidth true}]
-       display-name]]))
+(defn- legend-keys
+  [transforms]
+  (into [:ul]
+        (map (fn [{:keys [::model/id
+                          ::model/display-name
+                          ::model/reference?
+                          ::model/transforms]}]
+               ^{:key (str id)}
+               [:li
+                [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
+                                :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                 [:button.locus {:class [(if reference?
+                                           "reference"
+                                           "non-reference")]}
+                  [:> fa/FontAwesomeIcon {:icon (if reference?
+                                                  faSolid/faLocationCrosshairs
+                                                  nil)
+                                          :fixedWidth true}]
+                  display-name]]
+                (when-not (empty? transforms)
+                  [legend-keys transforms])]))
+        transforms))
 
 (defn legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   (into [:ul]
-         (map (fn [dbid]
-                ^{:key (str dbid)}
-                [:li [legend-key dbid]])
-           @(re-posh/subscribe [::loci-tree])))
+   [legend-keys @(re-posh/subscribe [::loci])]
    [:div.controls
     [new-machine-button]]])
