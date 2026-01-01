@@ -1,7 +1,8 @@
 (ns cadro.model
   (:require
    [cadro.db :as db]
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [datascript.core :as d]))
 
 (db/register-schema!
   {::id
@@ -29,6 +30,14 @@
 
 ;; Is this the current reference point, used to computed displayed coordinates?
 (s/def ::reference? boolean?)
+(defmethod db/invariants ::only-one-reference?
+  [db]
+  (let [eids (d/q '[:find [?eid ...]
+                    :where [?eid ::reference? true]]
+                  db)]
+    (when (<= 2 (count eids))
+      [{:error "More than one entity tagged with ::model/reference?."
+        :eids eids}])))
 
 ;; A tranforms B if A is a Flarg and B is a point or Flarg that is affected by the transformation.
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))

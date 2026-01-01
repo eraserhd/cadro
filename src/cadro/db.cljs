@@ -22,6 +22,29 @@
     (dconn/reset-schema! *conn* @schema-atom))
   nil)
 
+(defmulti invariants
+  #(throw (ex-info "invariants is not intended to be called directly." {})))
+
+(defn failed-invariants
+  [db]
+  (->> (methods invariants)
+       vals
+       (mapcat #(% db))))
+
+(defn check-invariants
+  [{db :db-after}]
+  (when-let [failures (seq (failed-invariants db))]
+    (js/console.group "FAILED DATABASE INVARIANTS:")
+    (doseq [failure failures]
+      (js/console.error "%s" (pr-str failure)))
+    (js/console.groupCollapsed "Datoms")
+    (doseq [d (d/datoms db :eavt)]
+      (js/console.log "%s" (pr-str d)))
+    (js/console.groupEnd)
+    (js/console.groupEnd)
+    (when ^boolean goog.DEBUG
+      (throw (ex-info "Database fails invariant checks" {:db db, :failures failures})))))
+
 (defn- persist-to-localStorage
   [{:keys [db-after]}]
   (.setItem js/localStorage "db" (js/JSON.stringify (d/serializable db-after))))
@@ -49,6 +72,7 @@
     (let [conn (or (load-from-localStorage)
                    (d/create-conn (schema)))]
       (re-posh/connect! conn)
+      (d/listen! conn :check-invariants check-invariants)
       (d/listen! conn :persist-to-localStorage persist-to-localStorage)
       (set! *conn* conn)))
   *conn*)
