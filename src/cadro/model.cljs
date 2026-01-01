@@ -51,7 +51,8 @@
   '[::position
     {::_transforms ...
      ::spans
-     [::display-name
+     [::id
+      ::display-name
       ::raw-count]}])
 
 (defn root-path-axes
@@ -112,3 +113,6 @@
       ::raw-count    value
       ::controller   controller-id}]))
 
+(defn store-to-reference-tx
+  [ds scale-id]
+  [])
