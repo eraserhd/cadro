@@ -10,9 +10,7 @@
  ::reference-id
  (fn [ds _]
    {:type  :query
-    :query '[:find ?eid .
-             :where
-             [?eid ::model/reference? true]]}))
+    :query model/reference?-id-q}))
 
 (re-posh/reg-sub
  ::reference

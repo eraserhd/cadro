@@ -42,6 +42,11 @@
       [{:error "More than one entity tagged with ::model/reference?."
         :eids eids}])))
 
+(def reference?-id-q
+  '[:find ?eid .
+    :where
+    [?eid ::reference? true]])
+
 (defn set-reference?-tx
   [ds reference-id]
   (concat
