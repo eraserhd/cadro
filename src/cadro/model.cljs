@@ -39,6 +39,19 @@
       [{:error "More than one entity tagged with ::model/reference?."
         :eids eids}])))
 
+(defn set-reference?-tx
+  [ds reference-id]
+  (concat
+    (for [eid (d/q '[:find [?eid ...]
+                     :in $ ?reference-id
+                     :where
+                     [?eid ::reference? ?value]
+                     (not [(= ?eid ?reference-id)])]
+                   ds
+                   reference-id)]
+      [:db/retract eid ::reference?])
+    [[:db/add reference-id ::reference? true]]))
+
 ;; A tranforms B if A is a Flarg and B is a point or Flarg that is affected by the transformation.
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))
 

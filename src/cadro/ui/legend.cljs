@@ -5,6 +5,7 @@
    [cadro.model.locus :as locus]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.locus :as locusui]
+   [datascript.core :as d]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
    ["@fortawesome/react-fontawesome" :as fa]
@@ -48,7 +49,7 @@
 (re-posh/reg-event-ds
  ::locus-tapped
  (fn [ds [_ eid]]
-   (locus/set-reference-tx ds eid)))
+   (model/set-reference?-tx ds eid)))
 
 (re-posh/reg-event-fx
  ::locus-longpressed
