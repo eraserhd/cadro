@@ -4,7 +4,6 @@
    [cadro.model :as model]
    [cadro.model.locus :as locus]
    [cadro.model.scale-controller :as scale-controller]
-   [cadro.model.scale :as scale]
    [clojure.spec.alpha :as s]
    [cljs.repl :refer [doc apropos source]]
    [datascript.core :as d]))

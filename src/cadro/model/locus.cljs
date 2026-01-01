@@ -3,7 +3,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.scale :as scale]
    [clojure.spec.alpha :as s]
    [datascript.core :as d]))
 

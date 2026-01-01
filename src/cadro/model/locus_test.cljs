@@ -3,7 +3,6 @@
    [cadro.db :as db]
    [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [clojure.test :refer [deftest is]]
    [datascript.core :as d]))

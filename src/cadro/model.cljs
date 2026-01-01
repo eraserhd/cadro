@@ -75,3 +75,21 @@
 
 ;; A untranslated reading, as from a scale.
 (s/def ::raw-count number?)
+
+(defn upsert-raw-count-tx
+  [ds controller-id scale-name value]
+  (let [name->id (->> (d/q '[:find ?name ?id
+                             :in $ ?controller
+                             :where
+                             [?e ::id ?id]
+                             [?e ::display-name ?name]
+                             [?e ::controller ?controller]]
+                           ds
+                           controller-id)
+                      (into {}))]
+    [{::id           (or (get name->id scale-name)
+                         (db/squuid))
+      ::display-name scale-name
+      ::raw-count    value
+      ::controller   controller-id}]))
+

@@ -2,7 +2,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))

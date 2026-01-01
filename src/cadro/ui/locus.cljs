@@ -3,7 +3,6 @@
    [cadro.bluetooth :as bt]
    [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.scale :as scale]
    [cadro.model.scale-controller :as scale-controller]
    [cadro.ui.input :as input]
    [cadro.ui.panel :as panel]

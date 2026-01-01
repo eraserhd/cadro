@@ -2,7 +2,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.scale :as scale]
    [clojure.set :as set]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
@@ -70,7 +69,7 @@
     (concat
       [[:db/add controller-id ::receive-buffer to-process]]
       (mapcat (fn [[scale-name value]]
-                (scale/upsert-scale-value-tx ds controller-id scale-name value))
+                (model/upsert-raw-count-tx ds controller-id scale-name value))
               new-scale-values))))
 
 ;(s/def ::event-type string?)

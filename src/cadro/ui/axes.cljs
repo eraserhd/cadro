@@ -2,7 +2,6 @@
   (:require
    [cadro.model :as model]
    [cadro.model.locus :as locus]
-   [cadro.model.scale :as scale]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]))
 
