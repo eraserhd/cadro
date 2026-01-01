@@ -18,11 +18,3 @@
                                    ::model/display-name "Origin"
                                    ::model/position {}}]}]
           (model/set-reference?-tx ds [::model/id point-id]))}))
-
-(defn associate-scale-tx
-  [ds locus-id scale-id]
-  [[:db/add locus-id ::model/spans scale-id]])
-
-(defn dissociate-scale-tx
-  [ds locus-id scale-id]
-  [[:db/retract locus-id ::model/spans scale-id]])

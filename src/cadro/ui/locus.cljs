@@ -61,8 +61,8 @@
  ::scale-checkbox-changed
  (fn [ds [_ locus-id scale-id checked?]]
    (if checked?
-     (locus/associate-scale-tx ds locus-id scale-id)
-     (locus/dissociate-scale-tx ds locus-id scale-id))))
+     (model/associate-scale-tx ds locus-id scale-id)
+     (model/dissociate-scale-tx ds locus-id scale-id))))
 
 (defn scale-controls
   [locus-id

@@ -31,6 +31,14 @@
 ;; Something can span an axis, meaning coordinates extend into it.
 (s/def ::spans (s/coll-of (s/keys :req [::id ::display-name])))
 
+(defn associate-scale-tx
+  [ds locus-id scale-id]
+  [[:db/add locus-id ::spans scale-id]])
+
+(defn dissociate-scale-tx
+  [ds locus-id scale-id]
+  [[:db/retract locus-id ::spans scale-id]])
+
 ;; Is this the current reference point, used to computed displayed coordinates?
 (s/def ::reference? boolean?)
 (defmethod db/invariants ::only-one-reference?

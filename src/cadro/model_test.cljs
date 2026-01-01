@@ -65,13 +65,13 @@
         {:keys [id tx]} (locus/new-machine-tx @conn)
         _               (d/transact! conn tx)
         db1             @conn
-        tx              (locus/associate-scale-tx @conn id scale-id)
+        tx              (model/associate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
         db2             @conn
-        tx              (locus/associate-scale-tx @conn id scale-id)
+        tx              (model/associate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
         db3             @conn
-        tx              (locus/dissociate-scale-tx @conn id scale-id)
+        tx              (model/dissociate-scale-tx @conn id scale-id)
         _               (d/transact! conn tx)
         db4             @conn]
     (is (not (associated? db1 id "X")))
