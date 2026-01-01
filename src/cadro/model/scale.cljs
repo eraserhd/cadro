@@ -6,9 +6,7 @@
    [datascript.core :as d]))
 
 (db/register-schema!
- {::controller {:db/cardinality :db.cardinality/one
-                :db/valueType :db.type/ref}
-  ::scale      {:db/cardinality :db.cardinality/one
+ {::scale      {:db/cardinality :db.cardinality/one
                 :db/valueType :db.type/ref}})
 
 ;Defined in scale-controller for dependency issue
@@ -17,7 +15,7 @@
 
 (s/def ::scale (s/keys :req [::model/id
                              ::model/display-name
-                             ::controller
+                             ::model/controller
                              ::raw-value]))
 
 (defn upsert-scale-value-tx
@@ -27,7 +25,7 @@
                              :where
                              [?e ::model/id ?id]
                              [?e ::model/display-name ?name]
-                             [?e ::controller ?controller]]
+                             [?e ::model/controller ?controller]]
                            ds
                            controller-id)
                       (into {}))]
@@ -35,4 +33,4 @@
                                (db/squuid))
       ::model/display-name scale-name
       ::raw-value          value
-      ::controller         controller-id}]))
+      ::model/controller         controller-id}]))

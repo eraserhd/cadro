@@ -30,7 +30,7 @@
         scale-id        (d/q '[:find ?scale .
                                :where
                                [?scale ::model/display-name "X"]
-                               [?scale ::scale/controller ?controller]
+                               [?scale ::model/controller ?controller]
                                [?controller ::scale-controller/address "00:00:01"]]
                              @conn)
         {:keys [id tx]} (locus/new-machine-tx @conn)

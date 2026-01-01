@@ -25,7 +25,7 @@
     ::model/display-name
     ::scale-controller/address
     ::scale-controller/status
-    {::scale/_controller [::model/id
+    {::model/_controller [::model/id
                           ::model/display-name
                           ::scale/raw-value]}])
 
@@ -107,7 +107,7 @@
                           :keys [::model/display-name
                                  ::scale-controller/address
                                  ::scale-controller/status
-                                 ::scale/_controller]}]
+                                 ::model/_controller]}]
                       ^{:key (str controller-id)}
                       [:li.scale-controller
                        [:span.name display-name] " " [:span.address "(" address ")"]

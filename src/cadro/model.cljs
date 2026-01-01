@@ -17,6 +17,9 @@
    {:db/cardinality :db.cardinality/one}
    ::transforms
    {:db/cardinality :db.cardinality/many
+    :db/valueType   :db.type/ref}
+   ::controller
+   {:db/cardinality :db.cardinality/one
     :db/valueType   :db.type/ref}})
 
 ;; All objects should have an id?
@@ -66,3 +69,6 @@
                             db))]
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
+
+;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
+(s/def ::controller (s/keys :req [::id]))

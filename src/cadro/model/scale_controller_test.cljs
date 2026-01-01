@@ -65,18 +65,18 @@
               ::scale/raw-value 350}
              {::model/display-name "T"
               ::scale/raw-value 72}}
-           (->> (::scale/_controller controller)
+           (->> (::model/_controller controller)
                 (map #(select-keys % [::model/display-name ::scale/raw-value]))
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
-    (is (every? (comp uuid? ::model/id) (::scale/_controller controller))
+    (is (every? (comp uuid? ::model/id) (::model/_controller controller))
         "Every new scale is assigned a uuid.")
-    (is (= 4 (count (map ::model/id (::scale/_controller controller))))
+    (is (= 4 (count (map ::model/id (::model/_controller controller))))
         "The new uuids are unique."))
   (let [controller (after-receives "X150;\n" "X152;\n")]
     (is (= #{{::model/display-name "X"
               ::scale/raw-value 152}}
-           (->> (::scale/_controller controller)
+           (->> (::model/_controller controller)
                 (map #(select-keys % [::model/display-name ::scale/raw-value]))
                 (into #{})))
         "It updates existing scale values."))
@@ -94,7 +94,7 @@
                   ::scale/raw-value 350}
                  {::model/display-name "T"
                   ::scale/raw-value 72}}
-               (->> (::scale/_controller controller)
+               (->> (::model/_controller controller)
                     (map #(select-keys % [::model/display-name ::scale/raw-value]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))

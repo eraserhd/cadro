@@ -25,7 +25,7 @@
                                         ::status]
                                   :opt [::receive-buffer]))
 
-(s/def :cadro.model.scale/controller ::scale-controller)
+(s/def :cadro.model/controller ::scale-controller)
 
 (defn address
   [ds device-id]
