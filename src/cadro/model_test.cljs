@@ -117,95 +117,95 @@
       ::model/spans        [::model/id :uuid/X]}]
    [#'model/dissociate-scale-tx [::model/id :uuid/machine1] [::model/id :uuid/X]]
    (fn [{:keys [db :uuid/machine1 :uuid/X]}]
-     (is (not (associated? db [::model/id machine1] [::model/id X]))))
+     (is (not (associated? db [::model/id machine1] [::model/id X])))))
 
-   #_
-   (testing "When a scale is associated, components are added to transformed positions"
-     (let [machine-id
-           (fn [db]
-             (d/q '[:find ?machine-id .
-                    :where
-                    [?machine-id ::model/display-name "New Machine"]]
-                  db))
+  #_
+  (testing "When a scale is associated, components are added to transformed positions"
+    (let [machine-id
+          (fn [db]
+            (d/q '[:find ?machine-id .
+                   :where
+                   [?machine-id ::model/display-name "New Machine"]]
+                 db))
 
-           scale-id
-           (fn [db axis-name]
-             (d/q '[:find ?scale-id .
-                    :in $ ?axis-name
-                    :where
-                    [?scale-id ::model/controller]
-                    [?scale-id ::model/display-name ?axis-name]]
-                  db
-                  axis-name))
+          scale-id
+          (fn [db axis-name]
+            (d/q '[:find ?scale-id .
+                   :in $ ?axis-name
+                   :where
+                   [?scale-id ::model/controller]
+                   [?scale-id ::model/display-name ?axis-name]]
+                 db
+                 axis-name))
 
-           assoc-axis
-           (fn [conn axis-name]
-             (d/transact! conn (model/associate-scale-tx @conn (machine-id @conn) (scale-id @conn axis-name)))
-             conn)
+          assoc-axis
+          (fn [conn axis-name]
+            (d/transact! conn (model/associate-scale-tx @conn (machine-id @conn) (scale-id @conn axis-name)))
+            conn)
 
-           dissoc-axis
-           (fn [conn axis-name]
-             (d/transact! conn (model/dissociate-scale-tx @conn (machine-id @conn) (scale-id @conn axis-name)))
-             conn)
+          dissoc-axis
+          (fn [conn axis-name]
+            (d/transact! conn (model/dissociate-scale-tx @conn (machine-id @conn) (scale-id @conn axis-name)))
+            conn)
 
-           setup-machine
-           (fn [{:keys [scales assocs points]}]
-             (let [conn            (d/create-conn (db/schema))
-                   _               (d/transact! conn (scale-controller/add-controllers-tx
-                                                      @conn
-                                                      [{::model/display-name "HC-01"
-                                                        ::scale-controller/address "00:00:01"}]))
-                   data            (->> scales
-                                        (map (fn [[axis-name value]]
-                                               (str axis-name value ";")))
-                                        (apply str))
-                   _               (d/transact! conn (scale-controller/add-received-data-tx
-                                                      @conn
-                                                      [::scale-controller/address "00:00:01"]
-                                                      data))
-                   {:keys [id tx]} (locus/new-machine-tx @conn)
-                   _               (d/transact! conn tx)
-                   _               (doseq [axis-name assocs]
-                                     (assoc-axis conn axis-name))
-                   old-points      (d/q '[:find [?eid ...]
-                                          :where
-                                          [?eid ::model/position]]
-                                        @conn)
-                   _               (d/transact! conn (for [op old-points]
-                                                       [:db/retractEntity op]))
-                   _               (d/transact! conn (for [[pname pos] points]
-                                                       {::model/id (d/squuid)
-                                                        ::model/display-name pname
-                                                        ::model/position pos}))]
-               conn))
+          setup-machine
+          (fn [{:keys [scales assocs points]}]
+            (let [conn            (d/create-conn (db/schema))
+                  _               (d/transact! conn (scale-controller/add-controllers-tx
+                                                     @conn
+                                                     [{::model/display-name "HC-01"
+                                                       ::scale-controller/address "00:00:01"}]))
+                  data            (->> scales
+                                       (map (fn [[axis-name value]]
+                                              (str axis-name value ";")))
+                                       (apply str))
+                  _               (d/transact! conn (scale-controller/add-received-data-tx
+                                                     @conn
+                                                     [::scale-controller/address "00:00:01"]
+                                                     data))
+                  {:keys [id tx]} (locus/new-machine-tx @conn)
+                  _               (d/transact! conn tx)
+                  _               (doseq [axis-name assocs]
+                                    (assoc-axis conn axis-name))
+                  old-points      (d/q '[:find [?eid ...]
+                                         :where
+                                         [?eid ::model/position]]
+                                       @conn)
+                  _               (d/transact! conn (for [op old-points]
+                                                      [:db/retractEntity op]))
+                  _               (d/transact! conn (for [[pname pos] points]
+                                                      {::model/id (d/squuid)
+                                                       ::model/display-name pname
+                                                       ::model/position pos}))]
+              conn))
 
-           points
-           (fn [conn]
-             (->> (d/q '[:find ?name ?pos
-                         :where
-                         [?e ::model/display-name ?name]
-                         [?e ::model/position ?pos]]
-                       @conn)
-                  (into {})))]
-       (is (= {"P1" {"X" 150}}
-              (-> (setup-machine {:scales {"X" 150}
-                                  :assocs #{},
-                                  :points {"P1" {}}})
-                  (assoc-axis "X")
-                  points))
-           "Missing component is added to Origin when scale is associated with machine.")
-       (is (= {"P1" {"X" 150}}
-              (-> (setup-machine {:scales {"X" 205},
-                                  :assocs #{"X"},
-                                  :points {"P1" {"X" 150}}})
-                  (dissoc-axis "X")
-                  points))
-           "Component stays after scale is dissociated with machine.")
-       (is (= {"P1" {"X" 150, "Y" 79}}
-              (-> (setup-machine {:scales {"X" 42
-                                           "Y" 79},
-                                  :assocs #{"X"}
-                                  :points {"P1" {"X" 150}}})
-                  (assoc-axis "X")
-                  points))
-           "Existing component is not overridden when scale is associated with machine.")))))
+          points
+          (fn [conn]
+            (->> (d/q '[:find ?name ?pos
+                        :where
+                        [?e ::model/display-name ?name]
+                        [?e ::model/position ?pos]]
+                      @conn)
+                 (into {})))]
+      (is (= {"P1" {"X" 150}}
+             (-> (setup-machine {:scales {"X" 150}
+                                 :assocs #{},
+                                 :points {"P1" {}}})
+                 (assoc-axis "X")
+                 points))
+          "Missing component is added to Origin when scale is associated with machine.")
+      (is (= {"P1" {"X" 150}}
+             (-> (setup-machine {:scales {"X" 205},
+                                 :assocs #{"X"},
+                                 :points {"P1" {"X" 150}}})
+                 (dissoc-axis "X")
+                 points))
+          "Component stays after scale is dissociated with machine.")
+      (is (= {"P1" {"X" 150, "Y" 79}}
+             (-> (setup-machine {:scales {"X" 42
+                                          "Y" 79},
+                                 :assocs #{"X"}
+                                 :points {"P1" {"X" 150}}})
+                 (assoc-axis "X")
+                 points))
+          "Existing component is not overridden when scale is associated with machine."))))
