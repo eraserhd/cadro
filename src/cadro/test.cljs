@@ -27,8 +27,15 @@
    x))
 
 (defn scenario
-  [data f]
+  [data & fs]
   (let [conn (d/create-conn (db/schema))]
     (d/transact! conn (d data))
-    (f {:conn conn, :db @conn})))
-
+    (doseq [f fs]
+      (if (vector? f)
+        (let [[f-var & args] (d f)
+              _              (prn :f f-var @conn args)
+              result         (apply @f-var @conn args)]
+          (d/transact! conn result))
+        (do
+          (prn :not-vector f)
+          (f {:conn conn, :db @conn}))))))
