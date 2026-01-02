@@ -7,14 +7,6 @@
    [clojure.string :as str]
    [datascript.core :as d]))
 
-(s/def ::scale-controller (s/keys :req [::model/id
-                                        ::model/display-name
-                                        ::model/hardware-address
-                                        ::model/connection-status]
-                                  :opt [::model/receive-buffer]))
-
-(s/def :cadro.model/controller ::scale-controller)
-
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)

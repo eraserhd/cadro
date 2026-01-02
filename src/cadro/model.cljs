@@ -104,7 +104,11 @@
       :eids eids}]))
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
-(s/def ::controller (s/keys :req [::id]))
+(s/def ::controller (s/keys :req [::id
+                                  ::display-name
+                                  ::hardware-address
+                                  ::connection-status]
+                            :opt [::receive-buffer]))
 
 ;; A untranslated reading, as from a scale.
 (s/def ::raw-count number?)
