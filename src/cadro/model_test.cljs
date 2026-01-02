@@ -54,18 +54,18 @@
 (deftest t-associate-dissociate-scale-tx
   (t/scenario
     "Scales aren't automatically associated with machines."
-    [{::model/id           :uuid/X
+    [{::model/id           (t/id :scale/X)
       ::model/display-name "X"
       ::model/raw-count    150
-      ::model/controller   {::model/id :uuid/controller
+      ::model/controller   {::model/id (t/id :controller)
                             ::model/display-name "HC-01"
                             ::model/hardware-address "00:00:01"}}
-     {::model/id           :uuid/machine1
+     {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       :uuid/point1
+      ::model/transforms   {::model/id       (t/id :point1)
                             ::model/position {}}}]
-    (fn [{:keys [db :uuid/machine1 :uuid/X]}]
-      (is (not (associated? db [::model/id machine1] [::model/id X])))))
+    (fn [{:keys [db]}]
+      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)])))))
 
   (t/scenario
     "A scale can be associated."
