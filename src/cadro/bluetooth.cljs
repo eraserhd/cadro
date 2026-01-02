@@ -52,19 +52,19 @@
 (re-posh/reg-event-ds
  ::connect-requested
  (fn [ds [_ device-id]]
-   (scale-controller/set-status-tx device-id :connecting)))
+   (model/set-connection-status-tx device-id :connecting)))
 
 (re-posh/reg-event-ds
  ::connect-completed
  (fn [ds [_ device-id]]
-   (scale-controller/set-status-tx device-id :connected)))
+   (model/set-connection-status-tx device-id :connected)))
 
 (re-posh/reg-event-ds
  ::connect-failed
  (fn [ds [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
-   (scale-controller/set-status-tx device-id :disconnected)))
+   (model/set-connection-status-tx device-id :disconnected)))
 
 (re-posh/reg-event-ds
  ::data-received

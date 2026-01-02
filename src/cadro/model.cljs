@@ -134,6 +134,11 @@
                              :connecting
                              :connected})
 
+(defn set-connection-status-tx
+  [controller-id status]
+  {:pre [(s/assert ::connection-status status)]}
+  [[:db/add controller-id ::connection-status status]])
+
 ;; Unprocess, received data
 (s/def ::receive-buffer string?)
 

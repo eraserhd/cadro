@@ -15,11 +15,6 @@
 
 (s/def :cadro.model/controller ::scale-controller)
 
-(defn set-status-tx
-  [controller-id status]
-  {:pre [(s/assert ::model/connection-status status)]}
-  [[:db/add controller-id ::model/connection-status status]])
-
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
