@@ -4,16 +4,16 @@
    [clojure.walk :as w]
    [datascript.core :as d]))
 
-(def keyword-db (atom {}))
-
-(defn id
-  [kw]
-  {:pre [(keyword? kw)]}
-  (swap! keyword-db (fn [db]
-                      (if (contains? db kw)
-                        db
-                        (assoc db kw (d/squuid)))))
-  (get @keyword-db kw))
+(let [ids (atom {})]
+  (defn id
+    "Reproducibly maps a keyword to a UUID, for test readability."
+    [kw]
+    {:pre [(keyword? kw)]}
+    (swap! ids (fn [db]
+                 (if (contains? db kw)
+                   db
+                   (assoc db kw (d/squuid)))))
+    (get @ids kw)))
 
 (defn scenario
   "Run a test scenario with setup, actions, and assertions."
