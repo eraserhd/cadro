@@ -104,6 +104,20 @@
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
 
+(defn new-machine-tx
+  [ds]
+  (let [machine-id (db/squuid)
+        point-id   (db/squuid)]
+    {:id [::id machine-id]
+     :tx (concat
+          [{::id           machine-id
+            ::display-name "New Machine"
+            ::transforms   [{::id point-id
+                                   ::display-name "Origin"
+                                   ::position {}}]}]
+          (set-reference?-tx ds [::id point-id]))}))
+
+
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id
                                   ::display-name

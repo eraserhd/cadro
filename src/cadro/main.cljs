@@ -3,7 +3,6 @@
    [cadro.bluetooth :as bt]
    [cadro.db]
    [cadro.model]
-   [cadro.model.locus]
    [cadro.ui.axes]
    [cadro.ui.legend]
    [cadro.ui.locus]

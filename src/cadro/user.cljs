@@ -2,7 +2,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.locus :as locus]
    [cadro.test :as t]
    [clojure.spec.alpha :as s]
    [cljs.repl :refer [doc apropos source]]

@@ -1,7 +1,6 @@
 (ns cadro.ui.axes
   (:require
    [cadro.model :as model]
-   [cadro.model.locus :as locus]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
    ["@fortawesome/react-fontawesome" :as fa]

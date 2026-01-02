@@ -2,7 +2,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.locus :as locus]
    [cadro.test :as t]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
@@ -162,7 +161,7 @@
                                                      @conn
                                                      [::model/hardware-address "00:00:01"]
                                                      data))
-                  {:keys [id tx]} (locus/new-machine-tx @conn)
+                  {:keys [id tx]} (model/new-machine-tx @conn)
                   _               (d/transact! conn tx)
                   _               (doseq [axis-name assocs]
                                     (assoc-axis conn axis-name))

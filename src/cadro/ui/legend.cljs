@@ -2,7 +2,6 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
-   [cadro.model.locus :as locus]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.locus :as locusui]
    [datascript.core :as d]
@@ -42,7 +41,7 @@
  ::new-machine-tapped
  [(re-posh/inject-cofx :ds)]
  (fn [{:keys [ds], :as all} _]
-   (let [{:keys [id tx]} (locus/new-machine-tx ds)]
+   (let [{:keys [id tx]} (model/new-machine-tx ds)]
      {:transact tx
       ::locusui/edit id})))
 

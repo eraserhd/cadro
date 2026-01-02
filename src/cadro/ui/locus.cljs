@@ -2,7 +2,6 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model :as model]
-   [cadro.model.locus :as locus]
    [cadro.ui.input :as input]
    [cadro.ui.panel :as panel]
    [reagent.core :as ra]
