@@ -23,7 +23,7 @@
   '[::model/id
     ::model/display-name
     ::model/hardware-address
-    ::scale-controller/status
+    ::model/connection-status
     {::model/_controller [::model/id
                           ::model/display-name
                           ::model/raw-count]}])
@@ -105,13 +105,13 @@
                (map (fn [{controller-id ::model/id
                           :keys [::model/display-name
                                  ::model/hardware-address
-                                 ::scale-controller/status
+                                 ::model/connection-status
                                  ::model/_controller]}]
                       ^{:key (str controller-id)}
                       [:li.scale-controller
                        [:span.name display-name] " " [:span.hardware-address "(" hardware-address ")"]
                        [:div.scales
-                        (case status
+                        (case connection-status
                           (:connected)
                           (into [:ul.scales]
                                 (map (fn [scale]

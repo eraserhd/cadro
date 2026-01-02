@@ -16,7 +16,7 @@
         pull [::model/id
               ::model/display-name
               ::model/hardware-address
-              ::scale-controller/status]
+              ::model/connection-status]
         c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
         c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
         tx2  (scale-controller/add-controllers-tx @conn [{::model/display-name       "Nexus 7 Renamed"
@@ -25,12 +25,12 @@
         c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
     (is (= {::model/display-name "Nexus 7"
             ::model/hardware-address "00:00:01"
-            ::scale-controller/status :disconnected}
+            ::model/connection-status :disconnected}
            (dissoc c1 ::model/id))
         "It stores the 'Nexus 7' controller, marking as disconnected.")
     (is (= {::model/display-name "HC-06"
             ::model/hardware-address "02:03:04"
-            ::scale-controller/status :disconnected}
+            ::model/connection-status :disconnected}
            (dissoc c2 ::model/id))
         "It stores the 'HC-06' controller, marking as disconnected.")
     (is (uuid? (::model/id c1))

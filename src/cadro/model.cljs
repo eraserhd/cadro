@@ -20,7 +20,12 @@
     :db/valueType   :db.type/ref}
    ::controller
    {:db/cardinality :db.cardinality/one
-    :db/valueType   :db.type/ref}})
+    :db/valueType   :db.type/ref}
+   ::connection-status
+   {:db/cardinality :db.cardinality/one}
+   ::hardware-address
+   {:db/cardinality :db.cardinality/one
+    :db/unique      :db.unique/identity}})
 
 ;; All objects should have an id?
 (s/def ::id uuid?)
@@ -121,7 +126,16 @@
       ::raw-count    value
       ::controller   controller-id}]))
 
+;; Bluetooth, ethernet, or whatever address.
 (s/def ::hardware-address string?)
+
+;; Connection status for hardware
+(s/def ::connection-status #{:disconnected
+                             :connecting
+                             :connected})
+
+;; Unprocess, received data
+(s/def ::receive-buffer string?)
 
 (defn store-to-reference-tx
   [ds scale-id]
