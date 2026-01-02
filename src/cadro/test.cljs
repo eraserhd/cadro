@@ -15,16 +15,6 @@
                         (assoc db kw (d/squuid)))))
   (get @keyword-db kw))
 
-(defn d
-  "Massage test data before insertion."
-  [x]
-  (w/postwalk
-   (fn [x]
-     (if (and (keyword? x) (= "uuid" (namespace x)))
-       (id x)
-       x))
-   x))
-
 (defn scenario
   "Run a test scenario with setup, actions, and assertions."
   [& args]
@@ -32,10 +22,10 @@
                             args
                             (into ["Scenario"] args))
         conn (d/create-conn (db/schema))]
-    (d/transact! conn (d data))
+    (d/transact! conn data)
     (doseq [f fs]
       (if (vector? f)
-        (let [[f-var & args] (d f)
+        (let [[f-var & args] f
               result         (apply @f-var @conn args)]
           (d/transact! conn result))
-        (f (merge @keyword-db {:conn conn, :db @conn}))))))
+        (f {:conn conn, :db @conn})))))
