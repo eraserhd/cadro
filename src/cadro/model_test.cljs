@@ -9,30 +9,31 @@
    [datascript.core :as d]))
 
 (deftest t-set-reference?-tx
-  (let [conn     (d/create-conn (db/schema))
-        refs     (fn [db]
-                   (into #{} (d/q '[:find [?id ...]
-                                    :where
-                                    [?p ::model/reference? true]
-                                    [?p ::model/id ?id]]
-                                   db)))
-        _        (d/transact! conn (t/d [{::model/id         :uuid/point1
-                                          ::model/position   {"X" 42}}
-                                         {::model/id         :uuid/point2
-                                          ::model/position   {"X" 107}
-                                          ::model/reference? true}
-                                         {::model/id         :uuid/point3
-                                          ::model/position   {"X" 99}}]))
-        tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
-        _        (d/transact! conn tx)
-        db1      @conn
-        tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
-        _        (d/transact! conn tx)
-        db2      @conn]
-    (is (= (t/d #{:uuid/point1}) (refs db1))
-        "It sets an existing non-reference point to be reference.")
-    (is (= (t/d #{:uuid/point1}) (refs db2))
-        "An existing reference point is still reference.")))
+  (t/scenario
+   [{::model/id         :uuid/point1
+     ::model/position   {"X" 42}}
+    {::model/id         :uuid/point2
+     ::model/position   {"X" 107}
+     ::model/reference? true}
+    {::model/id         :uuid/point3
+     ::model/position   {"X" 99}}]
+   (fn [{:keys [conn]}]
+    (let [refs     (fn [db]
+                     (into #{} (d/q '[:find [?id ...]
+                                      :where
+                                      [?p ::model/reference? true]
+                                      [?p ::model/id ?id]]
+                                     db)))
+          tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
+          _        (d/transact! conn tx)
+          db1      @conn
+          tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
+          _        (d/transact! conn tx)
+          db2      @conn]
+      (is (= (t/d #{:uuid/point1}) (refs db1))
+          "It sets an existing non-reference point to be reference.")
+      (is (= (t/d #{:uuid/point1}) (refs db2))
+          "An existing reference point is still reference.")))))
 
 (defn- associated?
   [db locus-id axis-name]

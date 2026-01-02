@@ -1,5 +1,6 @@
 (ns cadro.test
   (:require
+   [cadro.db :as db]
    [clojure.walk :as w]
    [datascript.core :as d]))
 
@@ -16,7 +17,7 @@
   (get @keyword-db kw))
 
 (defn d
-  "Massage test datoms before insertion."
+  "Massage test data before insertion."
   [x]
   (w/postwalk
    (fn [x]
@@ -24,4 +25,10 @@
        (keyword->uuid x)
        x))
    x))
+
+(defn scenario
+  [data f]
+  (let [conn (d/create-conn (db/schema))]
+    (d/transact! conn (d data))
+    (f {:conn conn, :db @conn})))
 
