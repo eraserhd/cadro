@@ -4,6 +4,7 @@
    [cadro.model :as model]
    [cadro.model.locus :as locus]
    [cadro.model.scale-controller :as scale-controller]
+   [cadro.test :as t]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
 
@@ -15,26 +16,22 @@
                                     [?p ::model/reference? true]
                                     [?p ::model/id ?id]]
                                    db)))
-        machine1 (db/squuid)
-        point1   (db/squuid)
-        point2   (db/squuid)
-        point3   (db/squuid)
-        _        (d/transact! conn [{::model/id         point1
-                                     ::model/position   {"X" 42}}
-                                    {::model/id         point2
-                                     ::model/position   {"X" 107}
-                                     ::model/reference? true}
-                                    {::model/id         point3
-                                     ::model/position   {"X" 99}}])
-        tx       (model/set-reference?-tx @conn [::model/id point1])
+        _        (d/transact! conn (t/d [{::model/id         :uuid/point1
+                                          ::model/position   {"X" 42}}
+                                         {::model/id         :uuid/point2
+                                          ::model/position   {"X" 107}
+                                          ::model/reference? true}
+                                         {::model/id         :uuid/point3
+                                          ::model/position   {"X" 99}}]))
+        tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
         _        (d/transact! conn tx)
         db1      @conn
-        tx       (model/set-reference?-tx @conn [::model/id point1])
+        tx       (model/set-reference?-tx @conn (t/d [::model/id :uuid/point1]))
         _        (d/transact! conn tx)
         db2      @conn]
-    (is (= #{point1} (refs db1))
+    (is (= (t/d #{:uuid/point1}) (refs db1))
         "It sets an existing non-reference point to be reference.")
-    (is (= #{point1} (refs db2))
+    (is (= (t/d #{:uuid/point1}) (refs db2))
         "An existing reference point is still reference.")))
 
 (defn- associated?
