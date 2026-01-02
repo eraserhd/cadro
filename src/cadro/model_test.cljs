@@ -14,6 +14,7 @@
                                 [?p ::model/id ?id]]
                                db)))]
     (t/scenario
+      "It sets an existing non-reference point to be reference."
       [{::model/id         (t/id :point1)
         ::model/position   {"X" 42}}
        {::model/id         (t/id :point2)
@@ -23,10 +24,10 @@
         ::model/position   {"X" 99}}]
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
-        (is (= #{(t/id :point1)} (refs db))
-            "It sets an existing non-reference point to be reference.")))
+        (is (= #{(t/id :point1)} (refs db)))))
 
     (t/scenario
+      "Idempotency - an existing reference point is still a reference."
       [{::model/id         (t/id :point1)
         ::model/position   {"X" 42}}
        {::model/id         (t/id :point2)
@@ -37,8 +38,7 @@
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
-        (is (= #{(t/id :point1)} (refs db))
-            "An existing reference point is still reference.")))))
+        (is (= #{(t/id :point1)} (refs db)))))))
 
 (defn- associated?
   [db locus-id scale-id]
