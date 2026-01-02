@@ -1,7 +1,6 @@
 (ns cadro.bluetooth
   (:require
    [cadro.model :as model]
-   [cadro.model.scale-controller :as scale-controller]
    [datascript.core :as d]
    [re-posh.core :as re-posh]
    [re-posh.db :as re-posh.db]
@@ -69,7 +68,7 @@
 (re-posh/reg-event-ds
  ::data-received
  (fn [ds [_ device-id data]]
-   (scale-controller/add-received-data-tx ds device-id data)))
+   (model/add-received-data-tx ds device-id data)))
 
 (re-posh/reg-event-ds
  ::subscription-error-received

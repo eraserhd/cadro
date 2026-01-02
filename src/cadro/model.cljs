@@ -2,6 +2,7 @@
   (:require
    [cadro.db :as db]
    [clojure.spec.alpha :as s]
+   [clojure.string :as str]
    [datascript.core :as d]))
 
 (db/register-schema!
@@ -163,6 +164,25 @@
                     ::id new-id
                     ::connection-status new-status)))
          controller-list)))
+
+(defn add-received-data-tx
+  [ds controller-id data]
+  {:pre [(d/db? ds)
+         (string? data)]}
+  (let [to-process                    (-> (str (::receive-buffer (d/entity ds controller-id))
+                                               data)
+                                          (str/replace #"[;\s]+" ";")
+                                          (str/replace #"^;+" ""))
+        [to-process new-scale-values] (loop [to-process       to-process
+                                             new-scale-values {}]
+                                        (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
+                                          (recur left (assoc new-scale-values axis (* value-str 1.0)))
+                                          [to-process new-scale-values]))]
+    (concat
+      [[:db/add controller-id ::receive-buffer to-process]]
+      (mapcat (fn [[scale-name value]]
+                (upsert-raw-count-tx ds controller-id scale-name value))
+              new-scale-values))))
 
 (defn store-to-reference-tx
   [ds scale-id]
