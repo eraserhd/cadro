@@ -121,6 +121,8 @@
       ::raw-count    value
       ::controller   controller-id}]))
 
+(s/def ::hardware-address string?)
+
 (defn store-to-reference-tx
   [ds scale-id]
   [])

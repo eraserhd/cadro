@@ -43,7 +43,7 @@
             (let [device-list (into []
                                     (map (fn [device]
                                            {::model/display-name       (.-name device)
-                                            ::scale-controller/address (.-address device)}))
+                                            ::model/hardware-address (.-address device)}))
                                     devices)]
               (rf/dispatch [::device-list-arrived device-list])))
           (fn [error]
@@ -84,7 +84,7 @@
  ::connect
  (fn connect* [device-id]
    (rf/dispatch [::connect-requested device-id])
-   (let [device-address (scale-controller/address @@re-posh.db/store device-id)]
+   (let [device-address (::model/hardware-address (d/entity @@re-posh.db/store device-id))]
      (.connect
       bt-impl
       device-address

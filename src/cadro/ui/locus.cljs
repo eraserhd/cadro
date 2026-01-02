@@ -17,12 +17,12 @@
  (fn []
    {:type :query
     :query '[:find [?id ...]
-             :where [?id ::scale-controller/address]]}))
+             :where [?id ::model/hardware-address]]}))
 
 (def scale-pull
   '[::model/id
     ::model/display-name
-    ::scale-controller/address
+    ::model/hardware-address
     ::scale-controller/status
     {::model/_controller [::model/id
                           ::model/display-name
@@ -104,12 +104,12 @@
          (into [:ul.scale-controllers]
                (map (fn [{controller-id ::model/id
                           :keys [::model/display-name
-                                 ::scale-controller/address
+                                 ::model/hardware-address
                                  ::scale-controller/status
                                  ::model/_controller]}]
                       ^{:key (str controller-id)}
                       [:li.scale-controller
-                       [:span.name display-name] " " [:span.address "(" address ")"]
+                       [:span.name display-name] " " [:span.hardware-address "(" hardware-address ")"]
                        [:div.scales
                         (case status
                           (:connected)

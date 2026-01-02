@@ -61,7 +61,7 @@
       ::model/raw-count    150
       ::model/controller   {::model/id :uuid/controller
                             ::model/display-name "HC-01"
-                            ::scale-controller/address "00:00:01"}}
+                            ::model/hardware-address "00:00:01"}}
      {::model/id           :uuid/machine1
       ::model/display-name "New Machine"
       ::model/transforms   {::model/id       :uuid/point1
@@ -76,7 +76,7 @@
       ::model/raw-count    150
       ::model/controller   {::model/id :uuid/controller
                             ::model/display-name "HC-01"
-                            ::scale-controller/address "00:00:01"}}
+                            ::model/hardware-address "00:00:01"}}
      {::model/id           :uuid/machine1
       ::model/display-name "New Machine"
       ::model/transforms   {::model/id       :uuid/point1
@@ -92,7 +92,7 @@
       ::model/raw-count    150
       ::model/controller   {::model/id :uuid/controller
                             ::model/display-name "HC-01"
-                            ::scale-controller/address "00:00:01"}}
+                            ::model/hardware-address "00:00:01"}}
      {::model/id           :uuid/machine1
       ::model/display-name "New Machine"
       ::model/transforms   {::model/id       :uuid/point1
@@ -109,7 +109,7 @@
       ::model/raw-count    150
       ::model/controller   {::model/id :uuid/controller
                             ::model/display-name "HC-01"
-                            ::scale-controller/address "00:00:01"}}
+                            ::model/hardware-address "00:00:01"}}
      {::model/id           :uuid/machine1
       ::model/display-name "New Machine"
       ::model/transforms   {::model/id       :uuid/point1
@@ -154,14 +154,14 @@
                   _               (d/transact! conn (scale-controller/add-controllers-tx
                                                      @conn
                                                      [{::model/display-name "HC-01"
-                                                       ::scale-controller/address "00:00:01"}]))
+                                                       ::model/hardware-address "00:00:01"}]))
                   data            (->> scales
                                        (map (fn [[axis-name value]]
                                               (str axis-name value ";")))
                                        (apply str))
                   _               (d/transact! conn (scale-controller/add-received-data-tx
                                                      @conn
-                                                     [::scale-controller/address "00:00:01"]
+                                                     [::model/hardware-address "00:00:01"]
                                                      data))
                   {:keys [id tx]} (locus/new-machine-tx @conn)
                   _               (d/transact! conn tx)

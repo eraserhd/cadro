@@ -9,27 +9,27 @@
 (deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
         tx   (scale-controller/add-controllers-tx @conn [{::model/display-name      "Nexus 7"
-                                                          ::scale-controller/address "00:00:01"}
+                                                          ::model/hardware-address "00:00:01"}
                                                          {::model/display-name      "HC-06"
-                                                          ::scale-controller/address "02:03:04"}])
+                                                          ::model/hardware-address "02:03:04"}])
         _    (d/transact! conn tx)
         pull [::model/id
               ::model/display-name
-              ::scale-controller/address
+              ::model/hardware-address
               ::scale-controller/status]
-        c1   (d/pull @conn pull [::scale-controller/address "00:00:01"])
-        c2   (d/pull @conn pull [::scale-controller/address "02:03:04"])
+        c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
+        c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
         tx2  (scale-controller/add-controllers-tx @conn [{::model/display-name       "Nexus 7 Renamed"
-                                                          ::scale-controller/address  "00:00:01"}])
+                                                          ::model/hardware-address  "00:00:01"}])
         _    (d/transact! conn tx2)
-        c1'  (d/pull @conn pull [::scale-controller/address "00:00:01"])]
+        c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
     (is (= {::model/display-name "Nexus 7"
-            ::scale-controller/address "00:00:01"
+            ::model/hardware-address "00:00:01"
             ::scale-controller/status :disconnected}
            (dissoc c1 ::model/id))
         "It stores the 'Nexus 7' controller, marking as disconnected.")
     (is (= {::model/display-name "HC-06"
-            ::scale-controller/address "02:03:04"
+            ::model/hardware-address "02:03:04"
             ::scale-controller/status :disconnected}
            (dissoc c2 ::model/id))
         "It stores the 'HC-06' controller, marking as disconnected.")
@@ -44,10 +44,10 @@
 
 (defn- after-receives
   [& receives]
-  (let [controller-id [::scale-controller/address "00:00:01"]
+  (let [controller-id [::model/hardware-address "00:00:01"]
         conn          (d/create-conn (db/schema))
         tx            (scale-controller/add-controllers-tx @conn [{::model/display-name "HC-06"
-                                                                   ::scale-controller/address "00:00:01"}])
+                                                                   ::model/hardware-address "00:00:01"}])
         _             (d/transact! conn tx)
         _             (doseq [data receives]
                         (let [tx (scale-controller/add-received-data-tx @conn controller-id data)]

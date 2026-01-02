@@ -8,11 +8,8 @@
    [datascript.core :as d]))
 
 (db/register-schema!
- {::address {:db/cardinality :db.cardinality/one
-             :db/unique      :db.unique/identity}
-  ::status  {:db/cardinality :db.cardinality/one}})
+ {::status  {:db/cardinality :db.cardinality/one}})
 
-(s/def ::address string?)
 (s/def ::status #{:disconnected
                   :connecting
                   :connected})
@@ -20,15 +17,11 @@
 
 (s/def ::scale-controller (s/keys :req [::model/id
                                         ::model/display-name
-                                        ::address
+                                        ::model/hardware-address
                                         ::status]
                                   :opt [::receive-buffer]))
 
 (s/def :cadro.model/controller ::scale-controller)
-
-(defn address
-  [ds device-id]
-  (::address (d/entity ds device-id)))
 
 (defn set-status-tx
   [controller-id status]
@@ -38,7 +31,7 @@
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
-         (s/assert (s/coll-of (s/keys :req [::model/display-name ::address])) controller-list)]}
+         (s/assert (s/coll-of (s/keys :req [::model/display-name ::model/hardware-address])) controller-list)]}
   (let [addr->controller (into {}
                                (map (juxt ::address identity))
                                (d/q '[:find [(pull ?obj [::model/id ::address ::status]) ...]
