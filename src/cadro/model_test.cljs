@@ -85,20 +85,20 @@
 
   (t/scenario
     "Association is idempotent."
-    [{::model/id           :uuid/X
+    [{::model/id           (t/id :scale/X)
       ::model/display-name "X"
       ::model/raw-count    150
-      ::model/controller   {::model/id :uuid/controller
+      ::model/controller   {::model/id (t/id :controller)
                             ::model/display-name "HC-01"
                             ::model/hardware-address "00:00:01"}}
-     {::model/id           :uuid/machine1
+     {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       :uuid/point1
+      ::model/transforms   {::model/id       (t/id :point1)
                             ::model/position {}}}]
-   [#'model/associate-scale-tx [::model/id :uuid/machine1] [::model/id :uuid/X]]
-   [#'model/associate-scale-tx [::model/id :uuid/machine1] [::model/id :uuid/X]]
-   (fn [{:keys [db :uuid/machine1 :uuid/X]}]
-     (is (associated? db [::model/id machine1] [::model/id X]))))
+   [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
+   [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
+   (fn [{:keys [db]}]
+     (is (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))
 
   (t/scenario
     "Scales can be dissociated."
