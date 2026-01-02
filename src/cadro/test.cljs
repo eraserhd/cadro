@@ -1,6 +1,7 @@
 (ns cadro.test
   (:require
    [cadro.db :as db]
+   [clojure.test :refer [testing]]
    [clojure.walk :as w]
    [datascript.core :as d]))
 
@@ -20,12 +21,13 @@
   [& args]
   (let [[title data & fs] (if (string? (first args))
                             args
-                            (into ["Scenario"] args))
-        conn (d/create-conn (db/schema))]
-    (d/transact! conn data)
-    (doseq [f fs]
-      (if (vector? f)
-        (let [[f-var & args] f
-              result         (apply @f-var @conn args)]
-          (d/transact! conn result))
-        (f {:conn conn, :db @conn})))))
+                            (into ["Scenario"] args))]
+    (testing title
+      (let [conn (d/create-conn (db/schema))]
+        (d/transact! conn data)
+        (doseq [f fs]
+          (if (vector? f)
+            (let [[f-var & args] f
+                  result         (apply @f-var @conn args)]
+              (d/transact! conn result))
+            (f {:conn conn, :db @conn})))))))
