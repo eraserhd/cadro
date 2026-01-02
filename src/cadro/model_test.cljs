@@ -117,6 +117,51 @@
    (fn [{:keys [db]}]
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
+(deftest t-add-relative-positions
+  (t/scenario
+    "Adds positions relative to the reference point."
+    [{::model/id         (t/id :machine1)
+      ::model/transforms [{::model/id         (t/id :p1)
+                           ::model/position   {(t/id :scale/X) 142
+                                               (t/id :scale/Y) 87
+                                               (t/id :scale/Z) -107}}
+                          {::model/id         (t/id :p2)
+                           ::model/position   {(t/id :scale/X) 196
+                                               (t/id :scale/Y) -101
+                                               (t/id :scale/Z) -98}
+                           ::model/reference? true}
+                          {::model/id         (t/id :p3)
+                           ::model/position   {(t/id :scale/X) 67
+                                               (t/id :scale/Y) 111
+                                               (t/id :scale/Z) 82}}]}]
+    (fn [{:keys [db]}]
+      (is (= [{::model/id         (t/id :machine1)
+               ::model/transforms [{::model/id                (t/id :p1)
+                                    ::model/position          {(t/id :scale/X) 142
+                                                               (t/id :scale/Y) 87
+                                                               (t/id :scale/Z) -107}
+                                    ::model/relative-position {(t/id :scale/X) -54
+                                                               (t/id :scale/Y) 188
+                                                               (t/id :scale/Z) -9}}
+                                   {::model/id                (t/id :p2)
+                                    ::model/position          {(t/id :scale/X) 196
+                                                               (t/id :scale/Y) -101
+                                                               (t/id :scale/Z) -98}
+                                    ::model/relative-position {(t/id :scale/X) 0
+                                                               (t/id :scale/Y) 0
+                                                               (t/id :scale/Z) 0}
+                                    ::model/reference?        true}
+                                   {::model/id                (t/id :p3)
+                                    ::model/position          {(t/id :scale/X) 67
+                                                               (t/id :scale/Y) 111
+                                                               (t/id :scale/Z) 82}
+                                    ::model/relative-position {(t/id :scale/X) -129
+                                                               (t/id :scale/Y) 212
+                                                               (t/id :scale/Z) 180}}]}]
+             (->> (d/q model/toplevel-loci-eids-q db)
+               (map #(d/pull db model/toplevel-loci-pull %))
+               model/add-relative-positions))))))
+
 (deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
         tx   (model/add-controllers-tx @conn [{::model/display-name      "Nexus 7"
