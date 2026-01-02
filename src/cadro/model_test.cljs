@@ -14,30 +14,30 @@
                                 [?p ::model/id ?id]]
                                db)))]
     (t/scenario
-      [{::model/id         :uuid/point1
+      [{::model/id         (t/id :point1)
         ::model/position   {"X" 42}}
-       {::model/id         :uuid/point2
+       {::model/id         (t/id :point2)
         ::model/position   {"X" 107}
         ::model/reference? true}
-       {::model/id         :uuid/point3
+       {::model/id         (t/id :point3)
         ::model/position   {"X" 99}}]
-      [#'model/set-reference?-tx [::model/id :uuid/point1]]
+      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
-        (is (= (t/d #{:uuid/point1}) (refs db))
+        (is (= #{(t/id :point1)} (refs db))
             "It sets an existing non-reference point to be reference.")))
 
     (t/scenario
-      [{::model/id         :uuid/point1
+      [{::model/id         (t/id :point1)
         ::model/position   {"X" 42}}
-       {::model/id         :uuid/point2
+       {::model/id         (t/id :point2)
         ::model/position   {"X" 107}
         ::model/reference? true}
-       {::model/id         :uuid/point3
+       {::model/id         (t/id :point3)
         ::model/position   {"X" 99}}]
-      [#'model/set-reference?-tx [::model/id :uuid/point1]]
-      [#'model/set-reference?-tx [::model/id :uuid/point1]]
+      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
+      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
-        (is (= (t/d #{:uuid/point1}) (refs db))
+        (is (= #{(t/id :point1)} (refs db))
             "An existing reference point is still reference.")))))
 
 (defn- associated?

@@ -6,10 +6,9 @@
 
 (def keyword-db (atom {}))
 
-(defn keyword->uuid
+(defn id
   [kw]
-  {:pre [(keyword? kw)
-         (= "uuid" (namespace kw))]}
+  {:pre [(keyword? kw)]}
   (swap! keyword-db (fn [db]
                       (if (contains? db kw)
                         db
@@ -22,7 +21,7 @@
   (w/postwalk
    (fn [x]
      (if (and (keyword? x) (= "uuid" (namespace x)))
-       (keyword->uuid x)
+       (id x)
        x))
    x))
 
