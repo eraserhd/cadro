@@ -33,7 +33,7 @@
 (re-posh/reg-event-ds
  ::device-list-arrived
  (fn [ds [_ device-list]]
-   (scale-controller/add-controllers-tx ds device-list)))
+   (model/add-controllers-tx ds device-list)))
 
 (rf/reg-fx
  ::fetch-device-list

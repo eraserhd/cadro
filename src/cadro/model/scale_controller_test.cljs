@@ -8,10 +8,10 @@
 
 (deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
-        tx   (scale-controller/add-controllers-tx @conn [{::model/display-name      "Nexus 7"
-                                                          ::model/hardware-address "00:00:01"}
-                                                         {::model/display-name      "HC-06"
-                                                          ::model/hardware-address "02:03:04"}])
+        tx   (model/add-controllers-tx @conn [{::model/display-name      "Nexus 7"
+                                               ::model/hardware-address "00:00:01"}
+                                              {::model/display-name      "HC-06"
+                                               ::model/hardware-address "02:03:04"}])
         _    (d/transact! conn tx)
         pull [::model/id
               ::model/display-name
@@ -19,8 +19,8 @@
               ::model/connection-status]
         c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
         c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
-        tx2  (scale-controller/add-controllers-tx @conn [{::model/display-name       "Nexus 7 Renamed"
-                                                          ::model/hardware-address  "00:00:01"}])
+        tx2  (model/add-controllers-tx @conn [{::model/display-name       "Nexus 7 Renamed"
+                                               ::model/hardware-address  "00:00:01"}])
         _    (d/transact! conn tx2)
         c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
     (is (= {::model/display-name "Nexus 7"
@@ -46,8 +46,8 @@
   [& receives]
   (let [controller-id [::model/hardware-address "00:00:01"]
         conn          (d/create-conn (db/schema))
-        tx            (scale-controller/add-controllers-tx @conn [{::model/display-name "HC-06"
-                                                                   ::model/hardware-address "00:00:01"}])
+        tx            (model/add-controllers-tx @conn [{::model/display-name "HC-06"
+                                                        ::model/hardware-address "00:00:01"}])
         _             (d/transact! conn tx)
         _             (doseq [data receives]
                         (let [tx (scale-controller/add-received-data-tx @conn controller-id data)]

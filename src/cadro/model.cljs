@@ -146,6 +146,24 @@
 ;; Unprocess, received data
 (s/def ::receive-buffer string?)
 
+(defn add-controllers-tx
+  [ds controller-list]
+  {:pre [(d/db? ds)
+         (s/assert (s/coll-of (s/keys :req [::display-name ::hardware-address])) controller-list)]}
+  (let [addr->controller (into {}
+                               (map (juxt ::hardware-address identity))
+                               (d/q '[:find [(pull ?obj [::id ::hardware-address ::connection-status]) ...]
+                                      :where [?obj ::hardware-address]]
+                                    ds))]
+    (map (fn [{:keys [::hardware-address], :as scale-controller}]
+           (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
+                 new-status                     (or connection-status :disconnected)
+                 new-id                         (or id (db/squuid))]
+             (assoc scale-controller
+                    ::id new-id
+                    ::connection-status new-status)))
+         controller-list)))
+
 (defn store-to-reference-tx
   [ds scale-id]
   [])
