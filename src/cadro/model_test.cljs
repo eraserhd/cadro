@@ -55,6 +55,7 @@
 
 (deftest t-associate-dissociate-scale-tx
   (t/scenario
+    "Scales aren't automatically associated with machines."
     [{::model/id           :uuid/X
       ::model/display-name "X"
       ::model/raw-count    150
@@ -69,6 +70,7 @@
       (is (not (associated? db [::model/id machine1] [::model/id X])))))
 
   (t/scenario
+    "A scale can be associated."
     [{::model/id           :uuid/X
       ::model/display-name "X"
       ::model/raw-count    150
@@ -84,6 +86,7 @@
      (is (associated? db [::model/id machine1] [::model/id X]))))
 
   (t/scenario
+    "Association is idempotent."
     [{::model/id           :uuid/X
       ::model/display-name "X"
       ::model/raw-count    150
@@ -100,6 +103,7 @@
      (is (associated? db [::model/id machine1] [::model/id X]))))
 
   (t/scenario
+    "Scales can be dissociated."
     [{::model/id           :uuid/X
       ::model/display-name "X"
       ::model/raw-count    150
@@ -109,8 +113,8 @@
      {::model/id           :uuid/machine1
       ::model/display-name "New Machine"
       ::model/transforms   {::model/id       :uuid/point1
-                            ::model/position {}}}]
-   [#'model/associate-scale-tx [::model/id :uuid/machine1] [::model/id :uuid/X]]
+                            ::model/position {}}
+      ::model/spans        [::model/id :uuid/X]}]
    [#'model/dissociate-scale-tx [::model/id :uuid/machine1] [::model/id :uuid/X]]
    (fn [{:keys [db :uuid/machine1 :uuid/X]}]
      (is (not (associated? db [::model/id machine1] [::model/id X]))))

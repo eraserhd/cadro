@@ -27,8 +27,12 @@
    x))
 
 (defn scenario
-  [data & fs]
-  (let [conn (d/create-conn (db/schema))]
+  "Run a test scenario with setup, actions, and assertions."
+  [& args]
+  (let [[title data & fs] (if (string? (first args))
+                            args
+                            (into ["Scenario"] args))
+        conn (d/create-conn (db/schema))]
     (d/transact! conn (d data))
     (doseq [f fs]
       (if (vector? f)
