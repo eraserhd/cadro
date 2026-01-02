@@ -69,6 +69,19 @@
       ::display-name
       ::raw-count]}])
 
+(def toplevel-loci-eids-q
+  '[:find [?eid ...]
+    :where
+    [?eid ::transforms]
+    (not [_ ::transforms ?eid])])
+
+(def toplevel-loci-pull
+  '[::id
+    ::display-name
+    ::reference?
+    ::position
+    {::transforms ...}])
+
 (defn root-path-axes
   [root-path]
   (->> (iterate (comp first ::_transforms) root-path)
@@ -104,6 +117,10 @@
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
 
+(defn add-relative-positions
+  [tree]
+  tree)
+
 (defn new-machine-tx
   [ds]
   (let [machine-id (db/squuid)
@@ -116,7 +133,6 @@
                                    ::display-name "Origin"
                                    ::position {}}]}]
           (set-reference?-tx ds [::id point-id]))}))
-
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id

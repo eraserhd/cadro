@@ -10,31 +10,18 @@
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
-(def loci-eids-q
-  '[:find [?eid ...]
-    :where
-    [?eid ::model/transforms]
-    (not [_ ::model/transforms ?eid])])
-
 (re-posh/reg-sub
  ::loci-eids
  (fn [_ _]
    {:type  :query
-    :query loci-eids-q}))
-
-(def loci-pull
-  '[::model/id
-    ::model/display-name
-    ::model/reference?
-    ::model/position
-    {::model/transforms ...}])
+    :query model/toplevel-loci-eids-q}))
 
 (re-posh/reg-sub
  ::loci
  :<- [::loci-eids]
  (fn [eids]
    {:type    :pull-many
-    :pattern loci-pull
+    :pattern model/toplevel-loci-pull
     :ids     eids}))
 
 (re-posh/reg-event-fx
