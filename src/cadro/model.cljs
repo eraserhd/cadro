@@ -117,7 +117,7 @@
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
 
-(defn add-relative-positions
+(defn add-distances
   [tree]
   tree)
 

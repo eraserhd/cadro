@@ -117,7 +117,7 @@
    (fn [{:keys [db]}]
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
-(deftest t-add-relative-positions
+(deftest t-add-distances
   (t/scenario
     "Adds positions relative to the reference point."
     [{::model/id         (t/id :machine1)
@@ -160,7 +160,7 @@
                                                       (t/id :scale/Z) 180}}]}]
              (->> (d/q model/toplevel-loci-eids-q db)
                (map #(d/pull db model/toplevel-loci-pull %))
-               model/add-relative-positions))))))
+               model/add-distances))))))
 
 (deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
