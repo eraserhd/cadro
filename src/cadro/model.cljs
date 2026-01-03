@@ -117,9 +117,36 @@
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
 
+(defn- globalized-tree-reference [tree]
+  (cond
+    (::reference? tree) tree
+    (::position tree)   nil
+    :else               (first (keep globalized-tree-reference (::transforms tree)))))
+
+(defn- pairwise
+  [f a b default]
+  (->> (concat (keys a) (keys b))
+       distinct
+       (map (fn [k]
+              [k (f (get a k default) (get b k default))]))
+       (into {})))
+
+(defn- position-
+  [a b]
+  (pairwise - a b 0))
+
+(defn- add-distance1
+  ([tree]
+   (add-distance1 tree (globalized-tree-reference tree)))
+  ([tree {rpos ::position, :as r}]
+   (if-let [p (::position tree)]
+     (assoc tree ::distance (position- p rpos))
+     (update tree ::transforms (fn [transforms]
+                                 (mapv #(add-distance1 % r) transforms))))))
+
 (defn add-distances
-  [tree]
-  tree)
+  [tree-list]
+  (map add-distance1 tree-list))
 
 (defn new-machine-tx
   [ds]
