@@ -117,6 +117,55 @@
    (fn [{:keys [db]}]
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
+(deftest t-add-axes-names
+  (is (= [{::model/id         (t/id :machine1)
+           ::model/transforms [{::model/id         (t/id :p1)
+                                ::model/position   {(t/id :scale/X) 142
+                                                    (t/id :scale/Y) 87
+                                                    (t/id :scale/Z) -107}
+                                ::model/axes-names {(t/id :scale/X) "X"
+                                                    (t/id :scale/Y) "Y"
+                                                    (t/id :scale/Z) "Z"}}
+                               {::model/id         (t/id :p2)
+                                ::model/position   {(t/id :scale/X) 196
+                                                    (t/id :scale/Y) -101
+                                                    (t/id :scale/Z) -98}
+                                ::model/axes-names {(t/id :scale/X) "X"
+                                                    (t/id :scale/Y) "Y"
+                                                    (t/id :scale/Z) "Z"}
+                                ::model/reference? true}
+                               {::model/id         (t/id :p3)
+                                ::model/position   {(t/id :scale/X) 67
+                                                    (t/id :scale/Y) 111
+                                                    (t/id :scale/Z) 82}
+                                ::model/axes-names {(t/id :scale/X) "X"
+                                                    (t/id :scale/Y) "Y"
+                                                    (t/id :scale/Z) "Z"}}]
+           ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
+                          {::model/id (t/id :scale/Y), ::model/display-name "Y"}
+                          {::model/id (t/id :scale/Z), ::model/display-name "Z"}]
+           ::model/axes-names {(t/id :scale/X) "X"
+                               (t/id :scale/Y) "Y"
+                               (t/id :scale/Z) "Z"}}]
+         (model/add-axes-names
+           [{::model/id         (t/id :machine1)
+             ::model/transforms [{::model/id         (t/id :p1)
+                                  ::model/position   {(t/id :scale/X) 142
+                                                      (t/id :scale/Y) 87
+                                                      (t/id :scale/Z) -107}}
+                                 {::model/id         (t/id :p2)
+                                  ::model/position   {(t/id :scale/X) 196
+                                                      (t/id :scale/Y) -101
+                                                      (t/id :scale/Z) -98}
+                                  ::model/reference? true}
+                                 {::model/id         (t/id :p3)
+                                  ::model/position   {(t/id :scale/X) 67
+                                                      (t/id :scale/Y) 111
+                                                      (t/id :scale/Z) 82}}]
+             ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
+                            {::model/id (t/id :scale/Y), ::model/display-name "Y"}
+                            {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]))))
+
 (deftest t-add-distances
   (t/scenario
     "Adds distance to the reference point."
@@ -133,7 +182,10 @@
                           {::model/id         (t/id :p3)
                            ::model/position   {(t/id :scale/X) 67
                                                (t/id :scale/Y) 111
-                                               (t/id :scale/Z) 82}}]}]
+                                               (t/id :scale/Z) 82}}]
+      ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
+                     {::model/id (t/id :scale/Y), ::model/display-name "Y"}
+                     {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
     (fn [{:keys [db]}]
       (is (= [{::model/id         (t/id :machine1)
                ::model/transforms [{::model/id         (t/id :p1)
@@ -157,7 +209,10 @@
                                                         (t/id :scale/Z) 82}
                                     ::model/distance   {(t/id :scale/X) -129
                                                         (t/id :scale/Y) 212
-                                                        (t/id :scale/Z) 180}}]}]
+                                                        (t/id :scale/Z) 180}}]
+               ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
+                              {::model/id (t/id :scale/Y), ::model/display-name "Y"}
+                              {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
              (->> (d/q model/toplevel-loci-eids-q db)
                (map #(d/pull db model/toplevel-loci-pull %))
                model/add-distances))))))

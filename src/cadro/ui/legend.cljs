@@ -56,6 +56,7 @@
                           ::model/display-name
                           ::model/reference?
                           ::model/position
+                          ::model/distance
                           ::model/transforms]}]
                ^{:key (str id)}
                [:li
@@ -70,7 +71,9 @@
                                                   faSolid/faLocationCrosshairs
                                                   nil)
                                           :fixedWidth true}]
-                  display-name]]
+                  display-name
+                  (when distance
+                    (pr-str distance))]]
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
         transforms))
@@ -78,6 +81,6 @@
 (defn legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   [legend-keys @(re-posh/subscribe [::loci])]
+   [legend-keys (model/add-distances @(re-posh/subscribe [::loci]))]
    [:div.controls
     [new-machine-button]]])

@@ -3,7 +3,8 @@
    [cadro.db :as db]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
-   [datascript.core :as d]))
+   [datascript.core :as d]
+   [medley.core :as medley]))
 
 (db/register-schema!
   {::id
@@ -80,7 +81,8 @@
     ::display-name
     ::reference?
     ::position
-    {::transforms ...}])
+    {::transforms ...
+     ::spans [::id ::display-name]}])
 
 (defn root-path-axes
   [root-path]
@@ -116,6 +118,22 @@
                             db))]
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
+
+(defn add-axes-names1
+  ([tree]
+   (add-axes-names1 tree {}))
+  ([tree axes-names]
+   (let [axes-names (into axes-names
+                          (map (juxt ::id ::display-name))
+                          (::spans tree))]
+     (-> tree
+         (assoc ::axes-names axes-names)
+         (medley/update-existing ::transforms (fn [transforms]
+                                                (mapv #(add-axes-names1 % axes-names)
+                                                      transforms)))))))
+
+(defn add-axes-names [tree-list]
+  (map add-axes-names1 tree-list))
 
 (defn- globalized-tree-reference [tree]
   (cond
