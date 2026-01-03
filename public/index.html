@@ -207,14 +207,22 @@
         .legend li {
           list-style-type: none;
         }
-        .legend li button.locus {
-          padding-left: calc(var(--list-depth) * 1.25rem);
-        }
 
         button.locus {
           display: flex;
           align-items: center;
           gap: 0.25em;
+          padding-left: calc(var(--list-depth) * 1.25rem);
+        }
+
+        button.locus .name-and-distance {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        button.locus .display-name {
+          font-size: 0.75rem;
         }
 
         button.locus > svg {

@@ -4,6 +4,8 @@
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.locus :as locusui]
+   [clojure.set :as set]
+   [clojure.string :as str]
    [datascript.core :as d]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
@@ -49,6 +51,13 @@
    {:on-click #(rf/dispatch [::new-machine-tapped])}
    new-machine-icon])
 
+(defn- position-str
+  [position axes-names]
+  (let [axis-name->value (set/rename-keys position axes-names)]
+    (->> (sort (keys axis-name->value))
+         (map #(str % ": " (get axis-name->value %)))
+         (str/join ","))))
+
 (defn- legend-keys
   [transforms]
   (into [:ul]
@@ -56,6 +65,7 @@
                           ::model/display-name
                           ::model/reference?
                           ::model/position
+                          ::model/axes-names
                           ::model/distance
                           ::model/transforms]}]
                ^{:key (str id)}
@@ -71,9 +81,11 @@
                                                   faSolid/faLocationCrosshairs
                                                   nil)
                                           :fixedWidth true}]
-                  display-name
-                  (when distance
-                    (pr-str distance))]]
+                  (if distance
+                    [:div.name-and-distance
+                     [:span.display-name display-name]
+                     [:span.distance (str "(" (position-str distance axes-names) ")")]]
+                    display-name)]]
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
         transforms))
@@ -81,6 +93,8 @@
 (defn legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   [legend-keys (model/add-distances @(re-posh/subscribe [::loci]))]
+   [legend-keys (-> @(re-posh/subscribe [::loci])
+                    model/add-axes-names
+                    model/add-distances)]
    [:div.controls
     [new-machine-button]]])
