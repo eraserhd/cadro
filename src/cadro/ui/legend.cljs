@@ -56,7 +56,7 @@
   (let [axis-name->value (set/rename-keys position axes-names)]
     (->> (sort (keys axis-name->value))
          (map #(str % ": " (get axis-name->value %)))
-         (str/join ","))))
+         (str/join ", "))))
 
 (defn- legend-keys
   [transforms]
@@ -84,7 +84,7 @@
                   (if distance
                     [:div.name-and-distance
                      [:span.display-name display-name]
-                     [:span.distance (str "(" (position-str distance axes-names) ")")]]
+                     [:span.distance (position-str distance axes-names)]]
                     display-name)]]
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
