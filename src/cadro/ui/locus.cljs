@@ -63,7 +63,7 @@
      (model/dissociate-scale-tx ds locus-id scale-id))))
 
 (defn scale-controls
-  [locus-id
+  [fixture-id
    {scale-id ::model/id
     :keys [::model/display-name
            ::model/raw-count]}
@@ -75,7 +75,7 @@
             :on-change (fn [e]
                          (rf/dispatch
                           [::scale-checkbox-changed
-                           locus-id
+                           fixture-id
                            [::model/id scale-id]
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
