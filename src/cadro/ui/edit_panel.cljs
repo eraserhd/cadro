@@ -85,17 +85,17 @@
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
   (fn []
-    (when-let [locus-id @thing-to-edit]
+    (when-let [fixture-id @thing-to-edit]
       (let [scales            @(re-posh/subscribe [::scales])
-            locus             @(re-posh/subscribe [::locus locus-id])
+            locus             @(re-posh/subscribe [::locus fixture-id])
             associated-scales (->> (::model/spans locus)
                                    (map ::model/id)
                                    (into #{}))]
-        ^{:key (str locus-id)}
+        ^{:key (str fixture-id)}
         [panel/panel {:title "Edit Fixture"
                       :class "edit-panel"
                       :on-close #(reset! thing-to-edit nil)}
-         [input/input {:eid  locus-id
+         [input/input {:eid  fixture-id
                        :attr ::model/display-name
                        :label "Display Name"}]
          [:h2 "Scales"]
@@ -113,7 +113,7 @@
                           (:connected)
                           (into [:ul.scales]
                                 (map (fn [scale]
-                                       [scale-controls locus-id scale associated-scales]))
+                                       [scale-controls fixture-id scale associated-scales]))
                                 _controller)
 
                           (:disconnected)
