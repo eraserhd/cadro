@@ -51,12 +51,15 @@
    {:on-click #(rf/dispatch [::new-machine-tapped])}
    new-machine-icon])
 
-(defn- position-str
+(defn- position-hiccup
   [position axes-names]
   (let [axis-name->value (set/rename-keys position axes-names)]
-    (->> (sort (keys axis-name->value))
-         (map #(str % ": " (get axis-name->value %)))
-         (str/join ", "))))
+    (into [:span.distance]
+          (->> (sort (keys axis-name->value))
+               (map (fn [axis-name]
+                      [:span.component
+                       [:span.axis-name axis-name]
+                       [:span.axis-value (get axis-name->value axis-name)]]))))))
 
 (defn- legend-keys
   [transforms]
@@ -84,7 +87,7 @@
                   (if distance
                     [:div.name-and-distance
                      [:span.display-name display-name]
-                     [:span.distance (position-str distance axes-names)]]
+                     (position-hiccup distance axes-names)]
                     display-name)]]
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
