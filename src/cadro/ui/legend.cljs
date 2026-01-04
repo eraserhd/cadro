@@ -41,7 +41,7 @@
      (model/set-reference?-tx ds eid))))
 
 (re-posh/reg-event-fx
- ::locus-longpressed
+ ::legend-key-longpressed
  (fn [_ [_ eid]]
    {::locusui/edit eid}))
 
@@ -78,7 +78,7 @@
                [:li
                 (if position
                   [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped [::model/id id]])
-                                  :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                                  :on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
                    [:button.point {:class [(if reference? "reference" "non-reference")]}
                     [:> fa/FontAwesomeIcon {:icon (if reference?
                                                     faSolid/faLocationCrosshairs
@@ -87,7 +87,7 @@
                     [:div.name-and-distance
                      [:span.display-name display-name]
                      (position-hiccup distance spans)]]]
-                  [gestures/wrap {:on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                  [gestures/wrap {:on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
                    [:button.fixture {}
                     display-name]])
                 (when-not (empty? transforms)
