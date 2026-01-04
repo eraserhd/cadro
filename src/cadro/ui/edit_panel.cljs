@@ -40,10 +40,10 @@
 
 (re-posh/reg-sub
  ::locus
- (fn [_ [_ locus-id]]
+ (fn [_ [_ fixture-id]]
    {:type    :pull
     :pattern fixture-pull
-    :id      locus-id}))
+    :id      fixture-id}))
 
 (rf/reg-event-fx
  ::connect-clicked
