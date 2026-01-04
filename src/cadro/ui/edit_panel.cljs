@@ -87,8 +87,8 @@
   (fn []
     (when-let [fixture-id @thing-to-edit]
       (let [scales            @(re-posh/subscribe [::scales])
-            locus             @(re-posh/subscribe [::fixture fixture-id])
-            associated-scales (->> (::model/spans locus)
+            fixture           @(re-posh/subscribe [::fixture fixture-id])
+            associated-scales (->> (::model/spans fixture)
                                    (map ::model/id)
                                    (into #{}))]
         ^{:key (str fixture-id)}
