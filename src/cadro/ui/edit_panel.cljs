@@ -39,7 +39,7 @@
      [::model/id]}])
 
 (re-posh/reg-sub
- ::locus
+ ::fixture
  (fn [_ [_ fixture-id]]
    {:type    :pull
     :pattern fixture-pull
@@ -87,7 +87,7 @@
   (fn []
     (when-let [fixture-id @thing-to-edit]
       (let [scales            @(re-posh/subscribe [::scales])
-            locus             @(re-posh/subscribe [::locus fixture-id])
+            locus             @(re-posh/subscribe [::fixture fixture-id])
             associated-scales (->> (::model/spans locus)
                                    (map ::model/id)
                                    (into #{}))]
