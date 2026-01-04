@@ -210,7 +210,7 @@
                ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                               {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                               {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
-             (->> (d/q model/toplevel-loci-eids-q db)
+             (->> (d/q model/top-level-fixture-eids-q db)
                (map #(d/pull db model/toplevel-loci-pull %))
                model/add-distances))))))
 

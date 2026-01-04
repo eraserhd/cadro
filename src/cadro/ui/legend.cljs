@@ -16,7 +16,7 @@
  ::loci-eids
  (fn [_ _]
    {:type  :query
-    :query model/toplevel-loci-eids-q}))
+    :query model/top-level-fixture-eids-q}))
 
 (re-posh/reg-sub
  ::loci

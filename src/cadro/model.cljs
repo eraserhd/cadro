@@ -70,7 +70,7 @@
       ::display-name
       ::raw-count]}])
 
-(def toplevel-loci-eids-q
+(def top-level-fixture-eids-q
   '[:find [?eid ...]
     :where
     [?eid ::transforms]
