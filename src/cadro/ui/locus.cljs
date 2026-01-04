@@ -93,7 +93,7 @@
                                    (into #{}))]
         ^{:key (str locus-id)}
         [panel/panel {:title "Edit Fixture"
-                      :class "locus-edit-panel"
+                      :class "edit-panel"
                       :on-close #(reset! thing-to-edit nil)}
          [input/input {:eid  locus-id
                        :attr ::model/display-name
