@@ -34,7 +34,7 @@
     :pattern scale-pull
     :ids      eids}))
 
-(def locus-pull
+(def fixture-pull
   '[{::model/spans
      [::model/id]}])
 
@@ -42,7 +42,7 @@
  ::locus
  (fn [_ [_ locus-id]]
    {:type    :pull
-    :pattern locus-pull
+    :pattern fixture-pull
     :id      locus-id}))
 
 (rf/reg-event-fx
