@@ -57,10 +57,10 @@
 
 (re-posh/reg-event-ds
  ::scale-checkbox-changed
- (fn [ds [_ locus-id scale-id checked?]]
+ (fn [ds [_ fixture-id scale-id checked?]]
    (if checked?
-     (model/associate-scale-tx ds locus-id scale-id)
-     (model/dissociate-scale-tx ds locus-id scale-id))))
+     (model/associate-scale-tx ds fixture-id scale-id)
+     (model/dissociate-scale-tx ds fixture-id scale-id))))
 
 (defn scale-controls
   [fixture-id
