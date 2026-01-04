@@ -8,7 +8,7 @@
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]))
 
-(def ^:private locus-to-edit (ra/atom nil))
+(def ^:private thing-to-edit (ra/atom nil))
 
 (re-posh/reg-sub
  ::scale-eids
@@ -85,7 +85,7 @@
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])
   (fn []
-    (when-let [locus-id @locus-to-edit]
+    (when-let [locus-id @thing-to-edit]
       (let [scales            @(re-posh/subscribe [::scales])
             locus             @(re-posh/subscribe [::locus locus-id])
             associated-scales (->> (::model/spans locus)
@@ -94,7 +94,7 @@
         ^{:key (str locus-id)}
         [panel/panel {:title "Edit Fixture"
                       :class "locus-edit-panel"
-                      :on-close #(reset! locus-to-edit nil)}
+                      :on-close #(reset! thing-to-edit nil)}
          [input/input {:eid  locus-id
                        :attr ::model/display-name
                        :label "Display Name"}]
@@ -136,5 +136,5 @@
 (rf/reg-fx
  ::edit
  (fn [eid]
-   (reset! locus-to-edit eid)
+   (reset! thing-to-edit eid)
    (rf/dispatch [::edit-panel-opened])))
