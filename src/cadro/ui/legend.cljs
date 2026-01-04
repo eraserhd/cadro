@@ -13,14 +13,14 @@
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
 (re-posh/reg-sub
- ::loci-eids
+ ::top-level-fixture-eids
  (fn [_ _]
    {:type  :query
     :query model/top-level-fixture-eids-q}))
 
 (re-posh/reg-sub
  ::loci
- :<- [::loci-eids]
+ :<- [::top-level-fixture-eids]
  (fn [eids]
    {:type    :pull-many
     :pattern model/fixtures-and-points-trees-pull
