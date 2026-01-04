@@ -78,11 +78,8 @@
                [:li
                 [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
                                 :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
-                 [:button.locus {:class [(if reference?
-                                           "reference"
-                                           "non-reference")
-                                         (when position
-                                           "point")]}
+                 [:button {:class [(if reference? "reference" "non-reference")
+                                   (if position "point" "fixture")]}
                   [:> fa/FontAwesomeIcon {:icon (if reference?
                                                   faSolid/faLocationCrosshairs
                                                   nil)

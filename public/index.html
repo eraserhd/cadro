@@ -208,33 +208,27 @@
           list-style-type: none;
         }
 
-        button.locus {
+        button.point, button.fixture {
           display: flex;
           align-items: center;
           gap: 0.25em;
-          padding-left: calc(var(--list-depth) * 1.25rem);
         }
 
-        button.locus .name-and-distance {
+        button.point .name-and-distance {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
           gap: 0;
         }
 
-        button.locus .display-name {
+        button.point .display-name {
           font-size: 0.65rem;
         }
-        button.locus .distance {
+        button.point .distance {
           font-size: 1.25rem;
         }
 
-        button.locus > svg {
-          width: 1em;
-          flex-shrink: 0;
-        }
-
-        button.locus.non-reference::before {
+        button.point.non-reference::before {
           content: "";
           width: 1em;
           display: inline-block;
