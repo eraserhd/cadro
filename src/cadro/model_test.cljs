@@ -41,13 +41,13 @@
         (is (= #{(t/id :point1)} (refs db)))))))
 
 (defn- associated?
-  [db locus-id scale-id]
+  [db fixture-id scale-id]
   (let [result (d/q '[:find ?scale-id .
-                      :in $ ?locus-id ?scale-id
+                      :in $ ?fixture-id ?scale-id
                       :where
-                      [?locus-id ::model/spans ?scale-id]]
+                      [?fixture-id ::model/spans ?scale-id]]
                     db
-                    locus-id
+                    fixture-id
                     scale-id)]
     (boolean result)))
 
