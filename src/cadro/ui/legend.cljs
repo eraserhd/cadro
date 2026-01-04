@@ -35,7 +35,7 @@
       ::locusui/edit id})))
 
 (re-posh/reg-event-ds
- ::locus-tapped
+ ::point-tapped
  (fn [ds [_ eid]]
    (when (::model/position (d/entity ds eid))
      (model/set-reference?-tx ds eid))))
@@ -77,7 +77,7 @@
                ^{:key (str id)}
                [:li
                 (if position
-                  [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
+                  [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped [::model/id id]])
                                   :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
                    [:button.point {:class [(if reference? "reference" "non-reference")]}
                     [:> fa/FontAwesomeIcon {:icon (if reference?
@@ -87,8 +87,7 @@
                     [:div.name-and-distance
                      [:span.display-name display-name]
                      (position-hiccup distance spans)]]]
-                  [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
-                                  :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                  [gestures/wrap {:on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
                    [:button.fixture {}
                     display-name]])
                 (when-not (empty? transforms)
