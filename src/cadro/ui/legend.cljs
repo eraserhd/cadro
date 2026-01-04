@@ -19,7 +19,7 @@
     :query model/top-level-fixture-eids-q}))
 
 (re-posh/reg-sub
- ::loci
+ ::fixtures-and-points-trees
  :<- [::top-level-fixture-eids]
  (fn [eids]
    {:type    :pull-many
@@ -97,7 +97,7 @@
 (defn legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   [legend-keys (-> @(re-posh/subscribe [::loci])
+   [legend-keys (-> @(re-posh/subscribe [::fixtures-and-points-trees])
                     model/propagate-spans
                     model/add-distances)]
    [:div.controls
