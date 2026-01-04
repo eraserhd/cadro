@@ -211,7 +211,7 @@
                               {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                               {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
              (->> (d/q model/top-level-fixture-eids-q db)
-               (map #(d/pull db model/toplevel-loci-pull %))
+               (map #(d/pull db model/fixtures-and-points-trees-pull %))
                model/add-distances))))))
 
 (deftest t-add-controllers-tx

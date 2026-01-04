@@ -23,7 +23,7 @@
  :<- [::loci-eids]
  (fn [eids]
    {:type    :pull-many
-    :pattern model/toplevel-loci-pull
+    :pattern model/fixtures-and-points-trees-pull
     :ids     eids}))
 
 (re-posh/reg-event-fx

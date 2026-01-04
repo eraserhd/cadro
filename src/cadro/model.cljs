@@ -76,7 +76,7 @@
     [?eid ::transforms]
     (not [_ ::transforms ?eid])])
 
-(def toplevel-loci-pull
+(def fixtures-and-points-trees-pull
   '[::id
     ::display-name
     ::reference?
