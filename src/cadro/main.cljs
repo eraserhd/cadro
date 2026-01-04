@@ -5,7 +5,7 @@
    [cadro.model]
    [cadro.ui.axes]
    [cadro.ui.legend]
-   [cadro.ui.locus]
+   [cadro.ui.edit-panel]
    [clojure.spec.alpha :as s]
    [reagent.dom.client :as rdc]
    [re-frame.core :as rf]))
@@ -15,7 +15,7 @@
 (defn cadro []
   [:<>
    [cadro.ui.legend/legend]
-   [cadro.ui.locus/edit-panel]
+   [cadro.ui.edit-panel/edit-panel]
    [cadro.ui.axes/axes-panel]])
 
 (rf/reg-event-fx

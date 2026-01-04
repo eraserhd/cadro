@@ -1,4 +1,4 @@
-(ns cadro.ui.locus
+(ns cadro.ui.edit-panel
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model :as model]

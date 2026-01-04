@@ -3,7 +3,7 @@
    [cadro.db :as db]
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
-   [cadro.ui.locus :as locusui]
+   [cadro.ui.edit-panel :as edit-panel]
    [clojure.set :as set]
    [clojure.string :as str]
    [datascript.core :as d]
@@ -32,7 +32,7 @@
  (fn [{:keys [ds], :as all} _]
    (let [{:keys [id tx]} (model/new-machine-tx ds)]
      {:transact tx
-      ::locusui/edit id})))
+      ::edit-panel/edit id})))
 
 (re-posh/reg-event-ds
  ::point-tapped
@@ -43,7 +43,7 @@
 (re-posh/reg-event-fx
  ::legend-key-longpressed
  (fn [_ [_ eid]]
-   {::locusui/edit eid}))
+   {::edit-panel/edit eid}))
 
 (def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
