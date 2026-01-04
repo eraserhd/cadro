@@ -117,37 +117,34 @@
    (fn [{:keys [db]}]
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
-(deftest t-add-axes-names
+(deftest t-propagate-spans
   (is (= [{::model/id         (t/id :machine1)
            ::model/transforms [{::model/id         (t/id :p1)
                                 ::model/position   {(t/id :scale/X) 142
                                                     (t/id :scale/Y) 87
                                                     (t/id :scale/Z) -107}
-                                ::model/axes-names {(t/id :scale/X) "X"
-                                                    (t/id :scale/Y) "Y"
-                                                    (t/id :scale/Z) "Z"}}
+                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}
                                {::model/id         (t/id :p2)
                                 ::model/position   {(t/id :scale/X) 196
                                                     (t/id :scale/Y) -101
                                                     (t/id :scale/Z) -98}
-                                ::model/axes-names {(t/id :scale/X) "X"
-                                                    (t/id :scale/Y) "Y"
-                                                    (t/id :scale/Z) "Z"}
+                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]
                                 ::model/reference? true}
                                {::model/id         (t/id :p3)
                                 ::model/position   {(t/id :scale/X) 67
                                                     (t/id :scale/Y) 111
                                                     (t/id :scale/Z) 82}
-                                ::model/axes-names {(t/id :scale/X) "X"
-                                                    (t/id :scale/Y) "Y"
-                                                    (t/id :scale/Z) "Z"}}]
+                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}]
            ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                           {::model/id (t/id :scale/Y), ::model/display-name "Y"}
-                          {::model/id (t/id :scale/Z), ::model/display-name "Z"}]
-           ::model/axes-names {(t/id :scale/X) "X"
-                               (t/id :scale/Y) "Y"
-                               (t/id :scale/Z) "Z"}}]
-         (model/add-axes-names
+                          {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
+         (model/propagate-spans
            [{::model/id         (t/id :machine1)
              ::model/transforms [{::model/id         (t/id :p1)
                                   ::model/position   {(t/id :scale/X) 142

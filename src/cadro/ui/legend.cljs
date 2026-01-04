@@ -52,8 +52,11 @@
    new-machine-icon])
 
 (defn- position-hiccup
-  [position axes-names]
-  (let [axis-name->value (set/rename-keys position axes-names)]
+  [position spans]
+  (let [axes-names       (into {}
+                               (map (juxt ::model/id ::model/display-name))
+                               spans)
+        axis-name->value (set/rename-keys position axes-names)]
     (into [:span.distance]
           (->> (sort (keys axis-name->value))
                (map (fn [axis-name]
@@ -68,7 +71,7 @@
                           ::model/display-name
                           ::model/reference?
                           ::model/position
-                          ::model/axes-names
+                          ::model/spans
                           ::model/distance
                           ::model/transforms]}]
                ^{:key (str id)}
@@ -87,7 +90,7 @@
                   (if distance
                     [:div.name-and-distance
                      [:span.display-name display-name]
-                     (position-hiccup distance axes-names)]
+                     (position-hiccup distance spans)]
                     display-name)]]
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
@@ -97,7 +100,7 @@
   [:div.floating-card.legend
    [:h1 "Legend"]
    [legend-keys (-> @(re-posh/subscribe [::loci])
-                    model/add-axes-names
+                    model/propagate-spans
                     model/add-distances)]
    [:div.controls
     [new-machine-button]]])

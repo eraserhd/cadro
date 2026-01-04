@@ -119,21 +119,20 @@
     [{:error "::model/reference? point does not have ::model/position."
       :eids eids}]))
 
-(defn add-axes-names1
-  ([tree]
-   (add-axes-names1 tree {}))
-  ([tree axes-names]
-   (let [axes-names (into axes-names
-                          (map (juxt ::id ::display-name))
-                          (::spans tree))]
-     (-> tree
-         (assoc ::axes-names axes-names)
-         (medley/update-existing ::transforms (fn [transforms]
-                                                (mapv #(add-axes-names1 % axes-names)
-                                                      transforms)))))))
-
-(defn add-axes-names [tree-list]
-  (map add-axes-names1 tree-list))
+(defn propagate-spans
+  "Collects spans from more-root elements and marks all things and points."
+  [tree-list]
+  (map (fn propagate-over-tree
+         ([tree] (propagate-over-tree tree []))
+         ([tree spans]
+          (let [spans (->> (concat spans (::spans tree))
+                           (medley/distinct-by ::id)
+                           (into []))]
+            (-> tree
+              (assoc ::spans spans)
+              (medley/update-existing ::transforms (fn [transforms]
+                                                     (mapv #(propagate-over-tree % spans) transforms)))))))
+       tree-list))
 
 (defn- globalized-tree-reference [tree]
   (cond
