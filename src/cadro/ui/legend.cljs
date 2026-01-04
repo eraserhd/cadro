@@ -76,19 +76,21 @@
                           ::model/transforms]}]
                ^{:key (str id)}
                [:li
-                [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
-                                :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
-                 [:button {:class [(if reference? "reference" "non-reference")
-                                   (if position "point" "fixture")]}
-                  [:> fa/FontAwesomeIcon {:icon (if reference?
-                                                  faSolid/faLocationCrosshairs
-                                                  nil)
-                                          :fixedWidth true}]
-                  (if distance
+                (if position
+                  [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
+                                  :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                   [:button.point {:class [(if reference? "reference" "non-reference")]}
+                    [:> fa/FontAwesomeIcon {:icon (if reference?
+                                                    faSolid/faLocationCrosshairs
+                                                    nil)
+                                            :fixedWidth true}]
                     [:div.name-and-distance
                      [:span.display-name display-name]
-                     (position-hiccup distance spans)]
-                    display-name)]]
+                     (position-hiccup distance spans)]]]
+                  [gestures/wrap {:on-tap   #(rf/dispatch [::locus-tapped [::model/id id]])
+                                  :on-press #(rf/dispatch [::locus-longpressed [::model/id id]])}
+                   [:button.fixture {}
+                    display-name]])
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
         transforms))
