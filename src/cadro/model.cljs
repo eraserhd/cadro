@@ -204,7 +204,7 @@
 
 (defn set-connection-status-tx
   [controller-id status]
-  {:pre [(s/assert ::connection-status status)]}
+  {:pre [(s/valid? ::connection-status status)]}
   [[:db/add controller-id ::connection-status status]])
 
 ;; Unprocess, received data
@@ -213,7 +213,7 @@
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
-         (s/assert (s/coll-of (s/keys :req [::display-name ::hardware-address])) controller-list)]}
+         (s/valid? (s/coll-of (s/keys :req [::display-name ::hardware-address])) controller-list)]}
   (let [addr->controller (into {}
                                (map (juxt ::hardware-address identity))
                                (d/q '[:find [(pull ?obj [::id ::hardware-address ::connection-status]) ...]

@@ -1,8 +1,14 @@
 (ns cadro.transforms
-  (:refer-clojure :exclude [-]))
+  (:refer-clojure :exclude [-])
+  (:require
+   [clojure.spec.alpha :as s]))
+
+(s/def ::locus (s/or :nil nil? :non-nil (s/map-of any? number?)))
 
 (defn- pairwise
   [f default a b]
+  {:pre [(s/valid? ::locus a)
+         (s/valid? ::locus b)]}
   (->> (concat (keys a) (keys b))
        distinct
        (map (fn [k]
