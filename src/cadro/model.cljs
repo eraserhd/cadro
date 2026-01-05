@@ -1,6 +1,7 @@
 (ns cadro.model
   (:require
    [cadro.db :as db]
+   [cadro.transforms :as tr]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [datascript.core :as d]
@@ -140,24 +141,12 @@
     (::position tree)   nil
     :else               (first (keep globalized-tree-reference (::transforms tree)))))
 
-(defn- pairwise
-  [f a b default]
-  (->> (concat (keys a) (keys b))
-       distinct
-       (map (fn [k]
-              [k (f (get a k default) (get b k default))]))
-       (into {})))
-
-(defn- position-
-  [a b]
-  (pairwise - a b 0))
-
 (defn- add-distance1
   ([tree]
    (add-distance1 tree (globalized-tree-reference tree)))
   ([tree {rpos ::position, :as r}]
    (if-let [p (::position tree)]
-     (assoc tree ::distance (position- p rpos))
+     (assoc tree ::distance (tr/- p rpos))
      (update tree ::transforms (fn [transforms]
                                  (mapv #(add-distance1 % r) transforms))))))
 
