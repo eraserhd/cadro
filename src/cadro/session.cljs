@@ -22,15 +22,24 @@
 (defn clear! []
   (reset! session empty-session))
 
+(defn- save-session!
+  "Stores session to localStorage."
+  [session]
+  (let [data (->> (clara/query session model/persistent-facts)
+                  (map (fn [{:keys [?e ?a ?v]}]
+                         [?e ?a ?v]))
+                  pr-str)]
+    (.setItem js/localStorage "session" data)))
+
 (r/reg-fx
  :session
  (fn [new-session]
-   (let [new-session (clara/fire-rules new-session)
-         tuples      (->> (clara/query new-session model/persistent-facts)
-                          (map (fn [{:keys [?e ?a ?v]}]
-                                 [?e ?a ?v])))]
-     (reset! session new-session)
-     (.setItem js/localStorage "session" (pr-str tuples)))))
+   (let [new-session (clara/fire-rules new-session)]
+     (if-let [errors (seq (model/errors new-session))]
+       (js/console.warn "Session not saved due to errors:" errors)
+       (do
+         (reset! session new-session)
+         (save-session! new-session))))))
 
 (r/reg-cofx
  :session
