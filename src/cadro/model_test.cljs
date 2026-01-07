@@ -8,13 +8,35 @@
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
 
-(deftest t-Reference
+(deftest t-set-reference
   (let [id      (random-uuid)
         session (-> session/empty-session
-                    (clara/insert (model/->Reference id))
+                    (model/set-reference id)
                     (clara/fire-rules))]
     (is (= id (model/reference session))
-        "Can retrieve current reference.")))
+        "Can retrieve current reference.")
+    (is (empty? (model/errors session))
+        "No invariant errors"))
+  (let [id1     (random-uuid)
+        id2     (random-uuid)
+        session (-> session/empty-session
+                    (model/set-reference id1)
+                    (model/set-reference id2)
+                    (clara/fire-rules))]
+    (is (= id2 (model/reference session))
+        "Updates current reference.")
+    (is (empty? (model/errors session))
+        "No invariant errors"))
+  (let [id1     (random-uuid)
+        id2     (random-uuid)
+        session (-> session/empty-session
+                    (clara/insert (model/->Reference id1))
+                    (clara/insert (model/->Reference id2))
+                    (clara/fire-rules))]
+    (prn :errors (clara/query session model/errors-query))
+    (is (= [(model/->InvariantError "more than one Reference point in session")]
+           (model/errors session)))))
+
 (deftest t-set-reference?-tx
   (let [refs (fn [db]
                (into #{} (d/q '[:find [?id ...]

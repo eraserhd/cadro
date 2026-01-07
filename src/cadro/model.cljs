@@ -3,6 +3,7 @@
    [cadro.db :as db]
    [cadro.transforms :as tr]
    [clara.rules :as clara]
+   [clara.rules.accumulators :as acc]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [datascript.core :as d]
@@ -18,6 +19,16 @@
 (defrecord HardwareAddress [controler-id address])
 (defrecord ConnectionStatus [controller-id status])
 (defrecord ReceiveBuffer [controller-id data])
+
+
+(defrecord InvariantError [error])
+
+(clara/defquery errors-query []
+  [?error <- InvariantError])
+
+(defn errors [session]
+  (map :?error (clara/query session errors-query)))
+
 
 (db/register-schema!
   {::id
@@ -63,18 +74,23 @@
 
 ;; Is this the current reference point, used to computed displayed coordinates?
 (s/def ::reference? boolean?)
-(defmethod db/invariants ::only-one-reference?
-  [db]
-  (let [eids (d/q '[:find [?eid ...]
-                    :where [?eid ::reference? true]]
-                  db)]
-    (when (<= 2 (count eids))
-      [{:error "More than one entity tagged with ::model/reference?."
-        :eids eids}])))
+
+(clara/defrule only-one-reference
+  [?refcount <- (acc/count) :from [Reference]]
+  [:test (<= 2 ?refcount)]
+  =>
+  (clara/insert! (->InvariantError "more than one Reference point in session")))
 
 (clara/defquery reference-query
   []
   [?ref <- Reference])
+
+(defn set-reference [session id]
+  (as-> session $
+    (clara/fire-rules $)
+    (apply clara/retract $ (when-let [r (:?ref (first (clara/query $ reference-query)))]
+                             [r]))
+    (clara/insert $ (->Reference id))))
 
 (defn reference [session]
   (:id (:?ref (first (clara/query session reference-query)))))
