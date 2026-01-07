@@ -10,4 +10,5 @@
                                 :git/sha "675d2a085012f44a2ff1229b2c51554146052e91"}
         re-posh/re-posh        {:mvn/version "0.3.3"}
         dev.weavejester/medley {:mvn/version "1.9.0"}
-        binaryage/devtools    {:mvn/version "1.0.7"}}}
+        binaryage/devtools     {:mvn/version "1.0.7"}
+        com.cerner/clara-rules {:mvn/version "0.24.0"}}}

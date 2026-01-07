@@ -1,11 +1,24 @@
 (ns cadro.model
   (:require
    [cadro.db :as db]
+   [cadro.session :as session]
    [cadro.transforms :as tr]
+   [clara.rules :as clara]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [datascript.core :as d]
    [medley.core :as medley]))
+
+(defrecord DisplaysAs [id display-name])
+(defrecord Spans [id scale])
+(defrecord Reference [id])
+(defrecord Transforms [id child])
+(defrecord Coordinates [id coordinates])
+(defrecord ControlsScale [controller-id scale-id])
+(defrecord RawCount [scale-id value])
+(defrecord HardwareAddress [controler-id address])
+(defrecord ConnectionStatus [controller-id status])
+(defrecord ReceiveBuffer [controller-id data])
 
 (db/register-schema!
   {::id
@@ -36,8 +49,10 @@
 ;; Display name is a common concept everywhere.
 (s/def ::display-name string?)
 
+
 ;; Something can span an axis, meaning coordinates extend into it.
 (s/def ::spans (s/coll-of (s/keys :req [::id ::display-name])))
+
 
 (defn associate-scale-tx
   [ds fixture-id scale-id]
