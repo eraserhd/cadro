@@ -20,11 +20,6 @@
     :pattern model/root-path-pull
     :id      [::model/id reference-uuid]}))
 
-(re-posh/reg-event-ds
- ::store-to-reference-clicked
- (fn [ds [_ scale-id]]
-   (model/store-to-reference-tx ds [::model/id scale-id])))
-
 (defn axes-panel []
   (let [reference-tree @(rf/subscribe [::reference-tree])
         axes           (model/root-path-axes reference-tree)]
@@ -38,6 +33,5 @@
                   [:div.value raw-count]
                   [:button.icon.store
                    [:> fa/FontAwesomeIcon
-                    {:icon faSolid/faLocationCrosshairs
-                     :on-click #(rf/dispatch [::store-to-reference-clicked id])}]]]))
+                    {:icon faSolid/faLocationCrosshairs}]]]))
           axes)))

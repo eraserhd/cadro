@@ -283,7 +283,3 @@
       (mapcat (fn [[scale-name value]]
                 (upsert-raw-count-tx ds controller-id scale-name value))
               new-scale-values))))
-
-(defn store-to-reference-tx
-  [ds scale-id]
-  [])
