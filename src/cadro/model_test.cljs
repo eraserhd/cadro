@@ -30,11 +30,10 @@
   (let [id1     (random-uuid)
         id2     (random-uuid)
         session (-> session/empty-session
-                    (clara/insert (model/->Reference id1))
-                    (clara/insert (model/->Reference id2))
+                    (clara/insert (model/asserted id1 ::model/reference? true))
+                    (clara/insert (model/asserted id2 ::model/reference? true))
                     (clara/fire-rules))]
-    (prn :errors (clara/query session model/errors-query))
-    (is (= [(model/->InvariantError "more than one Reference point in session")]
+    (is (= [(model/->InvariantError "more than one reference point in session")]
            (model/errors session)))))
 
 (deftest t-set-reference?-tx

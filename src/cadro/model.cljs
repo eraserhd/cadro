@@ -9,16 +9,19 @@
    [datascript.core :as d]
    [medley.core :as medley]))
 
-(defrecord DisplaysAs [id display-name])
-(defrecord Spans [id scale])
-(defrecord Transforms [id child])
-(defrecord Coordinates [id coordinates])
-(defrecord ControlsScale [controller-id scale-id])
-(defrecord RawCount [scale-id value])
-(defrecord HardwareAddress [controler-id address])
-(defrecord ConnectionStatus [controller-id status])
-(defrecord ReceiveBuffer [controller-id data])
+(defrecord Fact [e a v persistent?])
+(defn asserted [e a v]
+  (->Fact e a v true))
 
+(defn derived [e a v]
+  (->Fact e a v false))
+
+;;-------------------------------------------------------------------------------
+
+(clara/defquery persistent-facts []
+  [?fact <- Fact (= persistent? true)])
+
+;;-------------------------------------------------------------------------------
 
 (defrecord InvariantError [error])
 
@@ -27,7 +30,6 @@
 
 (defn errors [session]
   (map :?error (clara/query session errors-query)))
-
 
 (db/register-schema!
   {::id
@@ -52,9 +54,6 @@
    {:db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity}})
 
-;; All objects should have an id?
-(s/def ::id uuid?)
-
 ;; Display name is a common concept everywhere.
 (s/def ::display-name string?)
 
@@ -71,28 +70,29 @@
   [ds fixture-id scale-id]
   [[:db/retract fixture-id ::spans scale-id]])
 
+;;-------------------------------------------------------------------------------
+
 ;; Is this the current reference point, used to computed displayed coordinates?
-(defrecord Reference [id])
 
 (clara/defrule only-one-reference
-  [?refcount <- (acc/count) :from [Reference]]
+  [?refcount <- (acc/count) :from [Fact (= a ::reference?)]]
   [:test (<= 2 ?refcount)]
   =>
-  (clara/insert! (->InvariantError "more than one Reference point in session")))
+  (clara/insert! (->InvariantError "more than one reference point in session")))
 
 (clara/defquery reference-query
   []
-  [?ref <- Reference])
+  [?ref <- Fact (= e ?id) (= a ::reference?)])
 
 (defn set-reference [session id]
   (as-> session $
     (clara/fire-rules $)
     (apply clara/retract $ (when-let [r (:?ref (first (clara/query $ reference-query)))]
                              [r]))
-    (clara/insert $ (->Reference id))))
+    (clara/insert $ (asserted id ::reference? true))))
 
 (defn reference [session]
-  (:id (:?ref (first (clara/query session reference-query)))))
+  (:?id (first (clara/query session reference-query))))
 
 (def root-path-pull
   '[::position
@@ -198,11 +198,11 @@
                                         ::position {}}]}]
                (set-reference?-tx ds [::id point-id]))
      :session (-> session
-                  (clara/insert (->DisplaysAs machine-id "New Machine")
-                                (->Transforms machine-id point-id)
-                                (->DisplaysAs point-id "Origin")
-                                (->Coordinates point-id {})
-                                (->Reference point-id)))}))
+                  (clara/insert (asserted machine-id ::displays-as "New Machine")
+                                (asserted machine-id ::transforms  point-id)
+                                (asserted point-id ::displays-as "Origin")
+                                (asserted point-id ::coordinates {})
+                                (asserted point-id ::reference? true)))}))
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id
