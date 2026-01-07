@@ -2,12 +2,16 @@
   (:require-macros
    [clara.rules :as clara])
   (:require
+   [cadro.model]
    [clara.rules :as clara]
    [re-frame.core :as r]))
 
-(clara/defsession empty-session)
+(clara/defsession empty-session 'cadro.model)
 
 (defonce session (atom empty-session))
+
+(defn clear! []
+  (reset! session empty-session))
 
 (r/reg-fx
  :session

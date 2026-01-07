@@ -28,10 +28,12 @@
 
 (re-posh/reg-event-fx
  ::new-machine-tapped
- [(re-posh/inject-cofx :ds)]
- (fn [{:keys [ds], :as all} _]
-   (let [{:keys [id tx]} (model/new-machine-tx ds)]
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds session], :as all} _]
+   (let [{:keys [id tx session]} (model/new-machine-tx ds session)]
      {:transact tx
+      :session session
       ::edit-panel/edit id})))
 
 (re-posh/reg-event-ds

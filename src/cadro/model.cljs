@@ -1,7 +1,6 @@
 (ns cadro.model
   (:require
    [cadro.db :as db]
-   [cadro.session :as session]
    [cadro.transforms :as tr]
    [clara.rules :as clara]
    [clojure.spec.alpha :as s]
@@ -72,6 +71,13 @@
     (when (<= 2 (count eids))
       [{:error "More than one entity tagged with ::model/reference?."
         :eids eids}])))
+
+(clara/defquery reference-query
+  []
+  [?ref <- Reference])
+
+(defn reference [session]
+  (:id (:?ref (first (clara/query session reference-query)))))
 
 (def reference-id-q
   '[:find ?eid .
@@ -170,17 +176,23 @@
   (map add-distance1 tree-list))
 
 (defn new-machine-tx
-  [ds]
+  [ds session]
   (let [machine-id (db/squuid)
         point-id   (db/squuid)]
-    {:id [::id machine-id]
-     :tx (concat
-          [{::id           machine-id
-            ::display-name "New Machine"
-            ::transforms   [{::id point-id
-                                   ::display-name "Origin"
-                                   ::position {}}]}]
-          (set-reference?-tx ds [::id point-id]))}))
+    {:id      [::id machine-id]
+     :tx      (concat
+               [{::id           machine-id
+                 ::display-name "New Machine"
+                 ::transforms   [{::id point-id
+                                        ::display-name "Origin"
+                                        ::position {}}]}]
+               (set-reference?-tx ds [::id point-id]))
+     :session (-> session
+                  (clara/insert (->DisplaysAs machine-id "New Machine")
+                                (->Transforms machine-id point-id)
+                                (->DisplaysAs point-id "Origin")
+                                (->Coordinates point-id {})
+                                (->Reference point-id)))}))
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id

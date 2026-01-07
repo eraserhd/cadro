@@ -2,10 +2,19 @@
   (:require
    [cadro.db :as db]
    [cadro.model :as model]
+   [cadro.session :as session]
    [cadro.test :as t]
+   [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]))
 
+(deftest t-Reference
+  (let [id      (random-uuid)
+        session (-> session/empty-session
+                    (clara/insert (model/->Reference id))
+                    (clara/fire-rules))]
+    (is (= id (model/reference session))
+        "Can retrieve current reference.")))
 (deftest t-set-reference?-tx
   (let [refs (fn [db]
                (into #{} (d/q '[:find [?id ...]

@@ -3,6 +3,7 @@
    [cadro.bluetooth :as bt]
    [cadro.db]
    [cadro.model]
+   [cadro.session]
    [cadro.ui.axes]
    [cadro.ui.legend]
    [cadro.ui.edit-panel]
