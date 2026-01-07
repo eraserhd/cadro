@@ -11,7 +11,6 @@
 
 (defrecord DisplaysAs [id display-name])
 (defrecord Spans [id scale])
-(defrecord Reference [id])
 (defrecord Transforms [id child])
 (defrecord Coordinates [id coordinates])
 (defrecord ControlsScale [controller-id scale-id])
@@ -73,7 +72,7 @@
   [[:db/retract fixture-id ::spans scale-id]])
 
 ;; Is this the current reference point, used to computed displayed coordinates?
-(s/def ::reference? boolean?)
+(defrecord Reference [id])
 
 (clara/defrule only-one-reference
   [?refcount <- (acc/count) :from [Reference]]
@@ -94,11 +93,6 @@
 
 (defn reference [session]
   (:id (:?ref (first (clara/query session reference-query)))))
-
-(def reference-id-q
-  '[:find ?eid .
-    :where
-    [?eid ::reference? true]])
 
 (def root-path-pull
   '[::position

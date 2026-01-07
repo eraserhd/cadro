@@ -1,24 +1,24 @@
 (ns cadro.ui.axes
   (:require
    [cadro.model :as model]
+   [cadro.session :as session]
    [re-frame.core :as rf]
    [re-posh.core :as re-posh]
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
-(re-posh/reg-sub
- ::reference-id
- (fn [ds _]
-   {:type  :query
-    :query model/reference-id-q}))
+(rf/reg-sub
+ ::reference-uuid
+ (fn [_ _]
+   (model/reference @session/session)))
 
 (re-posh/reg-sub
  ::reference-tree
- :<- [::reference-id]
- (fn [reference-id _]
+ :<- [::reference-uuid]
+ (fn [reference-uuid _]
    {:type    :pull
     :pattern model/root-path-pull
-    :id      reference-id}))
+    :id      [::model/id reference-uuid]}))
 
 (re-posh/reg-event-ds
  ::store-to-reference-clicked
