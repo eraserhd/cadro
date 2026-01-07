@@ -244,7 +244,7 @@
   {:pre [(s/valid? ::connection-status status)]}
   [[:db/add controller-id ::connection-status status]])
 
-;; Unprocess, received data
+;; Unprocessed, received data
 (s/def ::receive-buffer string?)
 
 (defn add-controllers-tx
