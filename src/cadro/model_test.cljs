@@ -262,7 +262,8 @@
                                                    {::model/displays-as      "HC-06"
                                                     ::model/hardware-address "02:03:04"}])
                         clara/fire-rules)
-        controllers (clara/query session model/controllers)]
+        controllers (->> (clara/query session model/controllers)
+                         (sort-by :?hardware-address))]
         ;pull [::model/id
         ;      ::model/displays-as
         ;      ::model/hardware-address
@@ -279,22 +280,10 @@
             {:?displays-as       "HC-06"
              :?hardware-address  "02:03:04"
              :?connection-status :disconnected}]
-           (->> controllers
-                (map #(dissoc % :?id)))))))
-    ;(is (= {::model/displays-as "Nexus 7"
-    ;        ::model/hardware-address "00:00:01"
-    ;        ::model/connection-status :disconnected}
-    ;       (dissoc c1 ::model/id))
-    ;    "It stores the 'Nexus 7' controller, marking as disconnected.")
-    ;(is (= {::model/displays-as "HC-06"
-    ;        ::model/hardware-address "02:03:04"
-    ;        ::model/connection-status :disconnected}
-    ;       (dissoc c2 ::model/id))
-    ;    "It stores the 'HC-06' controller, marking as disconnected.")
-    ;(is (uuid? (::model/id c1))
-    ;    "It creates a UUID for 'Nexus 7'.")
-    ;(is (uuid? (::model/id c2))
-    ;    "It creates a UUID for 'HC-06'.")
+           (map #(dissoc % :?id) controllers))
+        "It stores new controllers, defaulting to disconnected.")
+    (is (every? uuid? (map :?id controllers))
+        "It creates a UUID for every controller.")))
     ;(is (= "Nexus 7 Renamed" (::model/displays-as c1'))
     ;    "It updates a name when a new one is received.")
     ;(is (= (::model/id c1) (::model/id c1'))
