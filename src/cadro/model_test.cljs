@@ -256,24 +256,20 @@
                model/add-distances))))))
 
 (deftest t-insert-controllers
-  (let [session     (-> session/empty-session
-                        (model/insert-controllers [{::model/displays-as      "Nexus 7"
-                                                    ::model/hardware-address "00:00:01"}
-                                                   {::model/displays-as      "HC-06"
-                                                    ::model/hardware-address "02:03:04"}])
-                        clara/fire-rules)
-        controllers (->> (clara/query session model/controllers)
-                         (sort-by :?hardware-address))]
-        ;pull [::model/id
-        ;      ::model/displays-as
-        ;      ::model/hardware-address
-        ;      ::model/connection-status]
-        ;c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
-        ;c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
-        ;tx2  (model/add-controllers-tx @conn [{::model/displays-as       "Nexus 7 Renamed"
-        ;                                       ::model/hardware-address  "00:00:01"}])
-        ;_    (d/transact! conn tx2)
-        ;c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
+  (let [session      (-> session/empty-session
+                         (model/insert-controllers [{::model/displays-as      "Nexus 7"
+                                                     ::model/hardware-address "00:00:01"}
+                                                    {::model/displays-as      "HC-06"
+                                                     ::model/hardware-address "02:03:04"}])
+                         clara/fire-rules)
+        controllers  (->> (clara/query session model/controllers)
+                          (sort-by :?hardware-address))
+        session'     (-> session
+                         (model/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
+                                                     ::model/hardware-address "00:00:01"}])
+                         clara/fire-rules)
+        controllers' (->> (clara/query session' model/controllers)
+                          (sort-by :?hardware-address))]
     (is (= [{:?displays-as       "Nexus 7"
              :?hardware-address  "00:00:01"
              :?connection-status :disconnected}
@@ -283,11 +279,11 @@
            (map #(dissoc % :?id) controllers))
         "It stores new controllers, defaulting to disconnected.")
     (is (every? uuid? (map :?id controllers))
-        "It creates a UUID for every controller.")))
-    ;(is (= "Nexus 7 Renamed" (::model/displays-as c1'))
-    ;    "It updates a name when a new one is received.")
-    ;(is (= (::model/id c1) (::model/id c1'))
-    ;    "It does not update a UUID.")))
+        "It creates a UUID for every controller.")
+    (is (= "Nexus 7 Renamed" (-> controllers' first :?displays-as))
+        "It updates a name when a new one is received.")
+    (is (= (-> controllers first :?id) (-> controllers' first :?id))
+        "It does not update a UUID.")))
 
 (defn- after-receives
   [& receives]
