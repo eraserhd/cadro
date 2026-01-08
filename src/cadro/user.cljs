@@ -6,13 +6,17 @@
    [cadro.test :as t]
    [clara.rules :as clara]
    [clojure.spec.alpha :as s]
-   [cljs.repl :refer [doc apropos source]]
+   [cljs.repl :refer [dir doc apropos source]]
    [datascript.core :as d]))
 
 (defn session
   "Current Clara Rules session."
   []
   @session/session)
+
+(defn query
+  [& args]
+  (apply clara/query (session) args))
 
 (defn q
   "Query the app database."
