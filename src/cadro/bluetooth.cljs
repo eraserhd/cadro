@@ -29,10 +29,14 @@
       (js/console.log "found Cordova bluetooth serial implementation")
       js/bluetoothClassicSerial)))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::device-list-arrived
- (fn [ds [_ device-list]]
-   (model/add-controllers-tx ds device-list)))
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds session]} [_ device-list]]
+   {:transact (model/add-controllers-tx ds device-list)
+    :session  (model/insert-controllers session device-list)}))
+                  
 
 (rf/reg-fx
  ::fetch-device-list

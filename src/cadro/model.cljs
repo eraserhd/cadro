@@ -16,6 +16,21 @@
 (defn derived [e a v]
   (->Fact e a v false))
 
+(clara/defquery fact-values
+  [?e ?a]
+  [?fact <- Fact (= ?e e) (= ?a a) (= ?v v)])
+
+(defn upsert
+  "Insert triple, retracting any pre-existing values for it."
+  [session e a v]
+  (let [session        (clara/fire-rules session)
+        existing-facts (map :?fact (clara/query session fact-values :?e e :?a a))]
+    (if (and (= 1 (count existing-facts)) (= v (:?v (first existing-facts))))
+      session
+      (as-> session $
+        (apply clara/retract $ existing-facts)
+        (clara/insert $ (asserted e a v))))))
+
 ;;-------------------------------------------------------------------------------
 
 (clara/defquery persistent-facts []
@@ -30,6 +45,9 @@
 
 (defn errors [session]
   (map :?error (clara/query session errors-query)))
+
+;;-------------------------------------------------------------------------------
+
 
 (db/register-schema!
   {::id
@@ -261,6 +279,26 @@
                     ::id new-id
                     ::connection-status new-status)))
          controller-list)))
+
+(clara/defquery controllers []
+  [Fact (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
+  [Fact (= e ?id) (= a ::connection-status) (= v ?connection-status)])
+
+(defn insert-controllers
+  [session controller-list]
+  {:pre [(s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
+  (let [existing-controllers (->> (clara/query session controllers)
+                                  (group-by :?hardware-address))]
+    (reduce (fn [session {:keys [::displays-as ::hardware-address]}]
+              (let [{:keys [?id ?connection-status]} (get-in existing-controllers [hardware-address 0])
+                    id                               (or ?id (random-uuid))
+                    connection-status                (or ?connection-status :disconnected)]
+                (-> session
+                    (upsert id ::displays-as displays-as)
+                    (upsert id ::hardware-address hardware-address)
+                    (upsert id ::connection-status connection-status))))
+            session
+            controller-list)))
 
 (defn add-received-data-tx
   [ds controller-id data]
