@@ -11,6 +11,7 @@
 (deftest t-set-reference
   (let [id      (random-uuid)
         session (-> session/empty-session
+                    (clara/insert (model/asserted id ::model/coordinates {}))
                     (model/set-reference id)
                     (clara/fire-rules))]
     (is (= id (model/reference session))
@@ -20,6 +21,8 @@
   (let [id1     (random-uuid)
         id2     (random-uuid)
         session (-> session/empty-session
+                    (clara/insert (model/asserted id1 ::model/coordinates {}))
+                    (clara/insert (model/asserted id2 ::model/coordinates {}))
                     (model/set-reference id1)
                     (model/set-reference id2)
                     (clara/fire-rules))]
@@ -30,10 +33,18 @@
   (let [id1     (random-uuid)
         id2     (random-uuid)
         session (-> session/empty-session
+                    (clara/insert (model/asserted id1 ::model/coordinates {}))
+                    (clara/insert (model/asserted id2 ::model/coordinates {}))
                     (clara/insert (model/asserted id1 ::model/reference? true))
                     (clara/insert (model/asserted id2 ::model/reference? true))
                     (clara/fire-rules))]
     (is (= [(model/->InvariantError "more than one reference point in session")]
+           (model/errors session))))
+  (let [id      (random-uuid)
+        session (-> session/empty-session
+                    (model/set-reference id)
+                    (clara/fire-rules))]
+    (is (= [(model/->InvariantError "reference point does not have coordinates")]
            (model/errors session)))))
 
 (deftest t-set-reference?-tx

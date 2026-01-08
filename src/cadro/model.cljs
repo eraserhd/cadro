@@ -141,15 +141,11 @@
 
 ;; A coordinate in N-dimensional space.
 (s/def ::position (s/map-of string? number?))
-(defmethod db/invariants ::reference?-has-position
-  [db]
-  (when-let [eids (seq (d/q '[:find [?eid ...]
-                              :where
-                              [?eid ::reference? true]
-                              (not [?eid ::position])]
-                            db))]
-    [{:error "::model/reference? point does not have ::model/position."
-      :eids eids}]))
+(clara/defrule reference-has-coordinates
+  [Fact (= e ?eid) (= a ::reference?) (= v true)]
+  [:not [Fact (= e ?eid) (= a ::coordinates)]]
+  =>
+  (clara/insert! (->InvariantError "reference point does not have coordinates")))
 
 (defn propagate-spans
   "Collects spans from more-root elements and marks all things and points."
