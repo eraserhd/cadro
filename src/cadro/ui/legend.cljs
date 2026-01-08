@@ -39,7 +39,7 @@
 (re-posh/reg-event-ds
  ::point-tapped
  (fn [ds [_ eid]]
-   (when (::model/position (d/entity ds eid))
+   (when (::model/coordinates (d/entity ds eid))
      (model/set-reference?-tx ds eid))))
 
 (re-posh/reg-event-fx
@@ -72,13 +72,13 @@
         (map (fn [{:keys [::model/id
                           ::model/display-name
                           ::model/reference?
-                          ::model/position
+                          ::model/coordinates
                           ::model/spans
                           ::model/distance
                           ::model/transforms]}]
                ^{:key (str id)}
                [:li
-                (if position
+                (if coordinates
                   [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped [::model/id id]])
                                   :on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
                    [:button.point {:class [(if reference? "reference" "non-reference")]}

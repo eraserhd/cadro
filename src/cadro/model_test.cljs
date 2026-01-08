@@ -56,26 +56,26 @@
                                db)))]
     (t/scenario
       "It sets an existing non-reference point to be reference."
-      [{::model/id         (t/id :point1)
-        ::model/position   {"X" 42}}
-       {::model/id         (t/id :point2)
-        ::model/position   {"X" 107}
-        ::model/reference? true}
-       {::model/id         (t/id :point3)
-        ::model/position   {"X" 99}}]
+      [{::model/id          (t/id :point1)
+        ::model/coordinates {"X" 42}}
+       {::model/id          (t/id :point2)
+        ::model/coordinates {"X" 107}
+        ::model/reference?  true}
+       {::model/id          (t/id :point3)
+        ::model/coordinates {"X" 99}}]
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
         (is (= #{(t/id :point1)} (refs db)))))
 
     (t/scenario
       "Idempotency - an existing reference point is still a reference."
-      [{::model/id         (t/id :point1)
-        ::model/position   {"X" 42}}
-       {::model/id         (t/id :point2)
-        ::model/position   {"X" 107}
-        ::model/reference? true}
-       {::model/id         (t/id :point3)
-        ::model/position   {"X" 99}}]
+      [{::model/id          (t/id :point1)
+        ::model/coordinates {"X" 42}}
+       {::model/id          (t/id :point2)
+        ::model/coordinates {"X" 107}
+        ::model/reference?  true}
+       {::model/id          (t/id :point3)
+        ::model/coordinates {"X" 99}}]
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       [#'model/set-reference?-tx [::model/id (t/id :point1)]]
       (fn [{:keys [db]}]
@@ -103,8 +103,8 @@
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       (t/id :point1)
-                            ::model/position {}}}]
+      ::model/transforms   {::model/id          (t/id :point1)
+                            ::model/coordinates {}}}]
     (fn [{:keys [db]}]
       (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)])))))
 
@@ -118,8 +118,8 @@
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       (t/id :point1)
-                            ::model/position {}}}]
+      ::model/transforms   {::model/id          (t/id :point1)
+                            ::model/coordinates {}}}]
    [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
    (fn [{:keys [db]}]
      (is (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))
@@ -134,8 +134,8 @@
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       (t/id :point1)
-                            ::model/position {}}}]
+      ::model/transforms   {::model/id          (t/id :point1)
+                            ::model/coordinates {}}}]
    [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
    [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
    (fn [{:keys [db]}]
@@ -151,8 +151,8 @@
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
       ::model/display-name "New Machine"
-      ::model/transforms   {::model/id       (t/id :point1)
-                            ::model/position {}}
+      ::model/transforms   {::model/id          (t/id :point1)
+                            ::model/coordinates {}}
       ::model/spans        [::model/id (t/id :scale/X)]}]
    [#'model/dissociate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
    (fn [{:keys [db]}]
@@ -160,46 +160,46 @@
 
 (deftest t-propagate-spans
   (is (= [{::model/id         (t/id :machine1)
-           ::model/transforms [{::model/id         (t/id :p1)
-                                ::model/position   {(t/id :scale/X) 142
-                                                    (t/id :scale/Y) 87
-                                                    (t/id :scale/Z) -107}
-                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}
-                               {::model/id         (t/id :p2)
-                                ::model/position   {(t/id :scale/X) 196
-                                                    (t/id :scale/Y) -101
-                                                    (t/id :scale/Z) -98}
-                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]
-                                ::model/reference? true}
-                               {::model/id         (t/id :p3)
-                                ::model/position   {(t/id :scale/X) 67
-                                                    (t/id :scale/Y) 111
-                                                    (t/id :scale/Z) 82}
-                                ::model/spans      [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                    {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                    {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}]
+           ::model/transforms [{::model/id          (t/id :p1)
+                                ::model/coordinates {(t/id :scale/X) 142
+                                                     (t/id :scale/Y) 87
+                                                     (t/id :scale/Z) -107}
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}
+                               {::model/id          (t/id :p2)
+                                ::model/coordinates {(t/id :scale/X) 196
+                                                     (t/id :scale/Y) -101
+                                                     (t/id :scale/Z) -98}
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]
+                                ::model/reference?  true}
+                               {::model/id          (t/id :p3)
+                                ::model/coordinates {(t/id :scale/X) 67
+                                                     (t/id :scale/Y) 111
+                                                     (t/id :scale/Z) 82}
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}]
            ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                           {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                           {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
          (model/propagate-spans
            [{::model/id         (t/id :machine1)
-             ::model/transforms [{::model/id         (t/id :p1)
-                                  ::model/position   {(t/id :scale/X) 142
-                                                      (t/id :scale/Y) 87
-                                                      (t/id :scale/Z) -107}}
-                                 {::model/id         (t/id :p2)
-                                  ::model/position   {(t/id :scale/X) 196
-                                                      (t/id :scale/Y) -101
-                                                      (t/id :scale/Z) -98}
-                                  ::model/reference? true}
-                                 {::model/id         (t/id :p3)
-                                  ::model/position   {(t/id :scale/X) 67
-                                                      (t/id :scale/Y) 111
-                                                      (t/id :scale/Z) 82}}]
+             ::model/transforms [{::model/id          (t/id :p1)
+                                  ::model/coordinates {(t/id :scale/X) 142
+                                                       (t/id :scale/Y) 87
+                                                       (t/id :scale/Z) -107}}
+                                 {::model/id          (t/id :p2)
+                                  ::model/coordinates {(t/id :scale/X) 196
+                                                       (t/id :scale/Y) -101
+                                                       (t/id :scale/Z) -98}
+                                  ::model/reference?  true}
+                                 {::model/id          (t/id :p3)
+                                  ::model/coordinates {(t/id :scale/X) 67
+                                                       (t/id :scale/Y) 111
+                                                       (t/id :scale/Z) 82}}]
              ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                             {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                             {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]))))
@@ -208,46 +208,46 @@
   (t/scenario
     "Adds distance to the reference point."
     [{::model/id         (t/id :machine1)
-      ::model/transforms [{::model/id         (t/id :p1)
-                           ::model/position   {(t/id :scale/X) 142
-                                               (t/id :scale/Y) 87
-                                               (t/id :scale/Z) -107}}
-                          {::model/id         (t/id :p2)
-                           ::model/position   {(t/id :scale/X) 196
-                                               (t/id :scale/Y) -101
-                                               (t/id :scale/Z) -98}
-                           ::model/reference? true}
-                          {::model/id         (t/id :p3)
-                           ::model/position   {(t/id :scale/X) 67
-                                               (t/id :scale/Y) 111
-                                               (t/id :scale/Z) 82}}]
+      ::model/transforms [{::model/id          (t/id :p1)
+                           ::model/coordinates {(t/id :scale/X) 142
+                                                (t/id :scale/Y) 87
+                                                (t/id :scale/Z) -107}}
+                          {::model/id          (t/id :p2)
+                           ::model/coordinates {(t/id :scale/X) 196
+                                                (t/id :scale/Y) -101
+                                                (t/id :scale/Z) -98}
+                           ::model/reference?  true}
+                          {::model/id          (t/id :p3)
+                           ::model/coordinates {(t/id :scale/X) 67
+                                                (t/id :scale/Y) 111
+                                                (t/id :scale/Z) 82}}]
       ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                      {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                      {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
     (fn [{:keys [db]}]
       (is (= [{::model/id         (t/id :machine1)
-               ::model/transforms [{::model/id         (t/id :p1)
-                                    ::model/position   {(t/id :scale/X) 142
-                                                        (t/id :scale/Y) 87
-                                                        (t/id :scale/Z) -107}
-                                    ::model/distance   {(t/id :scale/X) -54
-                                                        (t/id :scale/Y) 188
-                                                        (t/id :scale/Z) -9}}
-                                   {::model/id         (t/id :p2)
-                                    ::model/position   {(t/id :scale/X) 196
-                                                        (t/id :scale/Y) -101
-                                                        (t/id :scale/Z) -98}
-                                    ::model/distance   {(t/id :scale/X) 0
-                                                        (t/id :scale/Y) 0
-                                                        (t/id :scale/Z) 0}
-                                    ::model/reference? true}
-                                   {::model/id         (t/id :p3)
-                                    ::model/position   {(t/id :scale/X) 67
-                                                        (t/id :scale/Y) 111
-                                                        (t/id :scale/Z) 82}
-                                    ::model/distance   {(t/id :scale/X) -129
-                                                        (t/id :scale/Y) 212
-                                                        (t/id :scale/Z) 180}}]
+               ::model/transforms [{::model/id          (t/id :p1)
+                                    ::model/coordinates {(t/id :scale/X) 142
+                                                         (t/id :scale/Y) 87
+                                                         (t/id :scale/Z) -107}
+                                    ::model/distance    {(t/id :scale/X) -54
+                                                         (t/id :scale/Y) 188
+                                                         (t/id :scale/Z) -9}}
+                                   {::model/id          (t/id :p2)
+                                    ::model/coordinates {(t/id :scale/X) 196
+                                                         (t/id :scale/Y) -101
+                                                         (t/id :scale/Z) -98}
+                                    ::model/distance    {(t/id :scale/X) 0
+                                                         (t/id :scale/Y) 0
+                                                         (t/id :scale/Z) 0}
+                                    ::model/reference?  true}
+                                   {::model/id          (t/id :p3)
+                                    ::model/coordinates {(t/id :scale/X) 67
+                                                         (t/id :scale/Y) 111
+                                                         (t/id :scale/Z) 82}
+                                    ::model/distance    {(t/id :scale/X) -129
+                                                         (t/id :scale/Y) 212
+                                                         (t/id :scale/Z) 180}}]
                ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
                               {::model/id (t/id :scale/Y), ::model/display-name "Y"}
                               {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]

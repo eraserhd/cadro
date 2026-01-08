@@ -95,7 +95,7 @@
   (:?id (first (clara/query session reference-query))))
 
 (def root-path-pull
-  '[::position
+  '[::coordinates
     {::_transforms ...
      ::spans
      [::id
@@ -112,7 +112,7 @@
   '[::id
     ::display-name
     ::reference?
-    ::position
+    ::coordinates
     {::transforms ...
      ::spans [::id ::display-name]}])
 
@@ -140,7 +140,7 @@
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))
 
 ;; A coordinate in N-dimensional space.
-(s/def ::position (s/map-of string? number?))
+(s/def ::coordinates (s/map-of string? number?))
 
 (clara/defrule reference-has-coordinates
   [Fact (= e ?eid) (= a ::reference?) (= v true)]
@@ -166,14 +166,14 @@
 (defn- globalized-tree-reference [tree]
   (cond
     (::reference? tree) tree
-    (::position tree)   nil
+    (::coordindates tree)   nil
     :else               (first (keep globalized-tree-reference (::transforms tree)))))
 
 (defn- add-distance1
   ([tree]
    (add-distance1 tree (globalized-tree-reference tree)))
-  ([tree {rpos ::position, :as r}]
-   (if-let [p (::position tree)]
+  ([tree {rpos ::coordinates, :as r}]
+   (if-let [p (::coordinates tree)]
      (assoc tree ::distance (tr/- p rpos))
      (update tree ::transforms (fn [transforms]
                                  (mapv #(add-distance1 % r) transforms))))))
@@ -191,8 +191,8 @@
                [{::id           machine-id
                  ::display-name "New Machine"
                  ::transforms   [{::id point-id
-                                        ::display-name "Origin"
-                                        ::position {}}]}]
+                                  ::display-name "Origin"
+                                  ::coordinates {}}]}]
                (set-reference?-tx ds [::id point-id]))
      :session (-> session
                   (clara/insert (asserted machine-id ::displays-as "New Machine")
