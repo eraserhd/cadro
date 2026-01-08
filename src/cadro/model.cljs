@@ -281,6 +281,7 @@
          controller-list)))
 
 (clara/defquery controllers []
+  [Fact (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
   [Fact (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
   [Fact (= e ?id) (= a ::connection-status) (= v ?connection-status)])
 

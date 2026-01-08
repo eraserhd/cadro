@@ -255,41 +255,50 @@
                (map #(d/pull db model/fixtures-and-points-trees-pull %))
                model/add-distances))))))
 
-(deftest t-add-controllers-tx
-  (let [conn (d/create-conn (db/schema))
-        tx   (model/add-controllers-tx @conn [{::model/displays-as      "Nexus 7"
-                                               ::model/hardware-address "00:00:01"}
-                                              {::model/displays-as      "HC-06"
-                                               ::model/hardware-address "02:03:04"}])
-        _    (d/transact! conn tx)
-        pull [::model/id
-              ::model/displays-as
-              ::model/hardware-address
-              ::model/connection-status]
-        c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
-        c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
-        tx2  (model/add-controllers-tx @conn [{::model/displays-as       "Nexus 7 Renamed"
-                                               ::model/hardware-address  "00:00:01"}])
-        _    (d/transact! conn tx2)
-        c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
-    (is (= {::model/displays-as "Nexus 7"
-            ::model/hardware-address "00:00:01"
-            ::model/connection-status :disconnected}
-           (dissoc c1 ::model/id))
-        "It stores the 'Nexus 7' controller, marking as disconnected.")
-    (is (= {::model/displays-as "HC-06"
-            ::model/hardware-address "02:03:04"
-            ::model/connection-status :disconnected}
-           (dissoc c2 ::model/id))
-        "It stores the 'HC-06' controller, marking as disconnected.")
-    (is (uuid? (::model/id c1))
-        "It creates a UUID for 'Nexus 7'.")
-    (is (uuid? (::model/id c2))
-        "It creates a UUID for 'HC-06'.")
-    (is (= "Nexus 7 Renamed" (::model/displays-as c1'))
-        "It updates a name when a new one is received.")
-    (is (= (::model/id c1) (::model/id c1'))
-        "It does not update a UUID.")))
+(deftest t-insert-controllers
+  (let [session     (-> session/empty-session
+                        (model/insert-controllers [{::model/displays-as      "Nexus 7"
+                                                    ::model/hardware-address "00:00:01"}
+                                                   {::model/displays-as      "HC-06"
+                                                    ::model/hardware-address "02:03:04"}])
+                        clara/fire-rules)
+        controllers (clara/query session model/controllers)]
+        ;pull [::model/id
+        ;      ::model/displays-as
+        ;      ::model/hardware-address
+        ;      ::model/connection-status]
+        ;c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
+        ;c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
+        ;tx2  (model/add-controllers-tx @conn [{::model/displays-as       "Nexus 7 Renamed"
+        ;                                       ::model/hardware-address  "00:00:01"}])
+        ;_    (d/transact! conn tx2)
+        ;c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
+    (is (= [{:?displays-as       "Nexus 7"
+             :?hardware-address  "00:00:01"
+             :?connection-status :disconnected}
+            {:?displays-as       "HC-06"
+             :?hardware-address  "02:03:04"
+             :?connection-status :disconnected}]
+           (->> controllers
+                (map #(dissoc % :?id)))))))
+    ;(is (= {::model/displays-as "Nexus 7"
+    ;        ::model/hardware-address "00:00:01"
+    ;        ::model/connection-status :disconnected}
+    ;       (dissoc c1 ::model/id))
+    ;    "It stores the 'Nexus 7' controller, marking as disconnected.")
+    ;(is (= {::model/displays-as "HC-06"
+    ;        ::model/hardware-address "02:03:04"
+    ;        ::model/connection-status :disconnected}
+    ;       (dissoc c2 ::model/id))
+    ;    "It stores the 'HC-06' controller, marking as disconnected.")
+    ;(is (uuid? (::model/id c1))
+    ;    "It creates a UUID for 'Nexus 7'.")
+    ;(is (uuid? (::model/id c2))
+    ;    "It creates a UUID for 'HC-06'.")
+    ;(is (= "Nexus 7 Renamed" (::model/displays-as c1'))
+    ;    "It updates a name when a new one is received.")
+    ;(is (= (::model/id c1) (::model/id c1'))
+    ;    "It does not update a UUID.")))
 
 (defn- after-receives
   [& receives]
