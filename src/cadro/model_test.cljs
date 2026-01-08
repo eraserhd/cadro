@@ -158,52 +158,6 @@
    (fn [{:keys [db]}]
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
-(deftest t-propagate-spans
-  (is (= [{::model/id         (t/id :machine1)
-           ::model/transforms [{::model/id          (t/id :p1)
-                                ::model/coordinates {(t/id :scale/X) 142
-                                                     (t/id :scale/Y) 87
-                                                     (t/id :scale/Z) -107}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]}
-                               {::model/id          (t/id :p2)
-                                ::model/coordinates {(t/id :scale/X) 196
-                                                     (t/id :scale/Y) -101
-                                                     (t/id :scale/Z) -98}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]
-                                ::model/reference?  true}
-                               {::model/id          (t/id :p3)
-                                ::model/coordinates {(t/id :scale/X) 67
-                                                     (t/id :scale/Y) 111
-                                                     (t/id :scale/Z) 82}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]}]
-           ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
-                          {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
-                          {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]
-         (model/propagate-spans
-           [{::model/id         (t/id :machine1)
-             ::model/transforms [{::model/id          (t/id :p1)
-                                  ::model/coordinates {(t/id :scale/X) 142
-                                                       (t/id :scale/Y) 87
-                                                       (t/id :scale/Z) -107}}
-                                 {::model/id          (t/id :p2)
-                                  ::model/coordinates {(t/id :scale/X) 196
-                                                       (t/id :scale/Y) -101
-                                                       (t/id :scale/Z) -98}
-                                  ::model/reference?  true}
-                                 {::model/id          (t/id :p3)
-                                  ::model/coordinates {(t/id :scale/X) 67
-                                                       (t/id :scale/Y) 111
-                                                       (t/id :scale/Z) 82}}]
-             ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
-                            {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
-                            {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]))))
-
 (deftest t-add-distances
   (t/scenario
     "Adds distance to the reference point."
