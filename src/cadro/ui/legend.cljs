@@ -56,7 +56,7 @@
 (defn- position-hiccup
   [position spans]
   (let [axes-names       (into {}
-                               (map (juxt ::model/id ::model/display-name))
+                               (map (juxt ::model/id ::model/displays-as))
                                spans)
         axis-name->value (set/rename-keys position axes-names)]
     (into [:span.distance]
@@ -70,7 +70,7 @@
   [transforms]
   (into [:ul]
         (map (fn [{:keys [::model/id
-                          ::model/display-name
+                          ::model/displays-as
                           ::model/reference?
                           ::model/coordinates
                           ::model/spans
@@ -87,11 +87,11 @@
                                                     nil)
                                             :fixedWidth true}]
                     [:div.name-and-distance
-                     [:span.display-name display-name]
+                     [:span.displays-as displays-as]
                      (position-hiccup distance spans)]]]
                   [gestures/wrap {:on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
                    [:button.fixture {}
-                    display-name]])
+                    displays-as]])
                 (when-not (empty? transforms)
                   [legend-keys transforms])]))
         transforms))

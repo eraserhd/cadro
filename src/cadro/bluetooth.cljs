@@ -41,7 +41,7 @@
           (fn [devices]
             (let [device-list (into []
                                     (map (fn [device]
-                                           {::model/display-name       (.-name device)
+                                           {::model/displays-as       (.-name device)
                                             ::model/hardware-address (.-address device)}))
                                     devices)]
               (rf/dispatch [::device-list-arrived device-list])))

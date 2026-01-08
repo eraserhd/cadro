@@ -26,10 +26,10 @@
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/id
-                            ::model/display-name
+                            ::model/displays-as
                             ::model/raw-count]}]
                  [:div.axis
-                  [:div.name display-name]
+                  [:div.name displays-as]
                   [:div.value raw-count]
                   [:button.icon.store
                    [:> fa/FontAwesomeIcon

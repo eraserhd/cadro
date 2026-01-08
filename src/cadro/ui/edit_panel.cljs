@@ -19,11 +19,11 @@
 
 (def scale-pull
   '[::model/id
-    ::model/display-name
+    ::model/displays-as
     ::model/hardware-address
     ::model/connection-status
     {::model/_controller [::model/id
-                          ::model/display-name
+                          ::model/displays-as
                           ::model/raw-count]}])
 
 (re-posh/reg-sub
@@ -65,7 +65,7 @@
 (defn scale-controls
   [fixture-id
    {scale-id ::model/id
-    :keys [::model/display-name
+    :keys [::model/displays-as
            ::model/raw-count]}
    associated-scales]
   [:li.scale
@@ -79,7 +79,7 @@
                            [::model/id scale-id]
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
-    [:span.name display-name]
+    [:span.name displays-as]
     [:span.value raw-count]]])
 
 (defn edit-panel []
@@ -96,18 +96,18 @@
                       :class "edit-panel"
                       :on-close #(reset! thing-to-edit nil)}
          [input/input {:eid  fixture-id
-                       :attr ::model/display-name
+                       :attr ::model/displays-as
                        :label "Display Name"}]
          [:h2 "Scales"]
          (into [:ul.scale-controllers]
                (map (fn [{controller-id ::model/id
-                          :keys [::model/display-name
+                          :keys [::model/displays-as
                                  ::model/hardware-address
                                  ::model/connection-status
                                  ::model/_controller]}]
                       ^{:key (str controller-id)}
                       [:li.scale-controller
-                       [:span.name display-name] " " [:span.hardware-address "(" hardware-address ")"]
+                       [:span.name displays-as] " " [:span.hardware-address "(" hardware-address ")"]
                        [:div.scales
                         (case connection-status
                           (:connected)

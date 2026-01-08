@@ -35,7 +35,7 @@
   {::id
    {:db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity}
-   ::display-name
+   ::displays-as
    {:db/cardinality :db.cardinality/one}
    ::spans
    {:db/cardinality :db.cardinality/many
@@ -55,11 +55,11 @@
     :db/unique      :db.unique/identity}})
 
 ;; Display name is a common concept everywhere.
-(s/def ::display-name string?)
+(s/def ::displays-as string?)
 
 
 ;; Something can span an axis, meaning coordinates extend into it.
-(s/def ::spans (s/coll-of (s/keys :req [::id ::display-name])))
+(s/def ::spans (s/coll-of (s/keys :req [::id ::displays-as])))
 
 
 (defn associate-scale-tx
@@ -99,7 +99,7 @@
     {::_transforms ...
      ::spans
      [::id
-      ::display-name
+      ::displays-as
       ::raw-count]}])
 
 (def top-level-fixture-eids-q
@@ -110,18 +110,18 @@
 
 (def fixtures-and-points-trees-pull
   '[::id
-    ::display-name
+    ::displays-as
     ::reference?
     ::coordinates
     {::transforms ...
-     ::spans [::id ::display-name]}])
+     ::spans [::id ::displays-as]}])
 
 (defn root-path-axes
   [root-path]
   (->> (iterate (comp first ::_transforms) root-path)
        (take-while some?)
        (mapcat ::spans)
-       (sort-by ::display-name)))
+       (sort-by ::displays-as)))
 
 (defn set-reference?-tx
   [ds reference-id]
@@ -189,9 +189,9 @@
     {:id      [::id machine-id]
      :tx      (concat
                [{::id           machine-id
-                 ::display-name "New Machine"
+                 ::displays-as "New Machine"
                  ::transforms   [{::id point-id
-                                  ::display-name "Origin"
+                                  ::displays-as "Origin"
                                   ::coordinates {}}]}]
                (set-reference?-tx ds [::id point-id]))
      :session (-> session
@@ -203,7 +203,7 @@
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id
-                                  ::display-name
+                                  ::displays-as
                                   ::hardware-address
                                   ::connection-status]
                             :opt [::receive-buffer]))
@@ -217,14 +217,14 @@
                              :in $ ?controller
                              :where
                              [?e ::id ?id]
-                             [?e ::display-name ?name]
+                             [?e ::displays-as ?name]
                              [?e ::controller ?controller]]
                            ds
                            controller-id)
                       (into {}))]
     [{::id           (or (get name->id scale-name)
                          (db/squuid))
-      ::display-name scale-name
+      ::displays-as scale-name
       ::raw-count    value
       ::controller   controller-id}]))
 
@@ -247,7 +247,7 @@
 (defn add-controllers-tx
   [ds controller-list]
   {:pre [(d/db? ds)
-         (s/valid? (s/coll-of (s/keys :req [::display-name ::hardware-address])) controller-list)]}
+         (s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
   (let [addr->controller (into {}
                                (map (juxt ::hardware-address identity))
                                (d/q '[:find [(pull ?obj [::id ::hardware-address ::connection-status]) ...]

@@ -96,13 +96,13 @@
   (t/scenario
     "Scales aren't automatically associated with machines."
     [{::model/id           (t/id :scale/X)
-      ::model/display-name "X"
+      ::model/displays-as "X"
       ::model/raw-count    150
       ::model/controller   {::model/id (t/id :controller)
-                            ::model/display-name "HC-01"
+                            ::model/displays-as "HC-01"
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
-      ::model/display-name "New Machine"
+      ::model/displays-as "New Machine"
       ::model/transforms   {::model/id          (t/id :point1)
                             ::model/coordinates {}}}]
     (fn [{:keys [db]}]
@@ -111,13 +111,13 @@
   (t/scenario
     "A scale can be associated."
     [{::model/id           (t/id :scale/X)
-      ::model/display-name "X"
+      ::model/displays-as "X"
       ::model/raw-count    150
       ::model/controller   {::model/id (t/id :controller)
-                            ::model/display-name "HC-01"
+                            ::model/displays-as "HC-01"
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
-      ::model/display-name "New Machine"
+      ::model/displays-as "New Machine"
       ::model/transforms   {::model/id          (t/id :point1)
                             ::model/coordinates {}}}]
    [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
@@ -127,13 +127,13 @@
   (t/scenario
     "Association is idempotent."
     [{::model/id           (t/id :scale/X)
-      ::model/display-name "X"
+      ::model/displays-as "X"
       ::model/raw-count    150
       ::model/controller   {::model/id (t/id :controller)
-                            ::model/display-name "HC-01"
+                            ::model/displays-as "HC-01"
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
-      ::model/display-name "New Machine"
+      ::model/displays-as "New Machine"
       ::model/transforms   {::model/id          (t/id :point1)
                             ::model/coordinates {}}}]
    [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
@@ -144,13 +144,13 @@
   (t/scenario
     "Scales can be dissociated."
     [{::model/id           (t/id :scale/X)
-      ::model/display-name "X"
+      ::model/displays-as "X"
       ::model/raw-count    150
       ::model/controller   {::model/id (t/id :controller)
-                            ::model/display-name "HC-01"
+                            ::model/displays-as "HC-01"
                             ::model/hardware-address "00:00:01"}}
      {::model/id           (t/id :machine1)
-      ::model/display-name "New Machine"
+      ::model/displays-as "New Machine"
       ::model/transforms   {::model/id          (t/id :point1)
                             ::model/coordinates {}}
       ::model/spans        [::model/id (t/id :scale/X)]}]
@@ -164,27 +164,27 @@
                                 ::model/coordinates {(t/id :scale/X) 142
                                                      (t/id :scale/Y) 87
                                                      (t/id :scale/Z) -107}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]}
                                {::model/id          (t/id :p2)
                                 ::model/coordinates {(t/id :scale/X) 196
                                                      (t/id :scale/Y) -101
                                                      (t/id :scale/Z) -98}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]
                                 ::model/reference?  true}
                                {::model/id          (t/id :p3)
                                 ::model/coordinates {(t/id :scale/X) 67
                                                      (t/id :scale/Y) 111
                                                      (t/id :scale/Z) 82}
-                                ::model/spans       [{::model/id (t/id :scale/X) ::model/display-name "X"}
-                                                     {::model/id (t/id :scale/Y) ::model/display-name "Y"}
-                                                     {::model/id (t/id :scale/Z) ::model/display-name "Z"}]}]
-           ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
-                          {::model/id (t/id :scale/Y), ::model/display-name "Y"}
-                          {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
+                                ::model/spans       [{::model/id (t/id :scale/X) ::model/displays-as "X"}
+                                                     {::model/id (t/id :scale/Y) ::model/displays-as "Y"}
+                                                     {::model/id (t/id :scale/Z) ::model/displays-as "Z"}]}]
+           ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
+                          {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
+                          {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]
          (model/propagate-spans
            [{::model/id         (t/id :machine1)
              ::model/transforms [{::model/id          (t/id :p1)
@@ -200,9 +200,9 @@
                                   ::model/coordinates {(t/id :scale/X) 67
                                                        (t/id :scale/Y) 111
                                                        (t/id :scale/Z) 82}}]
-             ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
-                            {::model/id (t/id :scale/Y), ::model/display-name "Y"}
-                            {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]))))
+             ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
+                            {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
+                            {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]))))
 
 (deftest t-add-distances
   (t/scenario
@@ -221,9 +221,9 @@
                            ::model/coordinates {(t/id :scale/X) 67
                                                 (t/id :scale/Y) 111
                                                 (t/id :scale/Z) 82}}]
-      ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
-                     {::model/id (t/id :scale/Y), ::model/display-name "Y"}
-                     {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
+      ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
+                     {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
+                     {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]
     (fn [{:keys [db]}]
       (is (= [{::model/id         (t/id :machine1)
                ::model/transforms [{::model/id          (t/id :p1)
@@ -248,36 +248,36 @@
                                     ::model/distance    {(t/id :scale/X) -129
                                                          (t/id :scale/Y) 212
                                                          (t/id :scale/Z) 180}}]
-               ::model/spans [{::model/id (t/id :scale/X), ::model/display-name "X"}
-                              {::model/id (t/id :scale/Y), ::model/display-name "Y"}
-                              {::model/id (t/id :scale/Z), ::model/display-name "Z"}]}]
+               ::model/spans [{::model/id (t/id :scale/X), ::model/displays-as "X"}
+                              {::model/id (t/id :scale/Y), ::model/displays-as "Y"}
+                              {::model/id (t/id :scale/Z), ::model/displays-as "Z"}]}]
              (->> (d/q model/top-level-fixture-eids-q db)
                (map #(d/pull db model/fixtures-and-points-trees-pull %))
                model/add-distances))))))
 
 (deftest t-add-controllers-tx
   (let [conn (d/create-conn (db/schema))
-        tx   (model/add-controllers-tx @conn [{::model/display-name      "Nexus 7"
+        tx   (model/add-controllers-tx @conn [{::model/displays-as      "Nexus 7"
                                                ::model/hardware-address "00:00:01"}
-                                              {::model/display-name      "HC-06"
+                                              {::model/displays-as      "HC-06"
                                                ::model/hardware-address "02:03:04"}])
         _    (d/transact! conn tx)
         pull [::model/id
-              ::model/display-name
+              ::model/displays-as
               ::model/hardware-address
               ::model/connection-status]
         c1   (d/pull @conn pull [::model/hardware-address "00:00:01"])
         c2   (d/pull @conn pull [::model/hardware-address "02:03:04"])
-        tx2  (model/add-controllers-tx @conn [{::model/display-name       "Nexus 7 Renamed"
+        tx2  (model/add-controllers-tx @conn [{::model/displays-as       "Nexus 7 Renamed"
                                                ::model/hardware-address  "00:00:01"}])
         _    (d/transact! conn tx2)
         c1'  (d/pull @conn pull [::model/hardware-address "00:00:01"])]
-    (is (= {::model/display-name "Nexus 7"
+    (is (= {::model/displays-as "Nexus 7"
             ::model/hardware-address "00:00:01"
             ::model/connection-status :disconnected}
            (dissoc c1 ::model/id))
         "It stores the 'Nexus 7' controller, marking as disconnected.")
-    (is (= {::model/display-name "HC-06"
+    (is (= {::model/displays-as "HC-06"
             ::model/hardware-address "02:03:04"
             ::model/connection-status :disconnected}
            (dissoc c2 ::model/id))
@@ -286,7 +286,7 @@
         "It creates a UUID for 'Nexus 7'.")
     (is (uuid? (::model/id c2))
         "It creates a UUID for 'HC-06'.")
-    (is (= "Nexus 7 Renamed" (::model/display-name c1'))
+    (is (= "Nexus 7 Renamed" (::model/displays-as c1'))
         "It updates a name when a new one is received.")
     (is (= (::model/id c1) (::model/id c1'))
         "It does not update a UUID.")))
@@ -295,7 +295,7 @@
   [& receives]
   (let [controller-id [::model/hardware-address "00:00:01"]
         conn          (d/create-conn (db/schema))
-        tx            (model/add-controllers-tx @conn [{::model/display-name "HC-06"
+        tx            (model/add-controllers-tx @conn [{::model/displays-as "HC-06"
                                                         ::model/hardware-address "00:00:01"}])
         _             (d/transact! conn tx)
         _             (doseq [data receives]
@@ -305,16 +305,16 @@
 
 (deftest t-add-received-data-tx
   (let [controller (after-receives "X150;Y250;Z350;T72;\n")]
-    (is (= #{{::model/display-name "X"
+    (is (= #{{::model/displays-as "X"
               ::model/raw-count 150}
-             {::model/display-name "Y"
+             {::model/displays-as "Y"
               ::model/raw-count 250}
-             {::model/display-name "Z"
+             {::model/displays-as "Z"
               ::model/raw-count 350}
-             {::model/display-name "T"
+             {::model/displays-as "T"
               ::model/raw-count 72}}
            (->> (::model/_controller controller)
-                (map #(select-keys % [::model/display-name ::model/raw-count]))
+                (map #(select-keys % [::model/displays-as ::model/raw-count]))
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
     (is (every? (comp uuid? ::model/id) (::model/_controller controller))
@@ -322,10 +322,10 @@
     (is (= 4 (count (map ::model/id (::model/_controller controller))))
         "The new uuids are unique."))
   (let [controller (after-receives "X150;\n" "X152;\n")]
-    (is (= #{{::model/display-name "X"
+    (is (= #{{::model/displays-as "X"
               ::model/raw-count 152}}
            (->> (::model/_controller controller)
-                (map #(select-keys % [::model/display-name ::model/raw-count]))
+                (map #(select-keys % [::model/displays-as ::model/raw-count]))
                 (into #{})))
         "It updates existing scale values."))
   (testing "partial receives"
@@ -334,15 +334,15 @@
       (let [a          (subs full-data 0 i)
             b          (subs full-data i)
             controller (after-receives a b)]
-        (is (= #{{::model/display-name "X"
+        (is (= #{{::model/displays-as "X"
                   ::model/raw-count 150}
-                 {::model/display-name "Y"
+                 {::model/displays-as "Y"
                   ::model/raw-count 250}
-                 {::model/display-name "Z"
+                 {::model/displays-as "Z"
                   ::model/raw-count 350}
-                 {::model/display-name "T"
+                 {::model/displays-as "T"
                   ::model/raw-count 72}}
                (->> (::model/_controller controller)
-                    (map #(select-keys % [::model/display-name ::model/raw-count]))
+                    (map #(select-keys % [::model/displays-as ::model/raw-count]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))
