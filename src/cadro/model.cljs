@@ -4,21 +4,21 @@
    [cadro.transforms :as tr]
    [clara.rules :as clara]
    [clara.rules.accumulators :as acc]
+   [clara-eav.eav :as eav]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [datascript.core :as d]
    [medley.core :as medley]))
 
-(defrecord Fact [e a v])
 (defn asserted [e a v]
-  (assoc (->Fact e a v) :persistent? true))
+  (assoc (eav/->EAV e a v) :persistent? true))
 
 (defn derived [e a v]
-  (->Fact e a v))
+  (eav/->EAV e a v))
 
 (clara/defquery fact-values
   [?e ?a]
-  [?fact <- Fact (= ?e e) (= ?a a) (= ?v v)])
+  [?fact <- eav/EAV (= ?e e) (= ?a a) (= ?v v)])
 
 (defn upsert
   "Insert triple, retracting any pre-existing values for it."
@@ -34,7 +34,7 @@
 ;;-------------------------------------------------------------------------------
 
 (clara/defquery persistent-facts []
-  [?fact <- Fact (= e ?e) (= a ?a) (= v ?v)]
+  [?fact <- eav/EAV (= e ?e) (= a ?a) (= v ?v)]
   [:test (:persistent? ?fact)])
 
 ;;-------------------------------------------------------------------------------
@@ -94,14 +94,14 @@
 ;; Is this the current reference point, used to computed displayed coordinates?
 
 (clara/defrule only-one-reference
-  [?refcount <- (acc/count) :from [Fact (= a ::reference?)]]
+  [?refcount <- (acc/count) :from [eav/EAV (= a ::reference?)]]
   [:test (<= 2 ?refcount)]
   =>
   (clara/insert! (->InvariantError "more than one reference point in session")))
 
 (clara/defquery reference-query
   []
-  [?ref <- Fact (= e ?id) (= a ::reference?)])
+  [?ref <- eav/EAV (= e ?id) (= a ::reference?)])
 
 (defn set-reference [session id]
   (as-> session $
@@ -162,8 +162,8 @@
 (s/def ::coordinates (s/map-of string? number?))
 
 (clara/defrule reference-has-coordinates
-  [Fact (= e ?eid) (= a ::reference?) (= v true)]
-  [:not [Fact (= e ?eid) (= a ::coordinates)]]
+  [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
+  [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
   =>
   (clara/insert! (->InvariantError "reference point does not have coordinates")))
 
@@ -282,9 +282,9 @@
          controller-list)))
 
 (clara/defquery controllers []
-  [Fact (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
-  [Fact (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
-  [Fact (= e ?id) (= a ::connection-status) (= v ?connection-status)])
+  [eav/EAV (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
+  [eav/EAV (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
+  [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
 
 (defn insert-controllers
   [session controller-list]
