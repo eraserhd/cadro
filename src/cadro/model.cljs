@@ -9,12 +9,12 @@
    [datascript.core :as d]
    [medley.core :as medley]))
 
-(defrecord Fact [e a v persistent?])
+(defrecord Fact [e a v])
 (defn asserted [e a v]
-  (->Fact e a v true))
+  (assoc (->Fact e a v) :persistent? true))
 
 (defn derived [e a v]
-  (->Fact e a v false))
+  (->Fact e a v))
 
 (clara/defquery fact-values
   [?e ?a]
@@ -34,7 +34,8 @@
 ;;-------------------------------------------------------------------------------
 
 (clara/defquery persistent-facts []
-  [Fact (= e ?e) (= a ?a) (= v ?v) (= persistent? true)])
+  [?fact <- Fact (= e ?e) (= a ?a) (= v ?v)]
+  [:test (:persistent? ?fact)])
 
 ;;-------------------------------------------------------------------------------
 
