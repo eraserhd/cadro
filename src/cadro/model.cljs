@@ -141,6 +141,7 @@
 
 ;; A coordinate in N-dimensional space.
 (s/def ::position (s/map-of string? number?))
+
 (clara/defrule reference-has-coordinates
   [Fact (= e ?eid) (= a ::reference?) (= v true)]
   [:not [Fact (= e ?eid) (= a ::coordinates)]]
