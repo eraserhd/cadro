@@ -6,6 +6,7 @@
   {:dev/always true}
   (:require
    [clojure.spec.alpha :as s]
+   [clojure.spec.test.alpha]
    [shadow.test :as st]
    [shadow.test.env :as env]
    [shadow.dom :as dom]
@@ -21,6 +22,7 @@
   (done))
 
 (defn ^:export init []
+  (clojure.spec.test.alpha/instrument)
   (s/check-asserts true)
   (dom/append [:div#test-root])
   (start))
