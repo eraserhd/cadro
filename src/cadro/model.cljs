@@ -1,4 +1,6 @@
 (ns cadro.model
+  (:require-macros
+   [net.eraserhead.clara-eql.core :as clara-eql])
   (:require
    [cadro.db :as db]
    [cadro.transforms :as tr]
