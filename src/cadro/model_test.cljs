@@ -38,13 +38,13 @@
                     (clara/insert (model/asserted id1 ::model/reference? true))
                     (clara/insert (model/asserted id2 ::model/reference? true))
                     (clara/fire-rules))]
-    (is (= [(model/->InvariantError "more than one reference point in session")]
+    (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
            (model/errors session))))
   (let [id      (random-uuid)
         session (-> session/empty-session
                     (model/set-reference id)
                     (clara/fire-rules))]
-    (is (= [(model/->InvariantError "reference point does not have coordinates")]
+    (is (= [(model/->InvariantError "reference point does not have coordinates" {:id id})]
            (model/errors session)))))
 
 (defn- associated?
