@@ -7,7 +7,8 @@
    [clara.rules :as clara]
    [clojure.spec.alpha :as s]
    [cljs.repl :refer [dir doc apropos source]]
-   [datascript.core :as d]))
+   [datascript.core :as d]
+   [net.eraserhead.clara-eql.pull :as pull]))
 
 (defn session
   "Current Clara Rules session."
@@ -18,21 +19,20 @@
   [& args]
   (apply clara/query (session) args))
 
-(defn q
-  "Query the app database."
-  [expr & args]
-  (apply d/q expr @db/*conn* args))
+(defn eav-map
+  "Full map of EAV triples."
+  []
+  (:?eav-map (first (clara/query (session) pull/eav-map))))
 
-(defn transact
-  "Transact data to the db."
-  [& args]
-  @(apply d/transact db/*conn* args))
-
-(defn entity
-  "Retrieve and entity."
-  [eid]
-  (d/touch (d/entity @db/*conn* eid)))
+(defn entid
+  "Resolve an entid."
+  [entity-ref]
+  (pull/entid (session) entity-ref))
 
 (defn pull
+  "Pull data from Clara session."
   [selector eid]
-  (d/pull @db/*conn* selector eid))
+  (pull/pull (session) selector eid))
+
+(defn reference []
+  (model/reference (session)))

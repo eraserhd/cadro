@@ -36,11 +36,11 @@
       :session session
       ::edit-panel/edit id})))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::point-tapped
- (fn [ds [_ eid]]
-   (when (::model/coordinates (d/entity ds eid))
-     (model/set-reference?-tx ds eid))))
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ id]]
+   {:session (model/set-reference session id)}))
 
 (re-posh/reg-event-fx
  ::legend-key-longpressed
@@ -79,7 +79,7 @@
                ^{:key (str id)}
                [:li
                 (if coordinates
-                  [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped [::model/id id]])
+                  [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped id])
                                   :on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
                    [:button.point {:class [(if reference? "reference" "non-reference")]}
                     [:> fa/FontAwesomeIcon {:icon (if reference?

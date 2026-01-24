@@ -41,7 +41,7 @@
 
 ;;-------------------------------------------------------------------------------
 
-(defrecord InvariantError [error])
+(defrecord InvariantError [error extra])
 
 (clara/defquery errors-query []
   [?error <- InvariantError])
@@ -99,12 +99,16 @@
   [?refcount <- (acc/count) :from [eav/EAV (= a ::reference?)]]
   [:test (<= 2 ?refcount)]
   =>
-  (clara/insert! (->InvariantError "more than one reference point in session")))
+  (clara/insert! (->InvariantError "more than one reference point in session" {:count ?refcount})))
 
 (clara/defquery reference-query
   []
   [?ref <- eav/EAV (= e ?id) (= a ::reference?)])
 
+(s/fdef set-reference
+  :args (s/cat :session any?
+               :id      uuid?)
+  :ret  any?)
 (defn set-reference [session id]
   (as-> session $
     (clara/fire-rules $)
@@ -144,19 +148,6 @@
        (mapcat ::spans)
        (sort-by ::displays-as)))
 
-(defn set-reference?-tx
-  [ds reference-id]
-  (concat
-    (for [eid (d/q '[:find [?eid ...]
-                     :in $ ?reference-id
-                     :where
-                     [?eid ::reference? ?value]
-                     (not [(= ?eid ?reference-id)])]
-                   ds
-                   reference-id)]
-      [:db/retract eid ::reference?])
-    [[:db/add reference-id ::reference? true]]))
-
 ;; A tranforms B if A is a Flarg and B is a point or Flarg that is affected by the transformation.
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))
 
@@ -167,7 +158,7 @@
   [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
   [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
   =>
-  (clara/insert! (->InvariantError "reference point does not have coordinates")))
+  (clara/insert! (->InvariantError "reference point does not have coordinates" {:eid ?eid})))
 
 (defn propagate-spans
   "Collects spans from more-root elements and marks all things and points."
@@ -208,19 +199,17 @@
   (let [machine-id (db/squuid)
         point-id   (db/squuid)]
     {:id      [::id machine-id]
-     :tx      (concat
-               [{::id           machine-id
-                 ::displays-as "New Machine"
-                 ::transforms   [{::id point-id
-                                  ::displays-as "Origin"
-                                  ::coordinates {}}]}]
-               (set-reference?-tx ds [::id point-id]))
+     :tx      [{::id           machine-id
+                ::displays-as "New Machine"
+                ::transforms   [{::id point-id
+                                 ::displays-as "Origin"
+                                 ::coordinates {}}]}]
      :session (-> session
                   (clara/insert (asserted machine-id ::displays-as "New Machine")
                                 (asserted machine-id ::transforms  point-id)
                                 (asserted point-id ::displays-as "Origin")
-                                (asserted point-id ::coordinates {})
-                                (asserted point-id ::reference? true)))}))
+                                (asserted point-id ::coordinates {}))
+                  (set-reference point-id))}))
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id

@@ -9,8 +9,9 @@
 
 (rf/reg-sub
  ::reference-uuid
- (fn [_ _]
-   (model/reference @session/session)))
+ :<- [:session]
+ (fn [session _]
+   (model/reference session)))
 
 (re-posh/reg-sub
  ::reference-tree

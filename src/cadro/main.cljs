@@ -8,6 +8,7 @@
    [cadro.ui.legend]
    [cadro.ui.edit-panel]
    [clojure.spec.alpha :as s]
+   [clojure.spec.test.alpha]
    [reagent.dom.client :as rdc]
    [re-frame.core :as rf]))
 
@@ -26,6 +27,7 @@
 
 (defn ^:dev/after-load start []
   (when ^boolean goog.DEBUG
+    (clojure.spec.test.alpha/instrument)
     (s/check-asserts true))
   (cadro.db/connect!)
   (rf/dispatch-sync [::initialize])

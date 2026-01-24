@@ -5,9 +5,11 @@
    [cadro.model :as model]
    [clara.rules :as clara]
    [clojure.edn :as edn]
+   [net.eraserhead.clara-eql.pull]
+   [reagent.ratom]
    [re-frame.core :as r]))
 
-(clara/defsession empty-session 'cadro.model)
+(clara/defsession empty-session 'cadro.model 'net.eraserhead.clara-eql.pull)
 
 (defonce session (atom
                    (let [ls-tuples (some-> js/localStorage
@@ -55,3 +57,8 @@
        {:session (handler session signal)})))
   ([event-name handler]
    (reg-event event-name [] handler)))
+
+(r/reg-sub-raw
+ :session
+ (fn [_ _]
+   (reagent.ratom/make-reaction #(deref session))))

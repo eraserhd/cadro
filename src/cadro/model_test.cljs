@@ -47,40 +47,6 @@
     (is (= [(model/->InvariantError "reference point does not have coordinates")]
            (model/errors session)))))
 
-(deftest t-set-reference?-tx
-  (let [refs (fn [db]
-               (into #{} (d/q '[:find [?id ...]
-                                :where
-                                [?p ::model/reference? true]
-                                [?p ::model/id ?id]]
-                               db)))]
-    (t/scenario
-      "It sets an existing non-reference point to be reference."
-      [{::model/id          (t/id :point1)
-        ::model/coordinates {"X" 42}}
-       {::model/id          (t/id :point2)
-        ::model/coordinates {"X" 107}
-        ::model/reference?  true}
-       {::model/id          (t/id :point3)
-        ::model/coordinates {"X" 99}}]
-      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
-      (fn [{:keys [db]}]
-        (is (= #{(t/id :point1)} (refs db)))))
-
-    (t/scenario
-      "Idempotency - an existing reference point is still a reference."
-      [{::model/id          (t/id :point1)
-        ::model/coordinates {"X" 42}}
-       {::model/id          (t/id :point2)
-        ::model/coordinates {"X" 107}
-        ::model/reference?  true}
-       {::model/id          (t/id :point3)
-        ::model/coordinates {"X" 99}}]
-      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
-      [#'model/set-reference?-tx [::model/id (t/id :point1)]]
-      (fn [{:keys [db]}]
-        (is (= #{(t/id :point1)} (refs db)))))))
-
 (defn- associated?
   [db fixture-id scale-id]
   (let [result (d/q '[:find ?scale-id .
