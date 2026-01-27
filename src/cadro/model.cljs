@@ -158,7 +158,7 @@
   [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
   [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
   =>
-  (clara/insert! (->InvariantError "reference point does not have coordinates" {:eid ?eid})))
+  (clara/insert! (->InvariantError "reference point does not have coordinates" {:id ?eid})))
 
 (defn propagate-spans
   "Collects spans from more-root elements and marks all things and points."
