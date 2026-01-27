@@ -21,10 +21,10 @@
 (re-posh/reg-sub
  ::fixtures-and-points-trees
  :<- [::top-level-fixture-ids]
- (fn [eids]
+ (fn [ids]
    {:type    :pull-many
     :pattern model/fixtures-and-points-trees-pull
-    :ids     eids}))
+    :ids     ids}))
 
 (rf/reg-event-fx
  ::new-machine-tapped
