@@ -44,8 +44,8 @@
 
 (rf/reg-event-fx
  ::legend-key-longpressed
- (fn [_ [_ eid]]
-   {::edit-panel/edit eid}))
+ (fn [_ [_ id]]
+   {::edit-panel/edit id}))
 
 (def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
