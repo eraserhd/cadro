@@ -29,10 +29,10 @@
 (re-posh/reg-sub
  ::scales
  :<- [::scale-ids]
- (fn [eids _]
+ (fn [ids _]
    {:type    :pull-many
     :pattern scale-pull
-    :ids      eids}))
+    :ids      ids}))
 
 (def fixture-pull
   '[{::model/spans
