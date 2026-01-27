@@ -73,10 +73,12 @@
   ;   (js/alert (str "Unable to connect: " error))]
    (model/set-connection-status-tx device-id :disconnected)))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::data-received
- (fn [ds [_ device-id data]]
-   (model/add-received-data-tx ds device-id data)))
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds]} [_ device-id data]]
+   {:transact (model/add-received-data-tx ds device-id data)}))
 
 (re-posh/reg-event-ds
  ::subscription-error-received
