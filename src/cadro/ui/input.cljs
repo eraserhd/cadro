@@ -16,8 +16,10 @@
 
 (rf/reg-event-fx
  ::set-value
- (fn [_ [_ id attr value]]
-   {:transact [[:db/add [::model/id id] attr value]]}))
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ id attr value]]
+   {:transact [[:db/add [::model/id id] attr value]]
+    :session (model/upsert session id attr value)}))
 
 (s/fdef control-name
   :args (s/cat :id uuid? :attr keyword?))
