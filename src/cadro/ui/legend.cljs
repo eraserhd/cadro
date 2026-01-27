@@ -45,7 +45,7 @@
 (rf/reg-event-fx
  ::legend-key-longpressed
  (fn [_ [_ id]]
-   {::edit-panel/edit id}))
+   {::edit-panel/edit [::model/id id]}))
 
 (def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
@@ -80,7 +80,7 @@
                [:li
                 (if coordinates
                   [gestures/wrap {:on-tap   #(rf/dispatch [::point-tapped id])
-                                  :on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
+                                  :on-press #(rf/dispatch [::legend-key-longpressed id])}
                    [:button.point {:class [(if reference? "reference" "non-reference")]}
                     [:> fa/FontAwesomeIcon {:icon (if reference?
                                                     faSolid/faLocationCrosshairs
@@ -89,7 +89,7 @@
                     [:div.name-and-distance
                      [:span.displays-as displays-as]
                      (position-hiccup distance spans)]]]
-                  [gestures/wrap {:on-press #(rf/dispatch [::legend-key-longpressed [::model/id id]])}
+                  [gestures/wrap {:on-press #(rf/dispatch [::legend-key-longpressed id])}
                    [:button.fixture {}
                     displays-as]])
                 (when-not (empty? transforms)
