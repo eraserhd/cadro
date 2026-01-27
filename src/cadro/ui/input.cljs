@@ -6,12 +6,12 @@
 
 (re-posh/reg-sub
  ::value
- (fn [_ [_ eid attr]]
+ (fn [_ [_ id attr]]
    {:type      :query
     :query     '[:find ?value
                  :in $ ?eid ?attr
                  :where [?eid ?attr ?value]]
-    :variables [eid attr]}))
+    :variables [[::model/id id] attr]}))
 
 (rf/reg-event-fx
  ::set-value
@@ -35,7 +35,7 @@
 (defn input
   "Input element for an object attribute in the datastore."
   [{:keys [id attr], :as props}]
-  (let [value (re-posh/subscribe [::value [::model/id id] attr])]
+  (let [value (re-posh/subscribe [::value id attr])]
     [:<>
      (when-let [lbl (:label props)]
        (label {:id id
