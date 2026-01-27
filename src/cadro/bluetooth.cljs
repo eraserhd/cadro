@@ -57,7 +57,7 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds]} [_ device-id]]
-   {:transact (model/set-connection-status-tx device-id :connecting)}))
+   {:transact (model/set-connection-status-tx [::model/id device-id] :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
@@ -96,7 +96,7 @@
 (rf/reg-fx
  ::connect
  (fn connect* [device-id]
-   (rf/dispatch [::connect-requested [::model/id device-id]])
+   (rf/dispatch [::connect-requested device-id])
    (let [device-address (::model/hardware-address (d/entity @@re-posh.db/store [::model/id device-id]))]
      (.connect
       bt-impl
