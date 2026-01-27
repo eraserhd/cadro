@@ -61,8 +61,8 @@
   (rf/inject-cofx :session)]
  (fn [{:keys [ds]} [_ fixture-id scale-id checked?]]
    (if checked?
-     {:transact (model/associate-scale-tx ds fixture-id scale-id)}
-     {:transact (model/dissociate-scale-tx ds fixture-id scale-id)})))
+     {:transact (model/associate-scale-tx ds [::model/id fixture-id] [::model/id scale-id])}
+     {:transact (model/dissociate-scale-tx ds [::model/id fixture-id] [::model/id scale-id])})))
 
 (defn scale-controls
   [fixture-id
@@ -77,8 +77,8 @@
             :on-change (fn [e]
                          (rf/dispatch
                           [::scale-checkbox-changed
-                           [::model/id fixture-id]
-                           [::model/id scale-id]
+                           fixture-id
+                           scale-id
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
     [:span.name displays-as]
