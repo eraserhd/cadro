@@ -66,12 +66,14 @@
  (fn [{:keys [ds]} [_ device-id]]
    {:transact (model/set-connection-status-tx device-id :connected)}))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::connect-failed
- (fn [ds [_ device-id error]]
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds]} [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
-   (model/set-connection-status-tx device-id :disconnected)))
+   {:transact (model/set-connection-status-tx device-id :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received
@@ -80,12 +82,14 @@
  (fn [{:keys [ds]} [_ device-id data]]
    {:transact (model/add-received-data-tx ds device-id data)}))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::subscription-error-received
- (fn [ds [_ device-id error]]
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds]} [_ device-id error]]
    ;     (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error])]
    ;FIXME:
-   []))
+   {}))
 
 (def ^:private decoder (js/TextDecoder. "ascii"))
 
