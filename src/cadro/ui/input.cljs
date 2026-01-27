@@ -16,8 +16,8 @@
 
 (rf/reg-event-fx
  ::set-value
- (fn [_ [_ eid attr value]]
-   {:transact [[:db/add eid attr value]]}))
+ (fn [_ [_ id attr value]]
+   {:transact [[:db/add [::model/id id] attr value]]}))
 
 (s/fdef control-name
   :args (s/cat :id uuid? :attr keyword?))
@@ -48,4 +48,4 @@
               :default-value @value
               :on-blur (fn [e]
                          (let [value (.. e -target -value)]
-                           (rf/dispatch [::set-value [::model/id id] attr value])))}]]))
+                           (rf/dispatch [::set-value id attr value])))}]]))
