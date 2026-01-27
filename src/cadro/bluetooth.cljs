@@ -96,23 +96,23 @@
 (rf/reg-fx
  ::connect
  (fn connect* [device-id]
-   (rf/dispatch [::connect-requested device-id])
-   (let [device-address (::model/hardware-address (d/entity @@re-posh.db/store device-id))]
+   (rf/dispatch [::connect-requested [::model/id device-id]])
+   (let [device-address (::model/hardware-address (d/entity @@re-posh.db/store [::model/id device-id]))]
      (.connect
       bt-impl
       device-address
       interface-id
       (fn []
-        (rf/dispatch [::connect-completed device-id])
+        (rf/dispatch [::connect-completed [::model/id device-id]])
         (.subscribeRawData
          bt-impl
          device-address
          interface-id
          (fn [raw-data]
            (let [data (.decode decoder (js/Uint8Array. raw-data))]
-             (rf/dispatch [::data-received device-id data])))
+             (rf/dispatch [::data-received [::model/id device-id] data])))
          (fn [error]
-           (rf/dispatch [::subscription-error-received device-id error]))))
+           (rf/dispatch [::subscription-error-received [::model/id device-id] error]))))
       (fn [error]
-        (rf/dispatch [::connect-failed device-id error])
+        (rf/dispatch [::connect-failed [::model/id device-id] error])
         (js/alert (str "Unable to connect: " error)))))))

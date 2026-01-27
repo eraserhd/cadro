@@ -48,7 +48,7 @@
 (rf/reg-event-fx
  ::connect-clicked
  (fn [_ [_ device-id]]
-   {::bt/connect [::model/id device-id]}))
+   {::bt/connect device-id}))
 
 (rf/reg-event-fx
  ::edit-panel-mounted
