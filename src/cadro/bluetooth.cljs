@@ -80,7 +80,7 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds]} [_ device-id data]]
-   {:transact (model/add-received-data-tx ds device-id data)}))
+   {:transact (model/add-received-data-tx ds [::model/id device-id] data)}))
 
 (rf/reg-event-fx
  ::subscription-error-received
@@ -110,7 +110,7 @@
          interface-id
          (fn [raw-data]
            (let [data (.decode decoder (js/Uint8Array. raw-data))]
-             (rf/dispatch [::data-received [::model/id device-id] data])))
+             (rf/dispatch [::data-received device-id data])))
          (fn [error]
            (rf/dispatch [::subscription-error-received [::model/id device-id] error]))))
       (fn [error]
