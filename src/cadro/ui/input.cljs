@@ -28,8 +28,8 @@
        (name attr)))
 
 (defn label
-  [{:keys [eid attr label]}]
-  [:label {:for (control-name eid attr)}
+  [{:keys [id attr label]}]
+  [:label {:for (control-name [::model/id id] attr)}
    label])
 
 (defn input
@@ -38,7 +38,7 @@
   (let [value (re-posh/subscribe [::value [::model/id id] attr])]
     [:<>
      (when-let [lbl (:label props)]
-       (label {:eid [::model/id id]
+       (label {:id id
                :attr attr
                :label lbl}))
      [:input {:id (control-name [::model/id id] attr)
