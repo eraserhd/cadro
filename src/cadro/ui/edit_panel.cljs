@@ -97,7 +97,7 @@
         [panel/panel {:title "Edit Fixture"
                       :class "edit-panel"
                       :on-close #(reset! thing-to-edit nil)}
-         [input/input {:eid  [::model/id fixture-id]
+         [input/input {:id fixture-id
                        :attr ::model/displays-as
                        :label "Display Name"}]
          [:h2 "Scales"]

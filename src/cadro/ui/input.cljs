@@ -1,5 +1,6 @@
 (ns cadro.ui.input
   (:require
+   [cadro.model :as model]
    [re-posh.core :as re-posh]
    [re-frame.core :as rf]))
 
@@ -33,15 +34,15 @@
 
 (defn input
   "Input element for an object attribute in the datastore."
-  [{:keys [eid attr], :as props}]
-  (let [value (re-posh/subscribe [::value eid attr])]
+  [{:keys [id attr], :as props}]
+  (let [value (re-posh/subscribe [::value [::model/id id] attr])]
     [:<>
      (when-let [lbl (:label props)]
-       (label {:eid eid
+       (label {:eid [::model/id id]
                :attr attr
                :label lbl}))
-     [:input {:id (control-name eid attr)
+     [:input {:id (control-name [::model/id id] attr)
               :default-value @value
               :on-blur (fn [e]
                          (let [value (.. e -target -value)]
-                           (rf/dispatch [::set-value eid attr value])))}]]))
+                           (rf/dispatch [::set-value [::model/id id] attr value])))}]]))
