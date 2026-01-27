@@ -48,7 +48,7 @@
 (rf/reg-event-fx
  ::connect-clicked
  (fn [_ [_ device-id]]
-   {::bt/connect device-id}))
+   {::bt/connect [::model/id device-id]}))
 
 (rf/reg-event-fx
  ::edit-panel-mounted
@@ -121,7 +121,7 @@
                           (:disconnected)
                           [:button.btn
                            {:type     "button"
-                            :on-click #(rf/dispatch [::connect-clicked [::model/id controller-id]])}
+                            :on-click #(rf/dispatch [::connect-clicked controller-id])}
                            "Connect"]
 
                           (:connecting)
