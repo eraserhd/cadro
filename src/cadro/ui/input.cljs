@@ -4,7 +4,6 @@
    [clara.rules :as clara]
    [net.eraserhead.clara-eql.pull :as pull]
    [clojure.spec.alpha :as s]
-   [re-posh.core :as re-posh]
    [re-frame.core :as rf]))
 
 ;; FIXME: if we subscribe to eav, narrow to e then to a then to v?
@@ -41,7 +40,7 @@
 (defn input
   "Input element for an object attribute in the datastore."
   [{:keys [id attr], :as props}]
-  (let [value (re-posh/subscribe [::value id attr])]
+  (let [value (rf/subscribe [::value id attr])]
     [:<>
      (when-let [lbl (:label props)]
        (label {:id id
