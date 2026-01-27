@@ -55,12 +55,14 @@
  (fn [_ _]
    {::bt/fetch-device-list nil}))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::scale-checkbox-changed
- (fn [ds [_ fixture-id scale-id checked?]]
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds]} [_ fixture-id scale-id checked?]]
    (if checked?
-     (model/associate-scale-tx ds fixture-id scale-id)
-     (model/dissociate-scale-tx ds fixture-id scale-id))))
+     {:transact (model/associate-scale-tx ds fixture-id scale-id)}
+     {:transact (model/dissociate-scale-tx ds fixture-id scale-id)})))
 
 (defn scale-controls
   [fixture-id
