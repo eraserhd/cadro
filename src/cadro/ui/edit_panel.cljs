@@ -77,7 +77,7 @@
             :on-change (fn [e]
                          (rf/dispatch
                           [::scale-checkbox-changed
-                           fixture-id
+                           [::model/id fixture-id]
                            [::model/id scale-id]
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
@@ -115,7 +115,7 @@
                           (:connected)
                           (into [:ul.scales]
                                 (map (fn [scale]
-                                       [scale-controls [::model/id fixture-id] scale associated-scales]))
+                                       [scale-controls fixture-id scale associated-scales]))
                                 _controller)
 
                           (:disconnected)
