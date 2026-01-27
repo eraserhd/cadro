@@ -34,7 +34,7 @@
    (let [{:keys [id tx session]} (model/new-machine-tx ds session)]
      {:transact tx
       :session session
-      ::edit-panel/edit id})))
+      ::edit-panel/edit [::model/id id]})))
 
 (rf/reg-event-fx
  ::point-tapped

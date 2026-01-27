@@ -198,7 +198,7 @@
   [ds session]
   (let [machine-id (db/squuid)
         point-id   (db/squuid)]
-    {:id      [::id machine-id]
+    {:id      machine-id
      :tx      [{::id           machine-id
                 ::displays-as "New Machine"
                 ::transforms   [{::id point-id
