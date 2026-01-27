@@ -1,18 +1,19 @@
 (ns cadro.ui.input
   (:require
    [cadro.model :as model]
+   [clara.rules :as clara]
+   [net.eraserhead.clara-eql.pull :as pull]
    [clojure.spec.alpha :as s]
    [re-posh.core :as re-posh]
    [re-frame.core :as rf]))
 
-(re-posh/reg-sub
+;; FIXME: if we subscribe to eav, narrow to e then to a then to v?
+(rf/reg-sub
  ::value
- (fn [_ [_ id attr]]
-   {:type      :query
-    :query     '[:find ?value
-                 :in $ ?eid ?attr
-                 :where [?eid ?attr ?value]]
-    :variables [[::model/id id] attr]}))
+ :<- [:session]
+ (fn [session [_ id attr]]
+   (let [eav-map (:?eav-map (first (clara/query session pull/eav-map)))]
+     (first (get-in eav-map [id attr])))))
 
 (rf/reg-event-fx
  ::set-value
