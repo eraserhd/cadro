@@ -12,10 +12,10 @@
                  :where [?eid ?attr ?value]]
     :variables [eid attr]}))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::set-value
  (fn [_ [_ eid attr value]]
-   [[:db/add eid attr value]]))
+   {:transact [[:db/add eid attr value]]}))
 
 (defn control-name
   "Derive the name for a form control from its database attribute."
