@@ -11,7 +11,7 @@
 (def ^:private thing-to-edit (ra/atom nil))
 
 (re-posh/reg-sub
- ::scale-eids
+ ::scale-ids
  (fn []
    {:type :query
     :query '[:find [?id ...]
@@ -28,7 +28,7 @@
 
 (re-posh/reg-sub
  ::scales
- :<- [::scale-eids]
+ :<- [::scale-ids]
  (fn [eids _]
    {:type    :pull-many
     :pattern scale-pull
