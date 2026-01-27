@@ -43,7 +43,7 @@
  (fn [_ [_ fixture-id]]
    {:type    :pull
     :pattern fixture-pull
-    :id      fixture-id}))
+    :id      [::model/id fixture-id]}))
 
 (rf/reg-event-fx
  ::connect-clicked
@@ -97,7 +97,7 @@
         [panel/panel {:title "Edit Fixture"
                       :class "edit-panel"
                       :on-close #(reset! thing-to-edit nil)}
-         [input/input {:eid  fixture-id
+         [input/input {:eid  [::model/id fixture-id]
                        :attr ::model/displays-as
                        :label "Display Name"}]
          [:h2 "Scales"]
@@ -115,7 +115,7 @@
                           (:connected)
                           (into [:ul.scales]
                                 (map (fn [scale]
-                                       [scale-controls fixture-id scale associated-scales]))
+                                       [scale-controls [::model/id fixture-id] scale associated-scales]))
                                 _controller)
 
                           (:disconnected)
@@ -137,6 +137,6 @@
 
 (rf/reg-fx
  ::edit
- (fn [eid]
-   (reset! thing-to-edit eid)
+ (fn [id]
+   (reset! thing-to-edit id)
    (rf/dispatch [::edit-panel-opened])))

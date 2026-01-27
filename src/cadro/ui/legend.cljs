@@ -34,7 +34,7 @@
    (let [{:keys [id tx session]} (model/new-machine-tx ds session)]
      {:transact tx
       :session session
-      ::edit-panel/edit [::model/id id]})))
+      ::edit-panel/edit id})))
 
 (rf/reg-event-fx
  ::point-tapped
@@ -45,7 +45,7 @@
 (rf/reg-event-fx
  ::legend-key-longpressed
  (fn [_ [_ id]]
-   {::edit-panel/edit [::model/id id]}))
+   {::edit-panel/edit id}))
 
 (def new-machine-icon [:> fa/FontAwesomeIcon {:icon faSolid/faPlugCirclePlus}])
 (defn new-machine-button []
