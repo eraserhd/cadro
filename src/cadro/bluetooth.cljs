@@ -73,7 +73,7 @@
  (fn [{:keys [ds]} [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
-   {:transact (model/set-connection-status-tx device-id :disconnected)}))
+   {:transact (model/set-connection-status-tx [::model/id device-id] :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received
@@ -112,7 +112,7 @@
            (let [data (.decode decoder (js/Uint8Array. raw-data))]
              (rf/dispatch [::data-received device-id data])))
          (fn [error]
-           (rf/dispatch [::subscription-error-received [::model/id device-id] error]))))
+           (rf/dispatch [::subscription-error-received device-id error]))))
       (fn [error]
-        (rf/dispatch [::connect-failed [::model/id device-id] error])
+        (rf/dispatch [::connect-failed device-id error])
         (js/alert (str "Unable to connect: " error)))))))
