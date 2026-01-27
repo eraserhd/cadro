@@ -52,10 +52,12 @@
           (fn [error]
             (js/alert (str "Unable to retrieve Bluetooth device list: " error))))))
 
-(re-posh/reg-event-ds
+(rf/reg-event-fx
  ::connect-requested
- (fn [ds [_ device-id]]
-   (model/set-connection-status-tx device-id :connecting)))
+ [(re-posh/inject-cofx :ds)
+  (rf/inject-cofx :session)]
+ (fn [{:keys [ds]} [_ device-id]]
+   {:transact (model/set-connection-status-tx device-id :connecting)}))
 
 (re-posh/reg-event-ds
  ::connect-completed
