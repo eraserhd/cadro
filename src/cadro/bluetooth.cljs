@@ -64,7 +64,7 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds]} [_ device-id]]
-   {:transact (model/set-connection-status-tx device-id :connected)}))
+   {:transact (model/set-connection-status-tx [::model/id device-id] :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
@@ -103,7 +103,7 @@
       device-address
       interface-id
       (fn []
-        (rf/dispatch [::connect-completed [::model/id device-id]])
+        (rf/dispatch [::connect-completed device-id])
         (.subscribeRawData
          bt-impl
          device-address
