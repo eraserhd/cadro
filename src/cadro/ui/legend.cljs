@@ -26,7 +26,7 @@
     :pattern model/fixtures-and-points-trees-pull
     :ids     eids}))
 
-(re-posh/reg-event-fx
+(rf/reg-event-fx
  ::new-machine-tapped
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
@@ -42,7 +42,7 @@
  (fn [{:keys [session]} [_ id]]
    {:session (model/set-reference session id)}))
 
-(re-posh/reg-event-fx
+(rf/reg-event-fx
  ::legend-key-longpressed
  (fn [_ [_ eid]]
    {::edit-panel/edit eid}))
