@@ -13,19 +13,13 @@
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
-(re-posh/reg-sub
- ::top-level-fixture-ids
- (fn [_ _]
-   {:type  :query
-    :query model/top-level-fixture-eids-q}))
-
-(re-posh/reg-sub
+(rf/reg-sub
  ::fixtures-and-points-trees
- :<- [::top-level-fixture-ids]
- (fn [ids]
-   {:type    :pull-many
-    :pattern model/fixtures-and-points-trees-pull
-    :ids     ids}))
+ :<- [:session]
+ (fn [session]
+   (->> (clara/query session model/fixtures-and-points-trees-query)
+        (map :?data)
+        (sort-by ::model/id))))
 
 (rf/reg-event-fx
  ::new-machine-tapped

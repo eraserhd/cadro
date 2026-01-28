@@ -151,8 +151,36 @@
     ::displays-as
     ::reference?
     ::coordinates
-    {::transforms ...
-     ::spans [::id ::displays-as]}])
+    {::transforms ;...}
+     [::id
+      ::displays-as
+      ::reference?
+      ::coordinates
+      {::transforms ...}
+      {::spans [::id ::displays-as]}]}
+    {::spans [::id ::displays-as]}])
+
+(clara-eql/defrule fixtures-and-points-trees-pull'
+  :query
+  [::id
+   ::displays-as
+   ::reference?
+   ::coordinates
+   {::transforms ;...
+    [::id
+     ::displays-as
+     ::reference?
+     ::coordinates
+     ;{::transforms ...}
+     {::spans [::id ::displays-as]}]}
+   {::spans [::id ::displays-as]}]
+  :from ?eid
+  :where
+  [eav/EAV (= e ?eid) (= a ::transforms)]
+  (not [eav/EAV (= a ::transforms) (= v ?eid)]))
+
+(clara/defquery fixtures-and-points-trees-query []
+  [clara-eql/QueryResult (= query `fixtures-and-points-trees-pull') (= result ?data)])
 
 (defn root-path-axes
   [root-path]
