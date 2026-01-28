@@ -10,7 +10,7 @@
 
 (deftest t-set-reference
   (let [id      (random-uuid)
-        session (-> session/empty-session
+        session (-> session/base-session
                     (clara/insert (model/asserted id ::model/coordinates {}))
                     (model/set-reference id)
                     (clara/fire-rules))]
@@ -20,7 +20,7 @@
         "No invariant errors"))
   (let [id1     (random-uuid)
         id2     (random-uuid)
-        session (-> session/empty-session
+        session (-> session/base-session
                     (clara/insert (model/asserted id1 ::model/coordinates {}))
                     (clara/insert (model/asserted id2 ::model/coordinates {}))
                     (model/set-reference id1)
@@ -32,7 +32,7 @@
         "No invariant errors"))
   (let [id1     (random-uuid)
         id2     (random-uuid)
-        session (-> session/empty-session
+        session (-> session/base-session
                     (clara/insert (model/asserted id1 ::model/coordinates {}))
                     (clara/insert (model/asserted id2 ::model/coordinates {}))
                     (clara/insert (model/asserted id1 ::model/reference? true))
@@ -41,7 +41,7 @@
     (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
            (model/errors session))))
   (let [id      (random-uuid)
-        session (-> session/empty-session
+        session (-> session/base-session
                     (model/set-reference id)
                     (clara/fire-rules))]
     (is (= [(model/->InvariantError "reference point does not have coordinates" {:id id})]
@@ -125,7 +125,7 @@
      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
 (deftest t-insert-controllers
-  (let [session      (-> session/empty-session
+  (let [session      (-> session/base-session
                          (model/insert-controllers [{::model/displays-as      "Nexus 7"
                                                      ::model/hardware-address "00:00:01"}
                                                     {::model/displays-as      "HC-06"

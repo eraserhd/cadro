@@ -60,11 +60,11 @@
 
 ;;-------------------------------------------------------------------------------
 
-(def session-schema
-  [[::id               :db/unique      :db.unique/identity]
-   [::spans            :db/cardinality :db.cardinality/many]
-   [::transforms       :db/cardinality :db.cardinality/many]
-   [::hardware-address :db/unique      :db.unique/identity]])
+(def schema
+  [(derived ::id               :db/unique      :db.unique/identity)
+   (derived ::spans            :db/cardinality :db.cardinality/many)
+   (derived ::transforms       :db/cardinality :db.cardinality/many)
+   (derived ::hardware-address :db/unique      :db.unique/identity)])
 
 (db/register-schema!
   {::id

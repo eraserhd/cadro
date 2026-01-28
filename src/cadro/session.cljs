@@ -9,21 +9,24 @@
    [reagent.ratom]
    [re-frame.core :as r]))
 
-(clara/defsession empty-session 'cadro.model 'net.eraserhead.clara-eql.pull)
+(clara/defsession ^:private empty-session 'cadro.model 'net.eraserhead.clara-eql.pull)
+
+(def base-session (-> empty-session
+                      (clara/insert-all model/schema)
+                      (clara/fire-rules)))
 
 (defonce session (reagent.ratom/atom
-                   (let [ls-tuples (or (some-> js/localStorage
-                                         (.getItem "session")
-                                         (edn/read-string))
-                                       model/session-schema)]
-                     (-> empty-session
+                   (let [ls-tuples (some-> js/localStorage
+                                     (.getItem "session")
+                                     (edn/read-string))]
+                     (-> base-session
                          (clara/insert-all (map (fn [[e a v]]
                                                   (model/asserted e a v))
                                                 ls-tuples))
                          (clara/fire-rules)))))
 
 (defn clear! []
-  (reset! session empty-session))
+  (reset! session base-session))
 
 (defn- save-session!
   "Stores session to localStorage."
