@@ -88,8 +88,8 @@
   (rf/dispatch [::edit-panel-mounted])
   (fn []
     (when-let [fixture-id @thing-to-edit]
-      (let [scales            @(re-posh/subscribe [::scales])
-            fixture           @(re-posh/subscribe [::fixture fixture-id])
+      (let [scales            @(rf/subscribe [::scales])
+            fixture           @(rf/subscribe [::fixture fixture-id])
             associated-scales (->> (::model/spans fixture)
                                    (map ::model/id)
                                    (into #{}))]
