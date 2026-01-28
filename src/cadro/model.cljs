@@ -134,8 +134,8 @@
 
 (def root-path-pull
   '[::coordinates
-    {::_transforms ...
-     ::spans
+    {::_transforms ...}
+    {::spans
      [::id
       ::displays-as
       ::raw-count]}])
@@ -151,10 +151,8 @@
     [::id
      ::displays-as
      ::reference?
-     ::coordinates
+     ::coordinates]}]
      ;{::transforms ...} ;;FIXME: clara-eql does not like?
-     {::spans [::id ::displays-as]}]}
-   {::spans [::id ::displays-as]}]
   :from ?eid
   :where
   [eav/EAV (= e ?eid) (= a ::transforms)]
