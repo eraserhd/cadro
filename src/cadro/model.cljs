@@ -140,6 +140,7 @@
       ::displays-as
       ::raw-count]}])
 
+;;FIXME: clara-eql needs recursion
 (clara-eql/defrule fixtures-and-points-trees-pull'
   :query
   [::id
@@ -151,7 +152,7 @@
      ::displays-as
      ::reference?
      ::coordinates
-     ;{::transforms ...}
+     ;{::transforms ...} ;;FIXME: clara-eql does not like?
      {::spans [::id ::displays-as]}]}
    {::spans [::id ::displays-as]}]
   :from ?eid
