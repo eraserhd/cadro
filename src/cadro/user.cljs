@@ -5,6 +5,7 @@
    [cadro.session :as session]
    [cadro.test :as t]
    [clara.rules :as clara]
+   [clojure.pprint :refer [pprint]]
    [clojure.spec.alpha :as s]
    [cljs.repl :refer [dir doc apropos source]]
    [datascript.core :as d]
