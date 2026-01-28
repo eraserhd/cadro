@@ -17,9 +17,7 @@
  ::fixtures-and-points-trees
  :<- [:session]
  (fn [session]
-   (->> (clara/query session model/fixtures-and-points-trees-query)
-        (map :?data)
-        (sort-by ::model/id))))
+   (model/fixtures-and-points-trees session)))
 
 (rf/reg-event-fx
  ::new-machine-tapped

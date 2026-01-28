@@ -141,7 +141,7 @@
       ::raw-count]}])
 
 ;;FIXME: clara-eql needs recursion
-(clara-eql/defrule fixtures-and-points-trees-pull'
+(clara-eql/defrule fixtures-and-points-trees-rule
   :query
   [::id
    ::displays-as
@@ -161,7 +161,12 @@
   (not [eav/EAV (= a ::transforms) (= v ?eid)]))
 
 (clara/defquery fixtures-and-points-trees-query []
-  [clara-eql/QueryResult (= query `fixtures-and-points-trees-pull') (= result ?data)])
+  [clara-eql/QueryResult (= query `fixtures-and-points-trees-rule) (= result ?data)])
+
+(defn fixtures-and-points-trees [session]
+  (->> (clara/query session fixtures-and-points-trees-query)
+       (map :?data)
+       (sort-by ::id)))
 
 (defn root-path-axes
   [root-path]
