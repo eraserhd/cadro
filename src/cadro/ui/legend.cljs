@@ -4,6 +4,7 @@
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.edit-panel :as edit-panel]
+   [clara.rules :as clara]
    [clojure.set :as set]
    [clojure.string :as str]
    [datascript.core :as d]

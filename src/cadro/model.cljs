@@ -10,7 +10,8 @@
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
    [datascript.core :as d]
-   [medley.core :as medley]))
+   [medley.core :as medley]
+   [net.eraserhead.clara-eql.core :as clara-eql]))
 
 (defn asserted [e a v]
   (assoc (eav/->EAV e a v) :persistent? true))
@@ -51,6 +52,19 @@
 
 ;;-------------------------------------------------------------------------------
 
+(clara/defrule model-id-attributes
+  "Pull expressions will need access to ::id as an attribute."
+  [(acc/exists) :from [eav/EAV (= e ?id)]]
+  =>
+  (clara/insert! (derived ?id ::id ?id)))
+
+;;-------------------------------------------------------------------------------
+
+(def session-schema
+  [[::id               :db/unique      :db.unique/identity]
+   [::spans            :db/cardinality :db.cardinality/many]
+   [::transforms       :db/cardinality :db.cardinality/many]
+   [::hardware-address :db/unique      :db.unique/identity]])
 
 (db/register-schema!
   {::id
@@ -101,8 +115,7 @@
   =>
   (clara/insert! (->InvariantError "more than one reference point in session" {:count ?refcount})))
 
-(clara/defquery reference-query
-  []
+(clara/defquery reference-query []
   [?ref <- eav/EAV (= e ?id) (= a ::reference?)])
 
 (s/fdef set-reference

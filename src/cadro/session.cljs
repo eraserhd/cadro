@@ -12,9 +12,10 @@
 (clara/defsession empty-session 'cadro.model 'net.eraserhead.clara-eql.pull)
 
 (defonce session (reagent.ratom/atom
-                   (let [ls-tuples (some-> js/localStorage
-                                     (.getItem "session")
-                                     (edn/read-string))]
+                   (let [ls-tuples (or (some-> js/localStorage
+                                         (.getItem "session")
+                                         (edn/read-string))
+                                       model/session-schema)]
                      (-> empty-session
                          (clara/insert-all (map (fn [[e a v]]
                                                   (model/asserted e a v))
