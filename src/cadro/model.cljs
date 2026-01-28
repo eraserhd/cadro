@@ -140,26 +140,6 @@
       ::displays-as
       ::raw-count]}])
 
-(def top-level-fixture-eids-q
-  '[:find [?eid ...]
-    :where
-    [?eid ::transforms]
-    (not [_ ::transforms ?eid])])
-
-(def fixtures-and-points-trees-pull
-  '[::id
-    ::displays-as
-    ::reference?
-    ::coordinates
-    {::transforms ;...}
-     [::id
-      ::displays-as
-      ::reference?
-      ::coordinates
-      {::transforms ...}
-      {::spans [::id ::displays-as]}]}
-    {::spans [::id ::displays-as]}])
-
 (clara-eql/defrule fixtures-and-points-trees-pull'
   :query
   [::id
