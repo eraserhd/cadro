@@ -80,8 +80,9 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-id data]]
-   {:transact (model/add-received-data-tx ds [::model/id device-id] data)
-    :session (model/add-received-data session [::model/id device-id] data)}))
+   (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
+     {:transact (model/add-received-data-tx ds [::model/id device-id] data (atom uuids))
+      :session (model/add-received-data session [::model/id device-id] data (atom uuids))})))
 
 (rf/reg-event-fx
  ::subscription-error-received
