@@ -58,24 +58,27 @@
  ::connect-requested
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
- (fn [{:keys [ds]} [_ device-id]]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :connecting)}))
+ (fn [{:keys [ds session]} [_ device-id]]
+   {:transact (model/set-connection-status-tx [::model/id device-id] :connecting)
+    :session (model/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
- (fn [{:keys [ds]} [_ device-id]]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :connected)}))
+ (fn [{:keys [ds session]} [_ device-id]]
+   {:transact (model/set-connection-status-tx [::model/id device-id] :connected)
+    :session (model/set-connection-status session device-id :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
- (fn [{:keys [ds]} [_ device-id error]]
+ (fn [{:keys [ds session]} [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :disconnected)}))
+   {:transact (model/set-connection-status-tx [::model/id device-id] :disconnected)
+    :session (model/set-connection-status session device-id :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received

@@ -308,6 +308,9 @@
   {:pre [(s/valid? ::connection-status status)]}
   [[:db/add controller-id ::connection-status status]])
 
+(defn set-connection-status [session controller-id status]
+  (upsert session controller-id ::connection-status status))
+
 ;; Unprocessed, received data
 (s/def ::receive-buffer string?)
 
