@@ -289,14 +289,14 @@
                                (d/q '[:find [(pull ?obj [::id ::hardware-address ::connection-status]) ...]
                                       :where [?obj ::hardware-address]]
                                     ds))]
-    (map (fn [{:keys [::hardware-address], :as scale-controller}]
-           (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
-                 new-status                     (or connection-status :disconnected)
-                 new-id                         (or id (random-uuid))]
-             (assoc scale-controller
-                    ::id new-id
-                    ::connection-status new-status)))
-         controller-list)))
+    (mapv (fn [{:keys [::hardware-address], :as scale-controller}]
+            (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
+                  new-status                     (or connection-status :disconnected)
+                  new-id                         (or id (random-uuid))]
+              (assoc scale-controller
+                     ::id new-id
+                     ::connection-status new-status)))
+          controller-list)))
 
 (clara/defquery controllers []
   [eav/EAV (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
