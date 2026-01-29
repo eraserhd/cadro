@@ -13,7 +13,7 @@
     (swap! ids (fn [db]
                  (if (contains? db kw)
                    db
-                   (assoc db kw (d/squuid)))))
+                   (assoc db kw (random-uuid)))))
     (get @ids kw)))
 
 (defn scenario

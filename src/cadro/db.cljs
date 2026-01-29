@@ -52,5 +52,3 @@
       (d/listen! conn :persist-to-localStorage persist-to-localStorage)
       (set! *conn* conn)))
   *conn*)
-
-(def squuid d/squuid)

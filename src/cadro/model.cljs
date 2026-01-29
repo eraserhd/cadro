@@ -222,8 +222,8 @@
 
 (defn new-machine-tx
   [ds session]
-  (let [machine-id (db/squuid)
-        point-id   (db/squuid)]
+  (let [machine-id (random-uuid)
+        point-id   (random-uuid)]
     {:id      machine-id
      :tx      [{::id           machine-id
                 ::displays-as "New Machine"
@@ -259,7 +259,7 @@
                            controller-id)
                       (into {}))]
     [{::id           (or (get name->id scale-name)
-                         (db/squuid))
+                         (random-uuid))
       ::displays-as scale-name
       ::raw-count    value
       ::controller   controller-id}]))
@@ -292,7 +292,7 @@
     (map (fn [{:keys [::hardware-address], :as scale-controller}]
            (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
                  new-status                     (or connection-status :disconnected)
-                 new-id                         (or id (db/squuid))]
+                 new-id                         (or id (random-uuid))]
              (assoc scale-controller
                     ::id new-id
                     ::connection-status new-status)))
