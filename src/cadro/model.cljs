@@ -280,8 +280,13 @@
 ;; Unprocessed, received data
 (s/def ::receive-buffer string?)
 
+(defn- next-random-uuid [uuids]
+  (let [result (first @uuids)]
+    (swap! uuids rest)
+    result))
+
 (defn add-controllers-tx
-  [ds controller-list]
+  [ds controller-list uuids]
   {:pre [(d/db? ds)
          (s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
   (let [addr->controller (into {}
@@ -292,7 +297,7 @@
     (mapv (fn [{:keys [::hardware-address], :as scale-controller}]
             (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
                   new-status                     (or connection-status :disconnected)
-                  new-id                         (or id (random-uuid))]
+                  new-id                         (or id (next-random-uuid uuids))]
               (assoc scale-controller
                      ::id new-id
                      ::connection-status new-status)))
@@ -304,13 +309,13 @@
   [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
 
 (defn insert-controllers
-  [session controller-list]
+  [session controller-list uuids]
   {:pre [(s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
   (let [existing-controllers (->> (clara/query session controllers)
                                   (group-by :?hardware-address))]
     (reduce (fn [session {:keys [::displays-as ::hardware-address]}]
               (let [{:keys [?id ?connection-status]} (get-in existing-controllers [hardware-address 0])
-                    id                               (or ?id (random-uuid))
+                    id                               (or ?id (next-random-uuid uuids))
                     connection-status                (or ?connection-status :disconnected)]
                 (-> session
                     (upsert id ::displays-as displays-as)

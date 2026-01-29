@@ -34,9 +34,9 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-list]]
-   {:transact (model/add-controllers-tx ds device-list)
-    :session  (model/insert-controllers session device-list)}))
-                  
+   (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
+     {:transact (model/add-controllers-tx ds device-list (atom uuids))
+      :session  (model/insert-controllers session device-list (atom uuids))})))
 
 (rf/reg-fx
  ::fetch-device-list
