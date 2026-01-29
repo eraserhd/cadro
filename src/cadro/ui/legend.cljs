@@ -1,15 +1,12 @@
 (ns cadro.ui.legend
   (:require
-   [cadro.db :as db]
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.edit-panel :as edit-panel]
    [clara.rules :as clara]
    [clojure.set :as set]
    [clojure.string :as str]
-   [datascript.core :as d]
    [re-frame.core :as rf]
-   [re-posh.core :as re-posh]
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 

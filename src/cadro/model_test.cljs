@@ -1,9 +1,7 @@
 (ns cadro.model-test
   (:require
-   [cadro.db :as db]
    [cadro.model :as model]
    [cadro.session :as session]
-   [cadro.test :as t]
    [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
    [datascript.core :as d]
@@ -58,72 +56,6 @@
                     fixture-id
                     scale-id)]
     (boolean result)))
-
-(deftest t-associate-dissociate-scale-tx
-  (t/scenario
-    "Scales aren't automatically associated with machines."
-    [{::model/id           (t/id :scale/X)
-      ::model/displays-as "X"
-      ::model/raw-count    150
-      ::model/controller   {::model/id (t/id :controller)
-                            ::model/displays-as "HC-01"
-                            ::model/hardware-address "00:00:01"}}
-     {::model/id           (t/id :machine1)
-      ::model/displays-as "New Machine"
-      ::model/transforms   {::model/id          (t/id :point1)
-                            ::model/coordinates {}}}]
-    (fn [{:keys [db]}]
-      (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)])))))
-
-  (t/scenario
-    "A scale can be associated."
-    [{::model/id           (t/id :scale/X)
-      ::model/displays-as "X"
-      ::model/raw-count    150
-      ::model/controller   {::model/id (t/id :controller)
-                            ::model/displays-as "HC-01"
-                            ::model/hardware-address "00:00:01"}}
-     {::model/id           (t/id :machine1)
-      ::model/displays-as "New Machine"
-      ::model/transforms   {::model/id          (t/id :point1)
-                            ::model/coordinates {}}}]
-   [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
-   (fn [{:keys [db]}]
-     (is (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))
-
-  (t/scenario
-    "Association is idempotent."
-    [{::model/id           (t/id :scale/X)
-      ::model/displays-as "X"
-      ::model/raw-count    150
-      ::model/controller   {::model/id (t/id :controller)
-                            ::model/displays-as "HC-01"
-                            ::model/hardware-address "00:00:01"}}
-     {::model/id           (t/id :machine1)
-      ::model/displays-as "New Machine"
-      ::model/transforms   {::model/id          (t/id :point1)
-                            ::model/coordinates {}}}]
-   [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
-   [#'model/associate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
-   (fn [{:keys [db]}]
-     (is (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))
-
-  (t/scenario
-    "Scales can be dissociated."
-    [{::model/id           (t/id :scale/X)
-      ::model/displays-as "X"
-      ::model/raw-count    150
-      ::model/controller   {::model/id (t/id :controller)
-                            ::model/displays-as "HC-01"
-                            ::model/hardware-address "00:00:01"}}
-     {::model/id           (t/id :machine1)
-      ::model/displays-as "New Machine"
-      ::model/transforms   {::model/id          (t/id :point1)
-                            ::model/coordinates {}}
-      ::model/spans        [::model/id (t/id :scale/X)]}]
-   [#'model/dissociate-scale-tx [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]]
-   (fn [{:keys [db]}]
-     (is (not (associated? db [::model/id (t/id :machine1)] [::model/id (t/id :scale/X)]))))))
 
 (deftest t-insert-controllers
   (let [session      (-> session/base-session

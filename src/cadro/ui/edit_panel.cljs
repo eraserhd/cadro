@@ -6,8 +6,7 @@
    [cadro.ui.panel :as panel]
    [clara.rules :as clara]
    [reagent.core :as ra]
-   [re-frame.core :as rf]
-   [re-posh.core :as re-posh]))
+   [re-frame.core :as rf]))
 
 (def ^:private thing-to-edit (ra/atom nil))
 
@@ -37,9 +36,8 @@
 
 (rf/reg-event-fx
  ::scale-checkbox-changed
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ fixture-id scale-id checked?]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ fixture-id scale-id checked?]]
    (if checked?
      {:session (clara/insert session (model/asserted fixture-id ::model/spans scale-id))}
      {:session (clara/retract session (model/asserted fixture-id ::model/spans scale-id))})))

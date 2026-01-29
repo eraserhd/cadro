@@ -1,7 +1,6 @@
 (ns cadro.main
   (:require
    [cadro.bluetooth :as bt]
-   [cadro.db]
    [cadro.model]
    [cadro.session]
    [cadro.ui.axes]
@@ -29,6 +28,5 @@
   (when ^boolean goog.DEBUG
     (clojure.spec.test.alpha/instrument)
     (s/check-asserts true))
-  (cadro.db/connect!)
   (rf/dispatch-sync [::initialize])
   (rdc/render root [cadro]))

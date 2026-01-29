@@ -3,8 +3,6 @@
    [cadro.model :as model]
    [clara.rules :as clara]
    [cadro.session :as session]
-   [datascript.core :as d]
-   [re-posh.db :as re-posh.db]
    [re-frame.core :as rf]
    ["@capacitor/core" :refer [Capacitor]]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))

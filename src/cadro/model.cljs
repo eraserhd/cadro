@@ -2,14 +2,12 @@
   (:require-macros
    [net.eraserhead.clara-eql.core :as clara-eql])
   (:require
-   [cadro.db :as db]
    [cadro.transforms :as tr]
    [clara.rules :as clara]
    [clara.rules.accumulators :as acc]
    [clara-eav.eav :as eav]
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
-   [datascript.core :as d]
    [medley.core :as medley]
    [net.eraserhead.clara-eql.core :as clara-eql]
    [net.eraserhead.clara-eql.pull :as pull]))
@@ -84,32 +82,8 @@
    ;; Hrmm, clara-eql can't figure this out?
    (derived ::_controller      :db/cardinality :db.cardinality/many)])
 
-(db/register-schema!
-  {::id
-   {:db/cardinality :db.cardinality/one
-    :db/unique      :db.unique/identity}
-   ::displays-as
-   {:db/cardinality :db.cardinality/one}
-   ::spans
-   {:db/cardinality :db.cardinality/many
-    :db/valueType   :db.type/ref}
-   ::reference?
-   {:db/cardinality :db.cardinality/one}
-   ::transforms
-   {:db/cardinality :db.cardinality/many
-    :db/valueType   :db.type/ref}
-   ::controller
-   {:db/cardinality :db.cardinality/one
-    :db/valueType   :db.type/ref}
-   ::connection-status
-   {:db/cardinality :db.cardinality/one}
-   ::hardware-address
-   {:db/cardinality :db.cardinality/one
-    :db/unique      :db.unique/identity}})
-
 ;; Display name is a common concept everywhere.
 (s/def ::displays-as string?)
-
 
 ;; Something can span an axis, meaning coordinates extend into it.
 (s/def ::spans (s/coll-of (s/keys :req [::id ::displays-as])))
@@ -288,23 +262,6 @@
   (let [result (first @uuids)]
     (swap! uuids rest)
     result))
-
-(defn upsert-raw-count-tx
-  [ds controller-id scale-name value uuids]
-  (let [name->id (->> (d/q '[:find ?name ?id
-                             :in $ ?controller
-                             :where
-                             [?e ::id ?id]
-                             [?e ::displays-as ?name]
-                             [?e ::controller ?controller]]
-                           ds
-                           controller-id)
-                      (into {}))]
-    [{::id           (or (get name->id scale-name)
-                         (next-uuid uuids))
-      ::displays-as scale-name
-      ::raw-count    value
-      ::controller   controller-id}]))
 
 ;; Bluetooth, ethernet, or whatever address.
 (s/def ::hardware-address string?)
