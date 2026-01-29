@@ -6,7 +6,8 @@
    [cadro.test :as t]
    [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
-   [datascript.core :as d]))
+   [datascript.core :as d]
+   [net.eraserhead.clara-eql.pull :as pull]))
 
 (deftest t-set-reference
   (let [id      (random-uuid)
@@ -157,17 +158,32 @@
 (defn- after-receives
   [& receives]
   (let [controller-id [::model/hardware-address "00:00:01"]
-        conn          (d/create-conn (db/schema))
-        tx            (model/add-controllers-tx @conn [{::model/displays-as "HC-06"
-                                                        ::model/hardware-address "00:00:01"}])
-        _             (d/transact! conn tx)
-        _             (doseq [data receives]
-                        (let [tx (model/add-received-data-tx @conn controller-id data)]
-                          (d/transact! conn tx)))]
-    (d/entity @conn controller-id)))
+        session       (-> session/base-session
+                          (model/insert-controllers [{::model/displays-as "HC-06"
+                                                      ::model/hardware-address "00:00:01"}])
+                          (clara/fire-rules))
+        session       (reduce (fn [session data]
+                                (-> session
+                                    (model/add-received-data controller-id data)
+                                    (clara/fire-rules)))
+                              session
+                              receives)
+        eav-map       (:?eav-map (first (clara/query session pull/eav-map)))]
+    (->> eav-map
+         (keep (fn [[k v]]
+                 (when (::model/raw-count v)
+                   k)))
+         (map (fn [scale-id]
+                (pull/pull session
+                           [::model/id
+                            ::model/displays-as
+                            ::model/raw-count
+                            {::model/controller
+                             [::model/id]}]
+                           scale-id))))))
 
-(deftest t-add-received-data-tx
-  (let [controller (after-receives "X150;Y250;Z350;T72;\n")]
+(deftest t-add-received-data
+  (let [scales (after-receives "X150;Y250;Z350;T72;\n")]
     (is (= #{{::model/displays-as "X"
               ::model/raw-count 150}
              {::model/displays-as "Y"
@@ -176,27 +192,27 @@
               ::model/raw-count 350}
              {::model/displays-as "T"
               ::model/raw-count 72}}
-           (->> (::model/_controller controller)
+           (->> scales
                 (map #(select-keys % [::model/displays-as ::model/raw-count]))
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
-    (is (every? (comp uuid? ::model/id) (::model/_controller controller))
+    (is (every? (comp uuid? ::model/id) scales)
         "Every new scale is assigned a uuid.")
-    (is (= 4 (count (map ::model/id (::model/_controller controller))))
+    (is (= 4 (count (map ::model/id scales)))
         "The new uuids are unique."))
-  (let [controller (after-receives "X150;\n" "X152;\n")]
+  (let [scales (after-receives "X150;\n" "X152;\n")]
     (is (= #{{::model/displays-as "X"
               ::model/raw-count 152}}
-           (->> (::model/_controller controller)
+           (->> scales
                 (map #(select-keys % [::model/displays-as ::model/raw-count]))
                 (into #{})))
         "It updates existing scale values."))
   (testing "partial receives"
     (doseq [:let [full-data "X150;Y250;Z350;T72;\n"]
             i (range (count full-data))]
-      (let [a          (subs full-data 0 i)
-            b          (subs full-data i)
-            controller (after-receives a b)]
+      (let [a      (subs full-data 0 i)
+            b      (subs full-data i)
+            scales (after-receives a b)]
         (is (= #{{::model/displays-as "X"
                   ::model/raw-count 150}
                  {::model/displays-as "Y"
@@ -205,7 +221,7 @@
                   ::model/raw-count 350}
                  {::model/displays-as "T"
                   ::model/raw-count 72}}
-               (->> (::model/_controller controller)
+               (->> scales
                     (map #(select-keys % [::model/displays-as ::model/raw-count]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))

@@ -11,7 +11,8 @@
    [clojure.string :as str]
    [datascript.core :as d]
    [medley.core :as medley]
-   [net.eraserhead.clara-eql.core :as clara-eql]))
+   [net.eraserhead.clara-eql.core :as clara-eql]
+   [net.eraserhead.clara-eql.pull :as pull]))
 
 (defn asserted [e a v]
   (assoc (eav/->EAV e a v) :persistent? true))
@@ -336,3 +337,32 @@
       (mapcat (fn [[scale-name value]]
                 (upsert-raw-count-tx ds controller-id scale-name value))
               new-scale-values))))
+
+(clara/defquery scale-id [?controller-id ?scale-name]
+  [eav/EAV (= e ?scale-id) (= a ::controller) (= v ?controller-id)]
+  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?scale-name)])
+
+(defn upsert-raw-count [session controller-id scale-name value]
+  (if-let [id (:?scale-id (first (clara/query session scale-id :?controller-id controller-id :?scale-name scale-name)))]
+    (upsert session id ::raw-count value)
+    (let [id (random-uuid)]
+      (-> session
+          (upsert id ::displays-as scale-name)
+          (upsert id ::raw-count value)
+          (upsert id ::controller controller-id)))))
+
+(defn add-received-data [session controller-ref data]
+  (let [controller-id                 (pull/entid session controller-ref)
+        to-process                    (-> (str (::receive-buffer (pull/pull session [::receive-buffer] controller-id))
+                                               data)
+                                          (str/replace #"[;\s]+" ";")
+                                          (str/replace #"^;+" ""))
+        [to-process new-scale-values] (loop [to-process       to-process
+                                             new-scale-values {}]
+                                        (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
+                                          (recur left (assoc new-scale-values axis (* value-str 1.0)))
+                                          [to-process new-scale-values]))]
+    (reduce (fn [session [scale-name value]]
+              (upsert-raw-count session controller-id scale-name value))
+            (upsert session controller-id ::receive-buffer to-process)
+            new-scale-values)))
