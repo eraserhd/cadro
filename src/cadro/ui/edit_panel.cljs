@@ -41,10 +41,8 @@
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ fixture-id scale-id checked?]]
    (if checked?
-     {:transact (model/associate-scale-tx ds [::model/id fixture-id] [::model/id scale-id])
-      :session (clara/insert session (model/asserted fixture-id ::model/spans scale-id))}
-     {:transact (model/dissociate-scale-tx ds [::model/id fixture-id] [::model/id scale-id])
-      :session (clara/retract session (model/asserted fixture-id ::model/spans scale-id))})))
+     {:session (clara/insert session (model/asserted fixture-id ::model/spans scale-id))}
+     {:session (clara/retract session (model/asserted fixture-id ::model/spans scale-id))})))
 
 (defn scale-controls
   [fixture-id

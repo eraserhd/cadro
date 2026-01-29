@@ -37,8 +37,7 @@
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-list]]
    (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
-     {:transact (model/add-controllers-tx ds device-list (atom uuids))
-      :session  (model/insert-controllers session device-list (atom uuids))})))
+     {:session  (model/insert-controllers session device-list (atom uuids))})))
 
 (rf/reg-fx
  ::fetch-device-list
@@ -59,16 +58,14 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-id]]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :connecting)
-    :session (model/set-connection-status session device-id :connecting)}))
+   {:session (model/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-id]]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :connected)
-    :session (model/set-connection-status session device-id :connected)}))
+   {:session (model/set-connection-status session device-id :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
@@ -77,8 +74,7 @@
  (fn [{:keys [ds session]} [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
-   {:transact (model/set-connection-status-tx [::model/id device-id] :disconnected)
-    :session (model/set-connection-status session device-id :disconnected)}))
+   {:session (model/set-connection-status session device-id :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received
@@ -86,8 +82,7 @@
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session]} [_ device-id data]]
    (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
-     {:transact (model/add-received-data-tx ds [::model/id device-id] data (atom uuids))
-      :session (model/add-received-data session device-id data (atom uuids))})))
+     {:session (model/add-received-data session device-id data (atom uuids))})))
 
 (rf/reg-event-fx
  ::subscription-error-received
