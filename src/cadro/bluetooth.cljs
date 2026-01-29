@@ -4,7 +4,6 @@
    [clara.rules :as clara]
    [cadro.session :as session]
    [datascript.core :as d]
-   [re-posh.core :as re-posh]
    [re-posh.db :as re-posh.db]
    [re-frame.core :as rf]
    ["@capacitor/core" :refer [Capacitor]]
@@ -33,9 +32,8 @@
 
 (rf/reg-event-fx
  ::device-list-arrived
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ device-list]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ device-list]]
    (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
      {:session  (model/insert-controllers session device-list (atom uuids))})))
 
@@ -55,39 +53,34 @@
 
 (rf/reg-event-fx
  ::connect-requested
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ device-id]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ device-id]]
    {:session (model/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ device-id]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ device-id]]
    {:session (model/set-connection-status session device-id :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ device-id error]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ device-id error]]
   ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
   ;   (js/alert (str "Unable to connect: " error))]
    {:session (model/set-connection-status session device-id :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session]} [_ device-id data]]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ device-id data]]
    (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
      {:session (model/add-received-data session device-id data (atom uuids))})))
 
 (rf/reg-event-fx
  ::subscription-error-received
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
+ [(rf/inject-cofx :session)]
  (fn [{:keys [ds]} [_ device-id error]]
    ;     (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error])]
    ;FIXME:
