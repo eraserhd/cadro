@@ -24,9 +24,8 @@
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
  (fn [{:keys [ds session], :as all} _]
-   (let [{:keys [id tx session]} (model/new-machine-tx ds session)]
-     {:transact tx
-      :session session
+   (let [{:keys [id session]} (model/new-machine-tx ds session)]
+     {:session session
       ::edit-panel/edit id})))
 
 (rf/reg-event-fx
