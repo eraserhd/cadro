@@ -1,6 +1,8 @@
 (ns cadro.bluetooth
   (:require
    [cadro.model :as model]
+   [clara.rules :as clara]
+   [cadro.session :as session]
    [datascript.core :as d]
    [re-posh.core :as re-posh]
    [re-posh.db :as re-posh.db]
@@ -82,7 +84,7 @@
  (fn [{:keys [ds session]} [_ device-id data]]
    (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
      {:transact (model/add-received-data-tx ds [::model/id device-id] data (atom uuids))
-      :session (model/add-received-data session [::model/id device-id] data (atom uuids))})))
+      :session (model/add-received-data session device-id data (atom uuids))})))
 
 (rf/reg-event-fx
  ::subscription-error-received
@@ -99,7 +101,11 @@
  ::connect
  (fn connect* [device-id]
    (rf/dispatch [::connect-requested device-id])
-   (let [device-address (::model/hardware-address (d/entity @@re-posh.db/store [::model/id device-id]))]
+   (let [device-address (->> (clara/query @cadro.session/session model/controllers)
+                             (filter (fn [{:keys [?id]}]
+                                       (= ?id device-id)))
+                             (map :?hardware-address)
+                             first)]
      (.connect
       bt-impl
       device-address

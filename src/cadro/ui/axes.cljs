@@ -3,27 +3,17 @@
    [cadro.model :as model]
    [cadro.session :as session]
    [re-frame.core :as rf]
-   [re-posh.core :as re-posh]
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
 
 (rf/reg-sub
- ::reference-uuid
+ ::axes
  :<- [:session]
  (fn [session _]
-   (model/reference session)))
-
-(re-posh/reg-sub
- ::reference-tree
- :<- [::reference-uuid]
- (fn [reference-uuid _]
-   {:type    :pull
-    :pattern model/root-path-pull
-    :id      [::model/id reference-uuid]}))
+   (model/axes session)))
 
 (defn axes-panel []
-  (let [reference-tree @(rf/subscribe [::reference-tree])
-        axes           (model/root-path-axes reference-tree)]
+  (let [axes @(rf/subscribe [::axes])]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/id

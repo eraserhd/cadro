@@ -167,6 +167,32 @@
        (map :?data)
        (sort-by ::id)))
 
+;; if reference or something that transforms it spans an axis, display it
+;; FIXME: dedup?
+(clara/defrule children-implicitly-span-parents-axes
+  [eav/EAV (= e ?flarg) (= a ::transforms) (= v ?object)]
+  [eav/EAV (= e ?flarg) (= a ::spans) (= v ?axis)]
+  =>
+  (clara/insert! (derived ?object ::spans ?axis)))
+
+(clara-eql/defrule axes-rule
+  :query
+  [::id
+   ::displays-as
+   ::raw-count]
+  :from ?axis
+  :where
+  [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
+  [eav/EAV (= e ?ref) (= a ::spans) (= v ?axis)])
+
+(clara/defquery axes-query []
+  [clara-eql/QueryResult (= query `axes-rule) (= result ?data)])
+
+(defn axes [session]
+  (->> (clara/query session axes-query)
+       (map :?data)
+       (sort-by ::displays-as)))
+
 (defn root-path-axes
   [root-path]
   (->> (iterate (comp first ::_transforms) root-path)
