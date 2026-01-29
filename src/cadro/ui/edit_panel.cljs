@@ -17,16 +17,13 @@
   (fn [session _]
     (model/scales session)))
 
-(def fixture-pull
-  '[{::model/spans
-     [::model/id]}])
-
-(re-posh/reg-sub
- ::fixture
- (fn [_ [_ fixture-id]]
-   {:type    :pull
-    :pattern fixture-pull
-    :id      [::model/id fixture-id]}))
+(rf/reg-sub
+  ::fixture-scales
+  :<- [:session]
+  (fn [session [_ fixture-id]]
+    (->> (clara/query session model/fixture-scales :?fixture-id fixture-id)
+         (map :?scale-id)
+         (into #{}))))
 
 (rf/reg-event-fx
  ::connect-clicked
@@ -74,10 +71,7 @@
   (fn []
     (when-let [fixture-id @thing-to-edit]
       (let [scales            @(rf/subscribe [::scales])
-            fixture           @(rf/subscribe [::fixture fixture-id])
-            associated-scales (->> (::model/spans fixture)
-                                   (map ::model/id)
-                                   (into #{}))]
+            associated-scales @(rf/subscribe [::fixture-scales fixture-id])]
         ^{:key (str fixture-id)}
         [panel/panel {:title "Edit Fixture"
                       :class "edit-panel"

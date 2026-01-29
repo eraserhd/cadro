@@ -438,3 +438,6 @@
   (->> (clara/query session scales-query)
        (map :?data)
        (sort-by ::displays-as)))
+
+(clara/defquery fixture-scales [?fixture-id]
+  [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
