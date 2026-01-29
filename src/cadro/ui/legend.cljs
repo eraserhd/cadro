@@ -21,10 +21,9 @@
 
 (rf/reg-event-fx
  ::new-machine-tapped
- [(re-posh/inject-cofx :ds)
-  (rf/inject-cofx :session)]
- (fn [{:keys [ds session], :as all} _]
-   (let [{:keys [id session]} (model/new-machine-tx ds session)]
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session], :as all} _]
+   (let [{:keys [id session]} (model/new-machine-tx session)]
      {:session session
       ::edit-panel/edit id})))
 

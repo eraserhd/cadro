@@ -263,8 +263,7 @@
   [tree-list]
   (map add-distance1 tree-list))
 
-(defn new-machine-tx
-  [ds session]
+(defn new-machine-tx [session]
   (let [machine-id (random-uuid)
         point-id   (random-uuid)]
     {:id      machine-id
