@@ -258,11 +258,6 @@
 ;; A untranslated reading, as from a scale.
 (s/def ::raw-count number?)
 
-(defn- next-uuid [uuids]
-  (let [result (first @uuids)]
-    (swap! uuids rest)
-    result))
-
 ;; Bluetooth, ethernet, or whatever address.
 (s/def ::hardware-address string?)
 
@@ -283,13 +278,13 @@
   [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
 
 (defn insert-controllers
-  [session controller-list uuids]
+  [session controller-list]
   {:pre [(s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
   (let [existing-controllers (->> (clara/query session controllers)
                                   (group-by :?hardware-address))]
     (reduce (fn [session {:keys [::displays-as ::hardware-address]}]
               (let [{:keys [?id ?connection-status]} (get-in existing-controllers [hardware-address 0])
-                    id                               (or ?id (next-uuid uuids))
+                    id                               (or ?id (random-uuid))
                     connection-status                (or ?connection-status :disconnected)]
                 (-> session
                     (upsert id ::displays-as displays-as)
@@ -302,16 +297,16 @@
   [eav/EAV (= e ?scale-id) (= a ::controller) (= v ?controller-id)]
   [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?scale-name)])
 
-(defn upsert-raw-count [session controller-id scale-name value uuids]
+(defn upsert-raw-count [session controller-id scale-name value]
   (if-let [id (:?scale-id (first (clara/query session scale-id :?controller-id controller-id :?scale-name scale-name)))]
     (upsert session id ::raw-count value)
-    (let [id (next-uuid uuids)]
+    (let [id (random-uuid)]
       (-> session
           (upsert id ::displays-as scale-name)
           (upsert id ::raw-count value)
           (upsert id ::controller controller-id)))))
 
-(defn add-received-data [session controller-ref data uuids]
+(defn add-received-data [session controller-ref data]
   (let [controller-id                 (pull/entid session controller-ref)
         to-process                    (-> (str (::receive-buffer (pull/pull session [::receive-buffer] controller-id))
                                                data)
@@ -323,7 +318,7 @@
                                           (recur left (assoc new-scale-values axis (* value-str 1.0)))
                                           [to-process new-scale-values]))]
     (reduce (fn [session [scale-name value]]
-              (upsert-raw-count session controller-id scale-name value uuids))
+              (upsert-raw-count session controller-id scale-name value))
             (upsert session controller-id ::receive-buffer to-process)
             new-scale-values)))
 

@@ -4,7 +4,6 @@
    [cadro.session :as session]
    [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
-   [datascript.core :as d]
    [net.eraserhead.clara-eql.pull :as pull]))
 
 (deftest t-set-reference
@@ -45,17 +44,6 @@
                     (clara/fire-rules))]
     (is (= [(model/->InvariantError "reference point does not have coordinates" {:id id})]
            (model/errors session)))))
-
-(defn- associated?
-  [db fixture-id scale-id]
-  (let [result (d/q '[:find ?scale-id .
-                      :in $ ?fixture-id ?scale-id
-                      :where
-                      [?fixture-id ::model/spans ?scale-id]]
-                    db
-                    fixture-id
-                    scale-id)]
-    (boolean result)))
 
 (deftest t-insert-controllers
   (let [session      (-> session/base-session

@@ -32,8 +32,7 @@
  ::device-list-arrived
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-list]]
-   (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
-     {:session  (model/insert-controllers session device-list (atom uuids))})))
+   {:session  (model/insert-controllers session device-list)}))
 
 (rf/reg-fx
  ::fetch-device-list
@@ -73,8 +72,7 @@
  ::data-received
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id data]]
-   (let [uuids [(random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid) (random-uuid)]]
-     {:session (model/add-received-data session device-id data (atom uuids))})))
+   {:session (model/add-received-data session device-id data)}))
 
 (rf/reg-event-fx
  ::subscription-error-received
