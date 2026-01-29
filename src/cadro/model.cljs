@@ -59,13 +59,30 @@
   =>
   (clara/insert! (derived ?id ::id ?id)))
 
+(defn reversed-attribute? [kw]
+  (and (keyword? kw) (= \_ (first (name kw)))))
+(defn reverse-attribute [kw]
+  (keyword (namespace kw)
+           (if (= \_ (first (name kw)))
+             (subs (name kw) 1)
+             (str \_ (name kw)))))
+
+(clara/defrule reverse-attributes
+  "Make derived reverse-attribute facts"
+  [eav/EAV (= e ?e) (= a ?a) (= v ?v) (uuid? ?e) (uuid? ?v) (not (reversed-attribute? ?a))]
+  =>
+  (clara/insert! (derived ?v (reverse-attribute ?a) ?e)))
+
 ;;-------------------------------------------------------------------------------
 
 (def schema
   [(derived ::id               :db/unique      :db.unique/identity)
    (derived ::spans            :db/cardinality :db.cardinality/many)
    (derived ::transforms       :db/cardinality :db.cardinality/many)
-   (derived ::hardware-address :db/unique      :db.unique/identity)])
+   (derived ::hardware-address :db/unique      :db.unique/identity)
+
+   ;; Hrmm, clara-eql can't figure this out?
+   (derived ::_controller      :db/cardinality :db.cardinality/many)])
 
 (db/register-schema!
   {::id
@@ -400,3 +417,24 @@
               (upsert-raw-count session controller-id scale-name value uuids))
             (upsert session controller-id ::receive-buffer to-process)
             new-scale-values)))
+
+(clara-eql/defrule scales-rule
+  :query
+  [::id
+   ::displays-as
+   ::hardware-address
+   ::connection-status
+   {::_controller [::id
+                   ::displays-as
+                   ::raw-count]}]
+  :from ?controller
+  :where
+  [eav/EAV (= e ?controller) (= a ::hardware-address)])
+
+(clara/defquery scales-query []
+  [clara-eql/QueryResult (= query `scales-rule) (= result ?data)])
+
+(defn scales [session]
+  (->> (clara/query session scales-query)
+       (map :?data)
+       (sort-by ::displays-as)))

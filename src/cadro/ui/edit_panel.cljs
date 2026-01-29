@@ -11,29 +11,11 @@
 
 (def ^:private thing-to-edit (ra/atom nil))
 
-(re-posh/reg-sub
- ::scale-ids
- (fn []
-   {:type :query
-    :query '[:find [?id ...]
-             :where [?id ::model/hardware-address]]}))
-
-(def scale-pull
-  '[::model/id
-    ::model/displays-as
-    ::model/hardware-address
-    ::model/connection-status
-    {::model/_controller [::model/id
-                          ::model/displays-as
-                          ::model/raw-count]}])
-
-(re-posh/reg-sub
- ::scales
- :<- [::scale-ids]
- (fn [ids _]
-   {:type    :pull-many
-    :pattern scale-pull
-    :ids      ids}))
+(rf/reg-sub
+  ::scales
+  :<- [:session]
+  (fn [session _]
+    (model/scales session)))
 
 (def fixture-pull
   '[{::model/spans
