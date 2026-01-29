@@ -79,8 +79,9 @@
  ::data-received
  [(re-posh/inject-cofx :ds)
   (rf/inject-cofx :session)]
- (fn [{:keys [ds]} [_ device-id data]]
-   {:transact (model/add-received-data-tx ds [::model/id device-id] data)}))
+ (fn [{:keys [ds session]} [_ device-id data]]
+   {:transact (model/add-received-data-tx ds [::model/id device-id] data)
+    :session (model/add-received-data session [::model/id device-id] data)}))
 
 (rf/reg-event-fx
  ::subscription-error-received
