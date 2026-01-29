@@ -268,11 +268,6 @@
   (let [machine-id (random-uuid)
         point-id   (random-uuid)]
     {:id      machine-id
-     :tx      [{::id           machine-id
-                ::displays-as "New Machine"
-                ::transforms   [{::id point-id
-                                 ::displays-as "Origin"
-                                 ::coordinates {}}]}]
      :session (-> session
                   (clara/insert (asserted machine-id ::displays-as "New Machine")
                                 (asserted machine-id ::transforms  point-id)
@@ -320,34 +315,11 @@
                              :connecting
                              :connected})
 
-(defn set-connection-status-tx
-  [controller-id status]
-  {:pre [(s/valid? ::connection-status status)]}
-  [[:db/add controller-id ::connection-status status]])
-
 (defn set-connection-status [session controller-id status]
   (upsert session controller-id ::connection-status status))
 
 ;; Unprocessed, received data
 (s/def ::receive-buffer string?)
-
-(defn add-controllers-tx
-  [ds controller-list uuids]
-  {:pre [(d/db? ds)
-         (s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
-  (let [addr->controller (into {}
-                               (map (juxt ::hardware-address identity))
-                               (d/q '[:find [(pull ?obj [::id ::hardware-address ::connection-status]) ...]
-                                      :where [?obj ::hardware-address]]
-                                    ds))]
-    (mapv (fn [{:keys [::hardware-address], :as scale-controller}]
-            (let [{:keys [::id ::connection-status]} (get addr->controller hardware-address)
-                  new-status                     (or connection-status :disconnected)
-                  new-id                         (or id (next-uuid uuids))]
-              (assoc scale-controller
-                     ::id new-id
-                     ::connection-status new-status)))
-          controller-list)))
 
 (clara/defquery controllers []
   [eav/EAV (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
@@ -369,25 +341,6 @@
                     (upsert id ::connection-status connection-status))))
             session
             controller-list)))
-
-(defn add-received-data-tx
-  [ds controller-id data uuids]
-  {:pre [(d/db? ds)
-         (string? data)]}
-  (let [to-process                    (-> (str (::receive-buffer (d/entity ds controller-id))
-                                               data)
-                                          (str/replace #"[;\s]+" ";")
-                                          (str/replace #"^;+" ""))
-        [to-process new-scale-values] (loop [to-process       to-process
-                                             new-scale-values {}]
-                                        (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])(-?\d+(?:\.\d*)?);(.*)" to-process)]
-                                          (recur left (assoc new-scale-values axis (* value-str 1.0)))
-                                          [to-process new-scale-values]))]
-    (concat
-      [[:db/add controller-id ::receive-buffer to-process]]
-      (mapcat (fn [[scale-name value]]
-                (upsert-raw-count-tx ds controller-id scale-name value uuids))
-              new-scale-values))))
 
 (clara/defquery scale-id [?controller-id ?scale-name]
   [eav/EAV (= e ?scale-id) (= a ::controller) (= v ?controller-id)]
