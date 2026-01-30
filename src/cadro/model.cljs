@@ -185,7 +185,7 @@
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))
 
 ;; A coordinate in N-dimensional space.
-(s/def ::coordinates (s/map-of string? number?))
+(s/def ::coordinates ::tr/locus)
 
 (defn new-machine-tx [session]
   (let [machine-id (random-uuid)
@@ -297,7 +297,9 @@
   [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
 
 ;; Offset of a point with coordinates from current scale position in N-dimensional space.
-(s/def ::distance (s/map-of string? number?))
+(s/def ::distance ::tr/locus)
+
+(s/def ::transformed-axes ::tr/locus)
 
 (defrecord Axis [displays-as raw-count])
 (defrecord AxisMap [axis-map])
