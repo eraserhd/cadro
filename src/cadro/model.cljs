@@ -88,15 +88,6 @@
 ;; Something can span an axis, meaning coordinates extend into it.
 (s/def ::spans (s/coll-of (s/keys :req [::id ::displays-as])))
 
-
-(defn associate-scale-tx
-  [ds fixture-id scale-id]
-  [[:db/add fixture-id ::spans scale-id]])
-
-(defn dissociate-scale-tx
-  [ds fixture-id scale-id]
-  [[:db/retract fixture-id ::spans scale-id]])
-
 ;;-------------------------------------------------------------------------------
 
 ;; Is this the current reference point, used to computed displayed coordinates?
@@ -123,14 +114,6 @@
 
 (defn reference [session]
   (:?id (first (clara/query session reference-query))))
-
-(def root-path-pull
-  '[::coordinates
-    {::_transforms ...}
-    {::spans
-     [::id
-      ::displays-as
-      ::raw-count]}])
 
 ;;FIXME: clara-eql needs recursion
 (clara-eql/defrule fixtures-and-points-trees-rule
