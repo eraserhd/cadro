@@ -129,11 +129,13 @@
    ::displays-as
    ::reference?
    ::coordinates
+   ::distance
    {::transforms ;...
     [::id
      ::displays-as
      ::reference?
-     ::coordinates]}]
+     ::coordinates
+     ::distance]}]
      ;{::transforms ...} ;;FIXME: clara-eql does not like?
   :from ?eid
   :where
