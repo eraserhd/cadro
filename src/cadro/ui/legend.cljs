@@ -87,7 +87,6 @@
 (defn legend []
   [:div.floating-card.legend
    [:h1 "Legend"]
-   [legend-keys (-> @(rf/subscribe [::fixtures-and-points-trees])
-                    model/add-distances)]
+   [legend-keys @(rf/subscribe [::fixtures-and-points-trees])]
    [:div.controls
     [new-machine-button]]])

@@ -34,3 +34,6 @@
 
 (defn reference []
   (model/reference (session)))
+
+(defn upsert [e a v]
+  (swap! session/session model/upsert e a v))

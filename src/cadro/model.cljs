@@ -299,21 +299,37 @@
 ;; Offset of a point with coordinates from current scale position in N-dimensional space.
 (s/def ::distance (s/map-of string? number?))
 
-(defn- globalized-tree-reference [tree]
-  (cond
-    (::reference? tree) tree
-    (::coordindates tree)   nil
-    :else               (first (keep globalized-tree-reference (::transforms tree)))))
+(defrecord Axis [displays-as raw-count])
+(defrecord AxisMap [axis-map])
 
-(defn- add-distance1
-  ([tree]
-   (add-distance1 tree (globalized-tree-reference tree)))
-  ([tree {rpos ::coordinates, :as r}]
-   (if-let [p (::coordinates tree)]
-     (assoc tree ::distance (tr/- p rpos))
-     (update tree ::transforms (fn [transforms]
-                                 (mapv #(add-distance1 % r) transforms))))))
+(clara/defrule global-axes
+  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
+  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
+  =>
+  (clara/insert! (->Axis ?displays-as ?raw-count)))
 
-(defn add-distances
-  [tree-list]
-  (map add-distance1 tree-list))
+(clara/defrule global-axis-map-rule
+  [?all-axes <- (acc/all) :from [Axis]]
+  =>
+  (clara/insert! (->AxisMap (into {}
+                                  (map (juxt :displays-as :raw-count))
+                                  ?all-axes))))
+
+(clara/defrule root-flarg-distances
+  [AxisMap (= axis-map ?axis-map)]
+  [eav/EAV (= e ?root) (= a ::transforms)]
+  (not [eav/EAV (= a ::transforms) (= v ?root)])
+  =>
+  (clara/insert! (derived ?root ::transformed-axes ?axis-map)))
+
+(clara/defrule derived-distances
+  [eav/EAV (= e ?node) (= a ::transformed-axes) (= v ?axis-map)]
+  [eav/EAV (= e ?node) (= a ::transforms) (= v ?transformed)]
+  =>
+  (clara/insert! (derived ?transformed ::transformed-axes ?axis-map)))
+
+(clara/defrule distance
+  [eav/EAV (= e ?p) (= a ::transformed-axes) (= v ?axis-map)]
+  [eav/EAV (= e ?p) (= a ::coordinates)      (= v ?coords)]
+  =>
+  (clara/insert! (derived ?p ::distance (tr/- ?coords ?axis-map))))
