@@ -91,12 +91,19 @@
 ;;-------------------------------------------------------------------------------
 
 ;; Is this the current reference point, used to computed displayed coordinates?
+(s/def ::reference? boolean?)
 
 (clara/defrule only-one-reference
   [?refcount <- (acc/count) :from [eav/EAV (= a ::reference?)]]
   [:test (<= 2 ?refcount)]
   =>
   (clara/insert! (->InvariantError "more than one reference point in session" {:count ?refcount})))
+
+(clara/defrule reference-has-coordinates
+  [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
+  [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
+  =>
+  (clara/insert! (->InvariantError "reference point does not have coordinates" {:id ?eid})))
 
 (clara/defquery reference-query []
   [?ref <- eav/EAV (= e ?id) (= a ::reference?)])
@@ -179,34 +186,6 @@
 
 ;; A coordinate in N-dimensional space.
 (s/def ::coordinates (s/map-of string? number?))
-
-;; Offset of a point with coordinates from current scale position in N-dimensional space.
-(s/def ::distance (s/map-of string? number?))
-
-(clara/defrule reference-has-coordinates
-  [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
-  [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
-  =>
-  (clara/insert! (->InvariantError "reference point does not have coordinates" {:id ?eid})))
-
-(defn- globalized-tree-reference [tree]
-  (cond
-    (::reference? tree) tree
-    (::coordindates tree)   nil
-    :else               (first (keep globalized-tree-reference (::transforms tree)))))
-
-(defn- add-distance1
-  ([tree]
-   (add-distance1 tree (globalized-tree-reference tree)))
-  ([tree {rpos ::coordinates, :as r}]
-   (if-let [p (::coordinates tree)]
-     (assoc tree ::distance (tr/- p rpos))
-     (update tree ::transforms (fn [transforms]
-                                 (mapv #(add-distance1 % r) transforms))))))
-
-(defn add-distances
-  [tree-list]
-  (map add-distance1 tree-list))
 
 (defn new-machine-tx [session]
   (let [machine-id (random-uuid)
@@ -316,3 +295,25 @@
 
 (clara/defquery fixture-scales [?fixture-id]
   [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
+
+;; Offset of a point with coordinates from current scale position in N-dimensional space.
+(s/def ::distance (s/map-of string? number?))
+
+(defn- globalized-tree-reference [tree]
+  (cond
+    (::reference? tree) tree
+    (::coordindates tree)   nil
+    :else               (first (keep globalized-tree-reference (::transforms tree)))))
+
+(defn- add-distance1
+  ([tree]
+   (add-distance1 tree (globalized-tree-reference tree)))
+  ([tree {rpos ::coordinates, :as r}]
+   (if-let [p (::coordinates tree)]
+     (assoc tree ::distance (tr/- p rpos))
+     (update tree ::transforms (fn [transforms]
+                                 (mapv #(add-distance1 % r) transforms))))))
+
+(defn add-distances
+  [tree-list]
+  (map add-distance1 tree-list))
