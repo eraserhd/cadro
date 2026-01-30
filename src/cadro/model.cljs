@@ -186,21 +186,6 @@
   =>
   (clara/insert! (->InvariantError "reference point does not have coordinates" {:id ?eid})))
 
-(defn propagate-spans
-  "Collects spans from more-root elements and marks all things and points."
-  [tree-list]
-  (map (fn propagate-over-tree
-         ([tree] (propagate-over-tree tree []))
-         ([tree spans]
-          (let [spans (->> (concat spans (::spans tree))
-                           (medley/distinct-by ::id)
-                           (into []))]
-            (-> tree
-              (assoc ::spans spans)
-              (medley/update-existing ::transforms (fn [transforms]
-                                                     (mapv #(propagate-over-tree % spans) transforms)))))))
-       tree-list))
-
 (defn- globalized-tree-reference [tree]
   (cond
     (::reference? tree) tree

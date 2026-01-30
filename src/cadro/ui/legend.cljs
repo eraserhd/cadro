@@ -88,7 +88,6 @@
   [:div.floating-card.legend
    [:h1 "Legend"]
    [legend-keys (-> @(rf/subscribe [::fixtures-and-points-trees])
-                    model/propagate-spans
                     model/add-distances)]
    [:div.controls
     [new-machine-button]]])
