@@ -180,6 +180,9 @@
 ;; A coordinate in N-dimensional space.
 (s/def ::coordinates (s/map-of string? number?))
 
+;; Offset of a point with coordinates from current scale position in N-dimensional space.
+(s/def ::distance (s/map-of string? number?))
+
 (clara/defrule reference-has-coordinates
   [eav/EAV (= e ?eid) (= a ::reference?) (= v true)]
   [:not [eav/EAV (= e ?eid) (= a ::coordinates)]]
