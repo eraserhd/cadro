@@ -41,6 +41,18 @@
    {:on-click #(rf/dispatch [::new-machine-tapped])}
    new-machine-icon])
 
+(rf/reg-event-fx
+ ::drop-pin-tapped
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} _]
+   {:session (model/drop-pin session (random-uuid))}))
+
+(def drop-pin-icon [:> fa/FontAwesomeIcon {:icon faSolid/faLocationDot}])
+(defn drop-pin-button []
+  [:button.icon.drop-pin
+   {:on-click #(rf/dispatch [::drop-pin-tapped])}
+   drop-pin-icon])
+
 (defn- position-hiccup
   [position spans]
   (let [axes-names       (into {}
@@ -89,4 +101,5 @@
    [:h1 "Legend"]
    [legend-keys @(rf/subscribe [::fixtures-and-points-trees])]
    [:div.controls
-    [new-machine-button]]])
+    [new-machine-button]
+    [drop-pin-button]]])
