@@ -330,3 +330,20 @@
   [eav/EAV (= e ?p) (= a ::coordinates)      (= v ?coords)]
   =>
   (clara/insert! (derived ?p ::distance (tr/- ?coords ?axis-map))))
+
+(clara/defquery store-scale-to-reference-q
+  [?scale-id]
+  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
+  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
+
+  [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
+  [eav/EAV (= e ?ref-id) (= a ::coordinates) (= v ?coordinates)])
+
+(defn store-scale-to-reference [session scale-id]
+  (let [{:keys [?displays-as
+                ?raw-count
+                ?ref-id
+                ?coordinates], :as data} (first (clara/query session store-scale-to-reference-q :?scale-id scale-id))
+        ;; FIXME: translate
+        coordinates (assoc ?coordinates ?displays-as ?raw-count)]
+    (upsert session ?ref-id ::coordinates coordinates)))

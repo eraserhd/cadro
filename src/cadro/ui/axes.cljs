@@ -12,17 +12,25 @@
  (fn [session _]
    (model/axes session)))
 
+(rf/reg-event-fx
+ ::store-clicked
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} [_ scale-id]]
+   {:session (model/store-scale-to-reference session scale-id)}))
+
 (defn axes-panel []
   (let [axes @(rf/subscribe [::axes])]
     (into [:div.floating-card.axes
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/id
                             ::model/displays-as
-                            ::model/raw-count]}]
+                            ::model/raw-count],
+                     :as scale}]
                  [:div.axis
                   [:div.name displays-as]
                   [:div.value raw-count]
                   [:button.icon.store
+                   {:on-click #(rf/dispatch [::store-clicked id])}
                    [:> fa/FontAwesomeIcon
                     {:icon faSolid/faLocationCrosshairs}]]]))
           axes)))
