@@ -150,8 +150,25 @@
 (deftest t-store-scale-to-reference
   (-> (t/session [[(t/id :x) ::model/displays-as "X"]
                   [(t/id :x) ::model/raw-count 42]
+                  [(t/id :m) ::model/spans (t/id :x)]
                   [(t/id :m) ::model/transforms (t/id :p)]
                   [(t/id :p) ::model/coordinates {"X" 78}]
                   [(t/id :p) ::model/reference? true]])
       (model/store-scale-to-reference (t/id :x))
       (t/check [(t/id :p) ::model/coordinates {"X" 42}])))
+
+(deftest t-drop-pin
+  (-> (t/session [[(t/id :x) ::model/displays-as "X"]
+                  [(t/id :x) ::model/raw-count 42]
+                  [(t/id :y) ::model/displays-as "Y"]
+                  [(t/id :y) ::model/raw-count 111]
+                  [(t/id :m) ::model/spans (t/id :x)]
+                  [(t/id :m) ::model/spans (t/id :y)]
+                  [(t/id :m) ::model/transforms (t/id :p)]
+                  [(t/id :p) ::model/coordinates {"X" 78, "Y" 96}]
+                  [(t/id :p) ::model/reference? true]])
+      (model/drop-pin (t/id :pin))
+      (t/check [(t/id :m) ::model/transforms (t/id :p)]
+               [(t/id :m) ::model/transforms (t/id :pin)]
+               [(t/id :pin) ::model/displays-as "A"]
+               [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))

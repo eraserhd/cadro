@@ -347,3 +347,24 @@
         ;; FIXME: translate
         coordinates (assoc ?coordinates ?displays-as ?raw-count)]
     (upsert session ?ref-id ::coordinates coordinates)))
+
+(clara/defquery drop-pin-q []
+  [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
+  [eav/EAV (= e ?ref-id) (= a ::spans) (= v ?scale-id)]
+  [eav/EAV (= e ?fixture-id) (= a ::transforms) (= v ?ref-id)]
+  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
+  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)])
+
+(defn drop-pin [session new-pin-id]
+  (let [results     (clara/query session drop-pin-q)
+        ref-id      (:?ref-id (first results))
+        fixture-id  (:?fixture-id (first results))
+        coordinates (into {}
+                          (map (fn [{:keys [?displays-as ?raw-count]}]
+                                 [?displays-as ?raw-count]))
+                          results)]
+    (clara/insert-all
+     session
+     [(asserted fixture-id ::transforms new-pin-id)
+      (asserted new-pin-id ::displays-as "A")
+      (asserted new-pin-id ::coordinates coordinates)])))
