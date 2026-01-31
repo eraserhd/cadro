@@ -153,8 +153,8 @@
 ;; if reference or something that transforms it spans an axis, display it
 ;; FIXME: dedup?
 (clara/defrule children-implicitly-span-parents-axes
-  [eav/EAV (= e ?flarg) (= a ::transforms) (= v ?object)]
-  [eav/EAV (= e ?flarg) (= a ::spans) (= v ?axis)]
+  [eav/EAV (= e ?thing) (= a ::transforms) (= v ?object)]
+  [eav/EAV (= e ?thing) (= a ::spans) (= v ?axis)]
   =>
   (clara/insert! (derived ?object ::spans ?axis)))
 
@@ -312,7 +312,7 @@
                                   (map (juxt :displays-as :raw-count))
                                   ?all-axes))))
 
-(clara/defrule root-flarg-distances
+(clara/defrule root-fixture-distances
   [AxisMap (= axis-map ?axis-map)]
   [eav/EAV (= e ?root) (= a ::transforms)]
   (not [eav/EAV (= a ::transforms) (= v ?root)])
