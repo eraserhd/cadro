@@ -33,9 +33,9 @@
   (let [session (clara/fire-rules session)
         eav-map (:?eav-map (first (clara/query session pull/eav-map)))]
     (doseq [[e a v] datoms
-            :let [vs (get-in eav-map [e a])]
-            :let [datom-msg (->> [e a v]
+            :let [vs (get-in eav-map [e a])
+                  datom-msg (->> [e a v]
                                  (mapv readable-uuid)
                                  pr-str
                                  (str "checking datom "))]]
-      (is (medley/find-first #(= % v)) datom-msg))))
+      (is (medley/find-first #(= % v) vs) datom-msg))))
