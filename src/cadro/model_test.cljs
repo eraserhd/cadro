@@ -2,6 +2,7 @@
   (:require
    [cadro.model :as model]
    [cadro.session :as session]
+   [cadro.test :as t]
    [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
    [net.eraserhead.clara-eql.pull :as pull]))
@@ -145,3 +146,12 @@
                     (map #(select-keys % [::model/displays-as ::model/raw-count]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))
+
+(deftest t-store-scale-to-reference
+  (-> (t/session [[(t/id :x) ::model/displays-as "X"]
+                  [(t/id :x) ::model/raw-count 42]
+                  [(t/id :m) ::model/transforms (t/id :p)]
+                  [(t/id :p) ::model/coordinates {"X" 78}]
+                  [(t/id :p) ::model/reference? true]])
+      (model/store-scale-to-reference (t/id :x))
+      (t/check [(t/id :p) ::model/coordinates {"X" 42}])))
