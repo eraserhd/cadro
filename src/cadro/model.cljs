@@ -176,13 +176,6 @@
        (map :?data)
        (sort-by ::displays-as)))
 
-(defn root-path-axes
-  [root-path]
-  (->> (iterate (comp first ::_transforms) root-path)
-       (take-while some?)
-       (mapcat ::spans)
-       (sort-by ::displays-as)))
-
 ;; A tranforms B if A is a Flarg and B is a point or Flarg that is affected by the transformation.
 (s/def ::transforms (s/coll-of (s/keys :req [::id])))
 
