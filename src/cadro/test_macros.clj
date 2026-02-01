@@ -26,15 +26,12 @@
      (cons (rewrite-expr h) (rewrite-arrows more)))))
   
 (defmacro scenario [msg & exprs]
-  (doto
-   `(testing ~msg
-      (-> cadro.session/base-session
-          ~@(rewrite-arrows exprs)))
-   prn))
+  `(testing ~msg
+     (-> cadro.session/base-session
+         ~@(rewrite-arrows exprs))))
 
 ;; str                    -> (testing str ...)
 ;; vector?                -> (insert (asserted []))
 ;; (f a b ...)            -> (f session a b ...)
 ;; (f a b ...) => checker -> (do (checker session (f a b ...)) session)
 ;; identity    => checker
-

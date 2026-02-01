@@ -22,15 +22,15 @@
                     (t/has-no-errors))]
     (is (= (t/id :p2) (model/reference session))
         "Updates current reference."))
-  (t/scenario "foo"
+  (t/scenario "cannot have more than one reference point in session"
     [(t/id :p1) ::model/coordinates {}]
     [(t/id :p2) ::model/coordinates {}]
     [(t/id :p1) ::model/reference? true]
     [(t/id :p2) ::model/reference? true]
     (t/has-error (model/->InvariantError "more than one reference point in session" {:count 2})))
-  (-> (t/session [])
-      (model/set-reference (t/id :id))
-      (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
+  (t/scenario "the reference point must have coordinates"
+    (model/set-reference (t/id :id))
+    (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
 
 (deftest t-insert-controllers
   (let [session      (-> session/base-session
