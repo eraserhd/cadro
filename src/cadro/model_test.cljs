@@ -25,12 +25,10 @@
         "Updates current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
-  (let [session (-> session/base-session
-                    (clara/insert (model/asserted (t/id :p1) ::model/coordinates {}))
-                    (clara/insert (model/asserted (t/id :p2) ::model/coordinates {}))
-                    (clara/insert (model/asserted (t/id :p1) ::model/reference? true))
-                    (clara/insert (model/asserted (t/id :p2) ::model/reference? true))
-                    (clara/fire-rules))]
+  (let [session (t/session [[(t/id :p1) ::model/coordinates {}]
+                            [(t/id :p2) ::model/coordinates {}]
+                            [(t/id :p1) ::model/reference? true]
+                            [(t/id :p2) ::model/reference? true]])]
     (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
            (model/errors session))))
   (let [session (-> session/base-session
