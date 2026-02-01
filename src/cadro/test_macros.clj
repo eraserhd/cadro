@@ -26,6 +26,7 @@
      (cons (rewrite-expr h) (rewrite-arrows more)))))
   
 (defmacro scenario [msg & exprs]
+  (assert (string? msg))
   `(testing ~msg
      (-> cadro.session/base-session
          ~@(rewrite-arrows exprs))))
