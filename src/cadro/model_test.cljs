@@ -130,14 +130,15 @@
             (str "It correctly processes '" a "' then '" b "'."))))))
 
 (deftest t-store-scale-to-reference
-  (-> (t/session [[(t/id :x) ::model/displays-as "X"]
-                  [(t/id :x) ::model/raw-count 42]
-                  [(t/id :m) ::model/spans (t/id :x)]
-                  [(t/id :m) ::model/transforms (t/id :p)]
-                  [(t/id :p) ::model/coordinates {"X" 78}]
-                  [(t/id :p) ::model/reference? true]])
-      (model/store-scale-to-reference (t/id :x))
-      (t/has-datoms [(t/id :p) ::model/coordinates {"X" 42}])))
+  (t/scenario "storing scale to reference"
+    [(t/id :x) ::model/displays-as "X"]
+    [(t/id :x) ::model/raw-count 42]
+    [(t/id :m) ::model/spans (t/id :x)]
+    [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/coordinates {"X" 78}]
+    [(t/id :p) ::model/reference? true]
+    (model/store-scale-to-reference (t/id :x))
+    (t/has-datoms [(t/id :p) ::model/coordinates {"X" 42}])))
 
 (deftest t-drop-pin
   (t/scenario "dropping a pin"
