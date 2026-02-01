@@ -30,11 +30,9 @@
                             [(t/id :p2) ::model/reference? true]])]
     (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
            (model/errors session))))
-  (let [session (-> (t/session [])
-                    (model/set-reference (t/id :id))
-                    (clara/fire-rules))]
-    (is (= [(model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)})]
-           (model/errors session)))))
+  (-> (t/session [])
+      (model/set-reference (t/id :id))
+      (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
 
 (deftest t-insert-controllers
   (let [session      (-> session/base-session

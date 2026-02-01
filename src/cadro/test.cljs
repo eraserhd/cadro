@@ -39,3 +39,8 @@
                                  pr-str
                                  (str "checking datom "))]]
       (is (medley/find-first #(= % v) vs) datom-msg))))
+
+(defn has-error [session error]
+  (let [session (clara/fire-rules session)]
+    (is (= [error] (model/errors session))
+        (str "did not find expected error " (pr-str error)))))
