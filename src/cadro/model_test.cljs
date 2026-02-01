@@ -8,12 +8,11 @@
    [net.eraserhead.clara-eql.pull :as pull]))
 
 (deftest t-set-reference
-  (let [id      (random-uuid)
-        session (-> session/base-session
-                    (clara/insert (model/asserted id ::model/coordinates {}))
-                    (model/set-reference id)
+  (let [session (-> session/base-session
+                    (clara/insert (model/asserted (t/id :ref) ::model/coordinates {}))
+                    (model/set-reference (t/id :ref))
                     (clara/fire-rules))]
-    (is (= id (model/reference session))
+    (is (= (t/id :ref) (model/reference session))
         "Can retrieve current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
