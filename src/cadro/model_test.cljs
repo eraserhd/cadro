@@ -16,9 +16,8 @@
         "Can retrieve current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
-  (let [session (-> session/base-session
-                    (clara/insert (model/asserted (t/id :p1) ::model/coordinates {}))
-                    (clara/insert (model/asserted (t/id :p2) ::model/coordinates {}))
+  (let [session (-> (t/session [[(t/id :p1) ::model/coordinates {}]
+                                [(t/id :p2) ::model/coordinates {}]])
                     (model/set-reference (t/id :p1))
                     (model/set-reference (t/id :p2))
                     (clara/fire-rules))]
