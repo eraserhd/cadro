@@ -15,13 +15,13 @@
     (model/set-reference (t/id :ref))
     (t/has-no-errors)
     (model/reference) => (t/id :ref))
-  (let [session (-> (t/session [[(t/id :p1) ::model/coordinates {}]
-                                [(t/id :p2) ::model/coordinates {}]])
-                    (model/set-reference (t/id :p1))
-                    (model/set-reference (t/id :p2))
-                    (t/has-no-errors))]
-    (is (= (t/id :p2) (model/reference session))
-        "Updates current reference."))
+  (t/scenario "can update the current reference"
+    [(t/id :p1) ::model/coordinates {}]
+    [(t/id :p2) ::model/coordinates {}]
+    (model/set-reference (t/id :p1))
+    (model/set-reference (t/id :p2))
+    (t/has-no-errors)
+    (model/reference) => (t/id :p2))
   (t/scenario "cannot have more than one reference point in session"
     [(t/id :p1) ::model/coordinates {}]
     [(t/id :p2) ::model/coordinates {}]
