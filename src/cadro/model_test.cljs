@@ -10,20 +10,17 @@
 (deftest t-set-reference
   (let [session (-> (t/session [[(t/id :ref) ::model/coordinates {}]])
                     (model/set-reference (t/id :ref))
-                    (clara/fire-rules))]
+                    (t/has-no-errors))]
     (is (= (t/id :ref) (model/reference session))
-        "Can retrieve current reference.")
-    (is (empty? (model/errors session))
-        "No invariant errors"))
+        "Can retrieve current reference."))
   (let [session (-> (t/session [[(t/id :p1) ::model/coordinates {}]
                                 [(t/id :p2) ::model/coordinates {}]])
                     (model/set-reference (t/id :p1))
                     (model/set-reference (t/id :p2))
+                    (t/has-no-errors)
                     (clara/fire-rules))]
     (is (= (t/id :p2) (model/reference session))
-        "Updates current reference.")
-    (is (empty? (model/errors session))
-        "No invariant errors"))
+        "Updates current reference."))
   (-> (t/session [[(t/id :p1) ::model/coordinates {}]
                   [(t/id :p2) ::model/coordinates {}]
                   [(t/id :p1) ::model/reference? true]

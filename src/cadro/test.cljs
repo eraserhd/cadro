@@ -40,7 +40,13 @@
                                  (str "checking datom "))]]
       (is (medley/find-first #(= % v) vs) datom-msg))))
 
+(defn has-no-errors [session]
+  (let [session (clara/fire-rules session)]
+    (is (empty? (model/errors session)) "has unexpected errors")
+    session))
+
 (defn has-error [session error]
   (let [session (clara/fire-rules session)]
     (is (= [error] (model/errors session))
-        (str "did not find expected error " (pr-str error)))))
+        (str "did not find expected error " (pr-str error)))
+    session))
