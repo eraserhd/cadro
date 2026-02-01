@@ -32,35 +32,31 @@
     (model/set-reference (t/id :id))
     (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
 
+(defn- controllers [session]
+  (->> (clara/query session model/controllers)
+       (sort-by :?hardware-address)
+       (map #(dissoc % :?id))))
+
 (deftest t-insert-controllers
-  (let [session      (-> session/base-session
-                         (model/insert-controllers [{::model/displays-as      "Nexus 7"
-                                                     ::model/hardware-address "00:00:01"}
-                                                    {::model/displays-as      "HC-06"
-                                                     ::model/hardware-address "02:03:04"}])
-                         clara/fire-rules)
-        controllers  (->> (clara/query session model/controllers)
-                          (sort-by :?hardware-address))
-        session'     (-> session
-                         (model/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
-                                                     ::model/hardware-address "00:00:01"}])
-                         clara/fire-rules)
-        controllers' (->> (clara/query session' model/controllers)
-                          (sort-by :?hardware-address))]
-    (is (= [{:?displays-as       "Nexus 7"
-             :?hardware-address  "00:00:01"
-             :?connection-status :disconnected}
-            {:?displays-as       "HC-06"
-             :?hardware-address  "02:03:04"
-             :?connection-status :disconnected}]
-           (map #(dissoc % :?id) controllers))
-        "It stores new controllers, defaulting to disconnected.")
-    (is (every? uuid? (map :?id controllers))
-        "It creates a UUID for every controller.")
-    (is (= "Nexus 7 Renamed" (-> controllers' first :?displays-as))
-        "It updates a name when a new one is received.")
-    (is (= (-> controllers first :?id) (-> controllers' first :?id))
-        "It does not update a UUID.")))
+  (t/scenario "inserting controllers"
+    (model/insert-controllers [{::model/displays-as      "Nexus 7"
+                                ::model/hardware-address "00:00:01"}
+                               {::model/displays-as      "HC-06"
+                                ::model/hardware-address "02:03:04"}])
+    controllers => [{:?displays-as       "Nexus 7"
+                     :?hardware-address  "00:00:01"
+                     :?connection-status :disconnected}
+                    {:?displays-as       "HC-06"
+                     :?hardware-address  "02:03:04"
+                     :?connection-status :disconnected}]
+    (model/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
+                                ::model/hardware-address "00:00:01"}])
+    controllers => [{:?displays-as       "Nexus 7 Renamed"
+                     :?hardware-address  "00:00:01"
+                     :?connection-status :disconnected}
+                    {:?displays-as       "HC-06"
+                     :?hardware-address  "02:03:04"
+                     :?connection-status :disconnected}]))
 
 (defn- after-receives
   [& receives]

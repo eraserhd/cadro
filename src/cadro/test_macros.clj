@@ -31,9 +31,11 @@
   
 (defmacro scenario [msg & exprs]
   (assert (string? msg))
-  `(testing ~msg
-     (-> cadro.session/base-session
-         ~@(rewrite-arrows exprs))))
+  (doto
+    `(testing ~msg
+       (-> cadro.session/base-session
+           ~@(rewrite-arrows exprs)))
+    prn))
 
 ;; str                    -> (testing str ...)
 ;; vector?                -> (insert (asserted []))
