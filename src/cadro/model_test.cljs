@@ -1,4 +1,6 @@
 (ns cadro.model-test
+  (:require-macros
+   [cadro.test-macros :as t])
   (:require
    [cadro.model :as model]
    [cadro.session :as session]
@@ -17,15 +19,15 @@
                                 [(t/id :p2) ::model/coordinates {}]])
                     (model/set-reference (t/id :p1))
                     (model/set-reference (t/id :p2))
-                    (t/has-no-errors)
-                    (clara/fire-rules))]
+                    (t/has-no-errors))]
     (is (= (t/id :p2) (model/reference session))
         "Updates current reference."))
-  (-> (t/session [[(t/id :p1) ::model/coordinates {}]
-                  [(t/id :p2) ::model/coordinates {}]
-                  [(t/id :p1) ::model/reference? true]
-                  [(t/id :p2) ::model/reference? true]])
-      (t/has-error (model/->InvariantError "more than one reference point in session" {:count 2})))
+  (t/scenario "foo"
+    [(t/id :p1) ::model/coordinates {}]
+    [(t/id :p2) ::model/coordinates {}]
+    [(t/id :p1) ::model/reference? true]
+    [(t/id :p2) ::model/reference? true]
+    (t/has-error (model/->InvariantError "more than one reference point in session" {:count 2})))
   (-> (t/session [])
       (model/set-reference (t/id :id))
       (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))

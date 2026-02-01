@@ -3,7 +3,7 @@
    [cadro.model :as model]
    [cadro.session :as session]
    [clara.rules :as clara]
-   [clojure.test :refer [is]]
+   [clojure.test :refer [testing is]]
    [medley.core :as medley]
    [net.eraserhead.clara-eql.pull :as pull]))
 
