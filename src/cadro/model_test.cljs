@@ -8,8 +8,7 @@
    [net.eraserhead.clara-eql.pull :as pull]))
 
 (deftest t-set-reference
-  (let [session (-> session/base-session
-                    (clara/insert (model/asserted (t/id :ref) ::model/coordinates {}))
+  (let [session (-> (t/session [[(t/id :ref) ::model/coordinates {}]])
                     (model/set-reference (t/id :ref))
                     (clara/fire-rules))]
     (is (= (t/id :ref) (model/reference session))
