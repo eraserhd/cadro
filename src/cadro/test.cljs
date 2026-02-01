@@ -22,12 +22,11 @@
     x))
 
 (defn session [datoms]
-  ;; FIXME: Check for invariants/errors
-  (let [session (reduce (fn [session [e a v]]
-                          (clara/insert session (model/asserted e a v)))
-                        session/base-session
-                        datoms)]
-    (clara/fire-rules session)))
+  (-> (reduce (fn [session [e a v]]
+                (clara/insert session (model/asserted e a v)))
+              session/base-session
+              datoms)
+      (clara/fire-rules)))
 
 (defn check [session & datoms]
   (let [session (clara/fire-rules session)
