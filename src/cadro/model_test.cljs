@@ -16,15 +16,13 @@
         "Can retrieve current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
-  (let [id1     (random-uuid)
-        id2     (random-uuid)
-        session (-> session/base-session
-                    (clara/insert (model/asserted id1 ::model/coordinates {}))
-                    (clara/insert (model/asserted id2 ::model/coordinates {}))
-                    (model/set-reference id1)
-                    (model/set-reference id2)
+  (let [session (-> session/base-session
+                    (clara/insert (model/asserted (t/id :p1) ::model/coordinates {}))
+                    (clara/insert (model/asserted (t/id :p2) ::model/coordinates {}))
+                    (model/set-reference (t/id :p1))
+                    (model/set-reference (t/id :p2))
                     (clara/fire-rules))]
-    (is (= id2 (model/reference session))
+    (is (= (t/id :p2) (model/reference session))
         "Updates current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
