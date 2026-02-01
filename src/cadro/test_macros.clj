@@ -29,13 +29,18 @@
    (let [[h & more] exprs]
      (cons (rewrite-expr h) (rewrite-arrows more)))))
   
-(defmacro scenario [msg & exprs]
+(defmacro scenario
+  "Threads a session through all exprs, calls fire-rules at appropriate
+  points, and adds expr => checker syntax that continue threading the
+  session.
+
+  If checker is a fn, (checker result) should return a truthy value.
+  Otherwise, (= result checker) is tested."
+  [msg & exprs]
   (assert (string? msg))
-  (doto
-    `(testing ~msg
-       (-> cadro.session/base-session
-           ~@(rewrite-arrows exprs)))
-    prn))
+  `(testing ~msg
+     (-> cadro.session/base-session
+         ~@(rewrite-arrows exprs))))
 
 ;; str                    -> (testing str ...)
 ;; vector?                -> (insert (asserted []))
