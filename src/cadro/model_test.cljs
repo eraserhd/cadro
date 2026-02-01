@@ -24,12 +24,11 @@
         "Updates current reference.")
     (is (empty? (model/errors session))
         "No invariant errors"))
-  (let [session (t/session [[(t/id :p1) ::model/coordinates {}]
-                            [(t/id :p2) ::model/coordinates {}]
-                            [(t/id :p1) ::model/reference? true]
-                            [(t/id :p2) ::model/reference? true]])]
-    (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
-           (model/errors session))))
+  (-> (t/session [[(t/id :p1) ::model/coordinates {}]
+                  [(t/id :p2) ::model/coordinates {}]
+                  [(t/id :p1) ::model/reference? true]
+                  [(t/id :p2) ::model/reference? true]])
+      (t/has-error (model/->InvariantError "more than one reference point in session" {:count 2})))
   (-> (t/session [])
       (model/set-reference (t/id :id))
       (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
