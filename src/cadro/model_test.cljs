@@ -10,11 +10,11 @@
    [net.eraserhead.clara-eql.pull :as pull]))
 
 (deftest t-set-reference
-  (let [session (-> (t/session [[(t/id :ref) ::model/coordinates {}]])
-                    (model/set-reference (t/id :ref))
-                    (t/has-no-errors))]
-    (is (= (t/id :ref) (model/reference session))
-        "Can retrieve current reference."))
+  (t/scenario "can retrieve the current reference"
+    [(t/id :ref) ::model/coordinates {}]
+    (model/set-reference (t/id :ref))
+    (t/has-no-errors)
+    (model/reference) => (t/id :ref))
   (let [session (-> (t/session [[(t/id :p1) ::model/coordinates {}]
                                 [(t/id :p2) ::model/coordinates {}]])
                     (model/set-reference (t/id :p1))
@@ -141,7 +141,7 @@
                   [(t/id :p) ::model/coordinates {"X" 78}]
                   [(t/id :p) ::model/reference? true]])
       (model/store-scale-to-reference (t/id :x))
-      (t/check [(t/id :p) ::model/coordinates {"X" 42}])))
+      (t/has-datoms [(t/id :p) ::model/coordinates {"X" 42}])))
 
 (deftest t-drop-pin
   (t/scenario "dropping a pin"
@@ -155,7 +155,7 @@
     [(t/id :p) ::model/coordinates {"X" 78, "Y" 96}]
     [(t/id :p) ::model/reference? true]
     (model/drop-pin (t/id :pin))
-    (t/check [(t/id :m) ::model/transforms (t/id :p)]
+    (t/has-datoms [(t/id :m) ::model/transforms (t/id :p)]
              [(t/id :m) ::model/transforms (t/id :pin)]
              [(t/id :pin) ::model/displays-as "A"]
              [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))

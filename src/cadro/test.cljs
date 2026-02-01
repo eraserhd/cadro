@@ -28,7 +28,15 @@
               datoms)
       (clara/fire-rules)))
 
-(defn check [session & datoms]
+(defn check [session f checker]
+  (let [session (clara/fire-rules session)
+        actual  (f session)]
+    (if (fn? checker)
+      (checker actual)
+      (is (= actual checker)))
+    session))
+
+(defn has-datoms [session & datoms]
   (let [session (clara/fire-rules session)
         eav-map (:?eav-map (first (clara/query session pull/eav-map)))]
     (doseq [[e a v] datoms

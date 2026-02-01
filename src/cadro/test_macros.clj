@@ -19,7 +19,11 @@
   
    (= '=> (second exprs))
    (let [[a _ b & more] exprs]
-     (cons (list '=> a b) (rewrite-arrows exprs)))
+     (cons `(cadro.test/check
+             (fn [session#]
+               (-> session# ~a))
+             ~b)
+           (rewrite-arrows more)))
   
    :else
    (let [[h & more] exprs]
