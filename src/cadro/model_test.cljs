@@ -34,11 +34,10 @@
                     (clara/fire-rules))]
     (is (= [(model/->InvariantError "more than one reference point in session" {:count 2})]
            (model/errors session))))
-  (let [id      (random-uuid)
-        session (-> session/base-session
-                    (model/set-reference id)
+  (let [session (-> session/base-session
+                    (model/set-reference (t/id :id))
                     (clara/fire-rules))]
-    (is (= [(model/->InvariantError "reference point does not have coordinates" {:id id})]
+    (is (= [(model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)})]
            (model/errors session)))))
 
 (deftest t-insert-controllers
