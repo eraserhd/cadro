@@ -286,7 +286,10 @@
 (defn scales [session]
   (->> (clara/query session scales-query)
        (map :?data)
-       (sort-by ::displays-as)))
+       (sort-by ::hardware-address)
+       (map (fn [controller]
+              (update controller ::_controller (fn [scales]
+                                                 (sort-by ::displays-as scales)))))))
 
 (clara/defquery fixture-scales [?fixture-id]
   [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
