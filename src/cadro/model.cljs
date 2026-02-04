@@ -144,10 +144,40 @@
   =>
   (clara/insert! (derived ?object ::spans ?axis)))
 
-(clara/defrule transformed-axis-count
-  [eav/EAV (= e ?e) (= a ::raw-count) (= v ?count)]
+;; ------
+
+(clara/defrule root-fixture-with-transform
+  [eav/EAV (= e ?root) (= a ::transforms)]
+  (not [eav/EAV (= a ::transforms) (= v ?root)])
+  [eav/EAV (= e ?root) (= a ::transform) (= v ?tr)]
   =>
-  (clara/insert! (derived ?e ::transformed-count ?count)))
+  (clara/insert! (derived ?root ::local-transform ?tr)))
+
+(clara/defrule root-fixture-without-transform
+  [eav/EAV (= e ?root) (= a ::transforms)]
+  (not [eav/EAV (= a ::transforms) (= v ?root)])
+  (not [eav/EAV (= e ?root) (= a ::transform)])
+  =>
+  (clara/insert! (derived ?root ::local-transform {})))
+
+(clara/defrule subfixture-transform-no-child-transform
+  [eav/EAV (= e ?parent) (= a ::local-transform) (= v ?parent-tr)]
+  [eav/EAV (= e ?parent) (= a ::transforms) (= v ?child)]
+  (not [eav/EAV (= e ?child) (= a ::transform)])
+  =>
+  (clara/insert! (derived ?child ::local-transform ?parent-tr)))
+
+;;FIXME: combine-case
+
+(clara/defrule transformed-axis-count
+  [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
+  [eav/EAV (= e ?ref) (= a ::local-transform) (= v ?tr)]
+  [eav/EAV (= e ?axis) (= a ::raw-count) (= v ?count)]
+  [eav/EAV (= e ?axis) (= a ::displays-as) (= v ?name)]
+  =>
+  (clara/insert! (derived ?axis ::transformed-count (get (tr/transform {?name ?count} ?tr) ?name))))
+
+;; -------
 
 (clara-eql/defrule axes-rule
   :query

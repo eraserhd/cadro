@@ -16,3 +16,8 @@
        (into {})))
 
 (def - (partial pairwise clojure.core/- 0))
+
+(defn transform [p m]
+  (if-let [scale (::scale m)]
+    (pairwise * 1.0 p scale)
+    p))

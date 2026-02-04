@@ -57,3 +57,10 @@
     (is (= [error] (model/errors session))
         (str "did not find expected error " (pr-str error)))
     session))
+
+(defn dump-session [session]
+  (let [eav-map (:?eav-map (first (clara/query session pull/eav-map)))]
+    (doseq [[e a->v] eav-map
+            [a v] a->v]
+      (prn e a v))
+    session))

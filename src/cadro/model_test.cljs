@@ -5,6 +5,7 @@
    [cadro.model :as model]
    [cadro.session :as session]
    [cadro.test :as t]
+   [cadro.transforms :as tr]
    [clara.rules :as clara]
    [clojure.test :refer [deftest testing is]]
    [net.eraserhead.clara-eql.pull :as pull]))
@@ -168,4 +169,17 @@
     [(t/id :p) ::model/reference? true]
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
-                      ::model/transformed-count 428}]))
+                      ::model/transformed-count 428}])
+  (t/scenario "when a transform with a scale factor of 1/2 is present"
+    [(t/id :x) ::model/displays-as "X"]
+    [(t/id :x) ::model/raw-count 428]
+    [(t/id :m) ::model/spans (t/id :x)]
+    [(t/id :m) ::model/displays-as "Mill"]
+    [(t/id :m) ::model/transform {::tr/scale {"X" 0.5}}]
+    [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/coordinates {"X" 42}]
+    [(t/id :p) ::model/reference? true]
+    (model/axes) => [{::model/id (t/id :x)
+                      ::model/displays-as "X"
+                      ::model/transformed-count 214}]))
+
