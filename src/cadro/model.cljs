@@ -57,20 +57,6 @@
   =>
   (clara/insert! (derived ?id ::id ?id)))
 
-(defn reversed-attribute? [kw]
-  (and (keyword? kw) (= \_ (first (name kw)))))
-(defn reverse-attribute [kw]
-  (keyword (namespace kw)
-           (if (= \_ (first (name kw)))
-             (subs (name kw) 1)
-             (str \_ (name kw)))))
-
-(clara/defrule reverse-attributes
-  "Make derived reverse-attribute facts"
-  [eav/EAV (= e ?e) (= a ?a) (= v ?v) (uuid? ?e) (uuid? ?v) (not (reversed-attribute? ?a))]
-  =>
-  (clara/insert! (derived ?v (reverse-attribute ?a) ?e)))
-
 ;;-------------------------------------------------------------------------------
 
 (def schema
@@ -158,11 +144,16 @@
   =>
   (clara/insert! (derived ?object ::spans ?axis)))
 
+(clara/defrule transformed-axis-count
+  [eav/EAV (= e ?e) (= a ::raw-count) (= v ?count)]
+  =>
+  (clara/insert! (derived ?e ::transformed-count ?count)))
+
 (clara-eql/defrule axes-rule
   :query
   [::id
    ::displays-as
-   ::raw-count]
+   ::transformed-count]
   :from ?axis
   :where
   [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]

@@ -156,3 +156,16 @@
              [(t/id :m) ::model/transforms (t/id :pin)]
              [(t/id :pin) ::model/displays-as "A"]
              [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))
+
+(deftest t-axes-display
+  (t/scenario "with no scale factor"
+    [(t/id :x) ::model/displays-as "X"]
+    [(t/id :x) ::model/raw-count 428]
+    [(t/id :m) ::model/spans (t/id :x)]
+    [(t/id :m) ::model/displays-as "Mill"]
+    [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/coordinates {"X" 42}]
+    [(t/id :p) ::model/reference? true]
+    (model/axes) => [{::model/id (t/id :x)
+                      ::model/displays-as "X"
+                      ::model/transformed-count 428}]))
