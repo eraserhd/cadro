@@ -18,6 +18,8 @@
 
           --button-background-hover-rgb: 125, 102, 217;
           --button-background-hover: rgb(var(--button-background-rgb));
+
+          --coordinate-width: 6rem;
         }
 
         * {
@@ -230,8 +232,11 @@
 
         button.point.non-reference::before {
           content: "";
-          width: 1em;
+          width: 1.5rem;
           display: inline-block;
+        }
+        button.point.reference svg {
+          width: 1.5rem;
         }
 
         .legend .controls {
