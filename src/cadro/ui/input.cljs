@@ -4,6 +4,7 @@
    [clara.rules :as clara]
    [net.eraserhead.clara-eql.pull :as pull]
    [clojure.spec.alpha :as s]
+   [clojure.string :as str]
    [re-frame.core :as rf]))
 
 ;; FIXME: if we subscribe to eav, narrow to e then to a then to v?
@@ -36,6 +37,12 @@
   [:label {:for (control-name id attr)}
    label])
 
+(defn- control-class
+  [attr]
+  (-> (str (namespace attr)
+           "_"
+           (name attr))
+      (str/replace #"[^a-z0-9_]" "-")))
 
 (defn default-lens
   ([x] x)
@@ -47,7 +54,7 @@
     :or {lens default-lens}
     :as props}]
   (let [source-value @(rf/subscribe [::value id attr])]
-    [:div.input-field
+    [:div.input-field {:class (control-class attr)}
      (when-let [lbl (:label props)]
        (label {:id id
                :attr attr
