@@ -24,11 +24,11 @@
            [:h1 "Axes"]]
           (map (fn [{:keys [::model/id
                             ::model/displays-as
-                            ::model/raw-count],
+                            ::model/transformed-count],
                      :as scale}]
                  [:div.axis
                   [:div.name displays-as]
-                  [:div.value raw-count]
+                  [:div.value transformed-count]
                   [:button.icon.store
                    {:on-click #(rf/dispatch [::store-clicked id])}
                    [:> fa/FontAwesomeIcon
