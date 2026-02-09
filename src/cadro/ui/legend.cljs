@@ -62,7 +62,7 @@
     (into [:span.distance]
           (->> (sort (keys axis-name->value))
                (map (fn [axis-name]
-                      [:span.scale
+                      [:span.axis
                        [:span.name axis-name]
                        [:span.value (get axis-name->value axis-name)]]))))))
 
