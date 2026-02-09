@@ -169,7 +169,7 @@
     [(t/id :p) ::model/reference? true]
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
-                      ::model/transformed-count 428}])
+                      ::model/transformed-count (- 428 42)}])
   (t/scenario "when a transform with a scale factor of 1/2 is present"
     [(t/id :x) ::model/displays-as "X"]
     [(t/id :x) ::model/raw-count 428]
@@ -181,5 +181,5 @@
     [(t/id :p) ::model/reference? true]
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
-                      ::model/transformed-count 214}]))
+                      ::model/transformed-count (- (/ 428 2) 42)}]))
 

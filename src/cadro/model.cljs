@@ -172,10 +172,15 @@
 (clara/defrule transformed-axis-count
   [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
   [eav/EAV (= e ?ref) (= a ::local-transform) (= v ?tr)]
+  [eav/EAV (= e ?ref) (= a ::coordinates) (= v ?coord)]
   [eav/EAV (= e ?axis) (= a ::raw-count) (= v ?count)]
   [eav/EAV (= e ?axis) (= a ::displays-as) (= v ?name)]
   =>
-  (clara/insert! (derived ?axis ::transformed-count (get (tr/transform {?name ?count} ?tr) ?name))))
+  (let [transformed-count (-> {?name ?count}
+                              (tr/transform ?tr)
+                              (tr/- ?coord)
+                              (get ?name))]
+    (clara/insert! (derived ?axis ::transformed-count transformed-count))))
 
 ;; -------
 
