@@ -47,7 +47,7 @@
     :or {lens default-lens}
     :as props}]
   (let [source-value @(rf/subscribe [::value id attr])]
-    [:<>
+    [:div.input-field
      (when-let [lbl (:label props)]
        (label {:id id
                :attr attr

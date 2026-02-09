@@ -59,7 +59,7 @@
                            fixture-id
                            scale-id
                            (.. e -target -checked)]))}]
-   [:label {:for (str scale-id)}
+   [:label.axis {:for (str scale-id)}
     [:span.name displays-as]
     [:span.value raw-count]]
    [input/input {:id fixture-id
