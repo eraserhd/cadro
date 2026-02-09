@@ -2,6 +2,7 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model :as model]
+   [cadro.transforms :as tr]
    [cadro.ui.input :as input]
    [cadro.ui.panel :as panel]
    [clara.rules :as clara]
@@ -60,7 +61,13 @@
                            (.. e -target -checked)]))}]
    [:label {:for (str scale-id)}
     [:span.name displays-as]
-    [:span.value raw-count]]])
+    [:span.value raw-count]]
+   [input/input {:id fixture-id
+                 :attr ::model/transform
+                 :lens (fn
+                         ([t] (get-in t [::tr/scale displays-as] 1.0))
+                         ([t v] (assoc-in t [::tr/scale displays-as] (js/parseFloat v))))
+                 :label "Scaling Factor"}]])
 
 (defn edit-panel []
   (rf/dispatch [::edit-panel-mounted])

@@ -36,17 +36,24 @@
   [:label {:for (control-name id attr)}
    label])
 
+
+(defn default-lens
+  ([x] x)
+  ([x v] v))
+
 (defn input
   "Input element for an object attribute in the datastore."
-  [{:keys [id attr], :as props}]
-  (let [value (rf/subscribe [::value id attr])]
+  [{:keys [id attr lens],
+    :or {lens default-lens}
+    :as props}]
+  (let [source-value @(rf/subscribe [::value id attr])]
     [:<>
      (when-let [lbl (:label props)]
        (label {:id id
                :attr attr
                :label lbl}))
      [:input {:id (control-name id attr)
-              :default-value @value
+              :default-value (lens source-value)
               :on-blur (fn [e]
-                         (let [value (.. e -target -value)]
+                         (let [value (lens source-value (.. e -target -value))]
                            (rf/dispatch [::set-value id attr value])))}]]))
