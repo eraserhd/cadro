@@ -19,7 +19,10 @@
           --button-background-hover-rgb: 125, 102, 217;
           --button-background-hover: rgb(var(--button-background-rgb));
 
-          --coordinate-width: 6rem;
+          --axis-name-rgb: 85, 85, 85;
+          --axis-name: rgb(var(--axis-name-rgb));
+
+          --coordinate-width: 5rem;
         }
 
         * {
@@ -167,14 +170,18 @@
         }
         .scale > label {
           display: flex;
-          padding-left: 0.5rem;
+          padding-left: 0.25rem;
         }
         .scale .name {
           font-weight: bold;
-          width: 5rem;
+          width: 2rem;
+          color: var(--axis-name);
         }
         .scale .value {
-          width: 10rem;
+          display: inline-block;
+          text-align: right;
+          padding-right: 0.5rem;
+          width: var(--coordinate-width);
         }
 
         .axes {

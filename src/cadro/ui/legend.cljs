@@ -62,9 +62,9 @@
     (into [:span.distance]
           (->> (sort (keys axis-name->value))
                (map (fn [axis-name]
-                      [:span.component
-                       [:span.axis-name axis-name]
-                       [:span.axis-value (get axis-name->value axis-name)]]))))))
+                      [:span.scale
+                       [:span.name axis-name]
+                       [:span.value (get axis-name->value axis-name)]]))))))
 
 (defn- legend-keys
   [transforms]
