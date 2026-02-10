@@ -135,11 +135,13 @@
     [(t/id :x) ::model/displays-as "X"]
     [(t/id :x) ::model/raw-count 42]
     [(t/id :m) ::model/spans (t/id :x)]
+    [(t/id :m) ::model/transform {::tr/scale {"X" 0.5}}]
     [(t/id :m) ::model/transforms (t/id :p)]
     [(t/id :p) ::model/coordinates {"X" 78}]
     [(t/id :p) ::model/reference? true]
     (model/store-scale-to-reference (t/id :x))
-    (t/has-datoms [(t/id :p) ::model/coordinates {"X" 42}])))
+    (t/has-datoms [(t/id :p) ::model/coordinates {"X" 21}]
+                  [(t/id :x) ::model/transformed-count 0])))
 
 (deftest t-drop-pin
   (t/scenario "dropping a pin"
@@ -154,9 +156,9 @@
     [(t/id :p) ::model/reference? true]
     (model/drop-pin (t/id :pin))
     (t/has-datoms [(t/id :m) ::model/transforms (t/id :p)]
-             [(t/id :m) ::model/transforms (t/id :pin)]
-             [(t/id :pin) ::model/displays-as "A"]
-             [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))
+                  [(t/id :m) ::model/transforms (t/id :pin)]
+                  [(t/id :pin) ::model/displays-as "A"]
+                  [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))
 
 (deftest t-axes-display
   (t/scenario "with no scale factor"

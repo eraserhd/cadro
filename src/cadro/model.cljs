@@ -364,17 +364,19 @@
   [?scale-id]
   [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
   [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
-
   [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
-  [eav/EAV (= e ?ref-id) (= a ::coordinates) (= v ?coordinates)])
+  [eav/EAV (= e ?ref-id) (= a ::coordinates) (= v ?coordinates)]
+  [eav/EAV (= e ?ref-id) (= a ::local-transform) (= v ?local-tr)])
 
 (defn store-scale-to-reference [session scale-id]
   (let [{:keys [?displays-as
                 ?raw-count
                 ?ref-id
-                ?coordinates], :as data} (first (clara/query session store-scale-to-reference-q :?scale-id scale-id))
-        ;; FIXME: translate
-        coordinates (assoc ?coordinates ?displays-as ?raw-count)]
+                ?coordinates
+                ?local-tr], :as data}
+        (first (clara/query session store-scale-to-reference-q :?scale-id scale-id))
+        tr-count    (get (tr/transform {?displays-as ?raw-count} ?local-tr) ?displays-as)
+        coordinates (assoc ?coordinates ?displays-as tr-count)]
     (upsert session ?ref-id ::coordinates coordinates)))
 
 (clara/defquery drop-pin-q []
