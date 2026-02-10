@@ -126,6 +126,7 @@
    {::transforms ;...
     [::id
      ::displays-as
+     ::display-order
      ::reference?
      ::coordinates
      ::distance]}]
@@ -141,7 +142,9 @@
 (defn fixtures-and-points-trees [session]
   (->> (clara/query session fixtures-and-points-trees-query)
        (map :?data)
-       (sort-by ::id)))
+       (sort-by ::id)
+       (map (fn [fixture]
+              (update fixture ::transforms #(sort-by ::display-order %))))))
 
 ;; if reference or something that transforms it spans an axis, display it
 ;; FIXME: dedup?
