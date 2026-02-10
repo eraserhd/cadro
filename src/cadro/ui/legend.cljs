@@ -20,7 +20,7 @@
  ::new-machine-tapped
  [(rf/inject-cofx :session)]
  (fn [{:keys [session], :as all} _]
-   (let [{:keys [id session]} (model/new-machine-tx session)]
+   (let [{:keys [id session]} (model/new-fixture session)]
      {:session session
       ::edit-panel/edit id})))
 

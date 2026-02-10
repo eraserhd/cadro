@@ -70,6 +70,7 @@
 
 ;; Display name is a common concept everywhere.
 (s/def ::displays-as string?)
+(s/def ::display-order number?)
 
 ;; Something can span an axis, meaning coordinates extend into it.
 (s/def ::spans (s/coll-of (s/keys :req [::id ::displays-as])))
@@ -208,13 +209,13 @@
 ;; A coordinate in N-dimensional space.
 (s/def ::coordinates ::tr/locus)
 
-(defn new-machine-tx [session]
-  (let [machine-id (random-uuid)
+(defn new-fixture [session]
+  (let [fixture-id (random-uuid)
         point-id   (random-uuid)]
-    {:id      machine-id
+    {:id      fixture-id
      :session (-> session
-                  (clara/insert (asserted machine-id ::displays-as "New Machine")
-                                (asserted machine-id ::transforms  point-id)
+                  (clara/insert (asserted fixture-id ::displays-as "New Machine")
+                                (asserted fixture-id ::transforms  point-id)
                                 (asserted point-id ::displays-as "Origin")
                                 (asserted point-id ::coordinates {}))
                   (set-reference point-id))}))

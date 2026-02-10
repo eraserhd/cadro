@@ -185,4 +185,3 @@
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
                       ::model/transformed-count (- (/ 428 2) 42)}]))
-
