@@ -373,7 +373,7 @@
                 ?raw-count
                 ?ref-id
                 ?coordinates
-                ?local-tr], :as data}
+                ?local-tr]}
         (first (clara/query session store-scale-to-reference-q :?scale-id scale-id))
         tr-count    (get (tr/transform {?displays-as ?raw-count} ?local-tr) ?displays-as)
         coordinates (assoc ?coordinates ?displays-as tr-count)]

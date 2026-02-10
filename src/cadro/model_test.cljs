@@ -141,6 +141,7 @@
     [(t/id :p) ::model/reference? true]
     (model/store-scale-to-reference (t/id :x))
     (t/has-datoms [(t/id :p) ::model/coordinates {"X" 21}]
+                  ;; The axis should always appear zero after storing
                   [(t/id :x) ::model/transformed-count 0])))
 
 (deftest t-drop-pin
