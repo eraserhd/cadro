@@ -92,6 +92,12 @@
   =>
   (clara/insert! (->InvariantError "reference point does not have coordinates" {:id ?eid})))
 
+(clara/defrule points-always-have-display-order
+  [eav/EAV (= e ?e) (= a ::coordinates)]
+  [:not [eav/EAV (= e ?e) (= a ::display-order)]]
+  =>
+  (clara/insert! (->InvariantError "Point does not have display-order" {:id ?e})))
+
 (clara/defquery reference-query []
   [?ref <- eav/EAV (= e ?id) (= a ::reference?)])
 
@@ -382,23 +388,33 @@
         coordinates (assoc ?coordinates ?displays-as tr-count)]
     (upsert session ?ref-id ::coordinates coordinates)))
 
+(defrecord ChildDisplayOrder [fixture-id display-order])
+
+(clara/defrule max-display-order
+  [eav/EAV (= e ?parent) (= a ::transforms) (= v ?child)]
+  [eav/EAV (= e ?child) (= a ::display-order) (= v ?display-order)]
+  =>
+  (clara/insert! (->ChildDisplayOrder ?parent ?display-order)))
+
 (clara/defquery drop-pin-q []
   [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
   [eav/EAV (= e ?ref-id) (= a ::spans) (= v ?scale-id)]
   [eav/EAV (= e ?fixture-id) (= a ::transforms) (= v ?ref-id)]
   [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
-  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)])
+  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
+  [?max-display-order <- (acc/max :display-order) :from [ChildDisplayOrder (= fixture-id ?fixture-id)]])
 
 (defn drop-pin [session new-pin-id]
-  (let [results     (clara/query session drop-pin-q)
-        ref-id      (:?ref-id (first results))
-        fixture-id  (:?fixture-id (first results))
-        coordinates (into {}
-                          (map (fn [{:keys [?displays-as ?raw-count]}]
-                                 [?displays-as ?raw-count]))
-                          results)]
+  (let [results                      (clara/query session drop-pin-q)
+        {:keys [?fixture-id
+                ?max-display-order]} (first results)
+        coordinates                  (into {}
+                                           (map (fn [{:keys [?displays-as ?raw-count]}]
+                                                  [?displays-as ?raw-count]))
+                                           results)]
     (clara/insert-all
      session
-     [(asserted fixture-id ::transforms new-pin-id)
+     [(asserted ?fixture-id ::transforms new-pin-id)
       (asserted new-pin-id ::displays-as "A")
+      (asserted new-pin-id ::display-order (inc ?max-display-order))
       (asserted new-pin-id ::coordinates coordinates)])))

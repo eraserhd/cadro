@@ -13,19 +13,24 @@
 (deftest t-set-reference
   (t/scenario "can retrieve the current reference"
     [(t/id :ref) ::model/coordinates {}]
+    [(t/id :ref) ::model/display-order 0]
     (model/set-reference (t/id :ref))
     (t/has-no-errors)
     (model/reference) => (t/id :ref))
   (t/scenario "can update the current reference"
     [(t/id :p1) ::model/coordinates {}]
+    [(t/id :p1) ::model/display-order 0]
     [(t/id :p2) ::model/coordinates {}]
+    [(t/id :p2) ::model/display-order 0]
     (model/set-reference (t/id :p1))
     (model/set-reference (t/id :p2))
     (t/has-no-errors)
     (model/reference) => (t/id :p2))
   (t/scenario "cannot have more than one reference point in session"
     [(t/id :p1) ::model/coordinates {}]
+    [(t/id :p1) ::model/display-order 0]
     [(t/id :p2) ::model/coordinates {}]
+    [(t/id :p2) ::model/display-order 0]
     [(t/id :p1) ::model/reference? true]
     [(t/id :p2) ::model/reference? true]
     (t/has-error (model/->InvariantError "more than one reference point in session" {:count 2})))
@@ -44,6 +49,7 @@
                                 ::model/hardware-address "00:00:01"}
                                {::model/displays-as      "HC-06"
                                 ::model/hardware-address "02:03:04"}])
+    (t/has-no-errors)
     controllers => [{:?displays-as       "Nexus 7"
                      :?hardware-address  "00:00:01"
                      :?connection-status :disconnected}
@@ -52,6 +58,7 @@
                      :?connection-status :disconnected}]
     (model/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
                                 ::model/hardware-address "00:00:01"}])
+    (t/has-no-errors)
     controllers => [{:?displays-as       "Nexus 7 Renamed"
                      :?hardware-address  "00:00:01"
                      :?connection-status :disconnected}
@@ -135,6 +142,7 @@
     (t/scenario "creating a new fixture"
       (new-fixture {:fixture-id (t/id :f)
                     :point-id   (t/id :p)})
+      (t/has-no-errors)
       (t/has-datoms [(t/id :f) ::model/displays-as "New Machine"]
                     [(t/id :f) ::model/transforms (t/id :p)]
                     [(t/id :p) ::model/displays-as "Origin"]
@@ -151,7 +159,9 @@
     [(t/id :m) ::model/transforms (t/id :p)]
     [(t/id :p) ::model/coordinates {"X" 78}]
     [(t/id :p) ::model/reference? true]
+    [(t/id :p) ::model/display-order 0]
     (model/store-scale-to-reference (t/id :x))
+    (t/has-no-errors)
     (t/has-datoms [(t/id :p) ::model/coordinates {"X" (/ 42 2)}]
                   ;; The axis should always appear zero after storing
                   [(t/id :x) ::model/transformed-count 0])))
@@ -165,12 +175,15 @@
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/spans (t/id :y)]
     [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/display-order 0]
     [(t/id :p) ::model/coordinates {"X" 78, "Y" 96}]
     [(t/id :p) ::model/reference? true]
     (model/drop-pin (t/id :pin))
+    (t/has-no-errors)
     (t/has-datoms [(t/id :m) ::model/transforms (t/id :p)]
                   [(t/id :m) ::model/transforms (t/id :pin)]
                   [(t/id :pin) ::model/displays-as "A"]
+                  [(t/id :pin) ::model/display-order 1]
                   [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))
 
 (deftest t-axes-display
@@ -180,8 +193,10 @@
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/displays-as "Mill"]
     [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/display-order 0]
     [(t/id :p) ::model/coordinates {"X" 42}]
     [(t/id :p) ::model/reference? true]
+    (t/has-no-errors)
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
                       ::model/transformed-count (- 428 42)}])
@@ -192,8 +207,10 @@
     [(t/id :m) ::model/displays-as "Mill"]
     [(t/id :m) ::model/transform {::tr/scale {"X" 0.5}}]
     [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :p) ::model/display-order 0]
     [(t/id :p) ::model/coordinates {"X" 42}]
     [(t/id :p) ::model/reference? true]
+    (t/has-no-errors)
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
                       ::model/transformed-count (- (/ 428 2) 42)}]))
