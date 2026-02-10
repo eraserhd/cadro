@@ -21,13 +21,6 @@
       x)
     x))
 
-(defn session [datoms]
-  (-> (reduce (fn [session [e a v]]
-                (clara/insert session (model/asserted e a v)))
-              session/base-session
-              datoms)
-      (clara/fire-rules)))
-
 (defn check [session f checker]
   (let [session (clara/fire-rules session)
         actual  (f session)]

@@ -130,6 +130,17 @@
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))
 
+(deftest t-new-fixture
+  (let [new-fixture (comp :session model/new-fixture)]
+    (t/scenario "creating a new fixture"
+      (new-fixture {:fixture-id (t/id :f)
+                    :point-id   (t/id :p)})
+      (t/has-datoms [(t/id :f) ::model/displays-as "New Machine"]
+                    [(t/id :f) ::model/transforms (t/id :p)]
+                    [(t/id :p) ::model/displays-as "Origin"]
+                    [(t/id :p) ::model/coordinates {}]
+                    [(t/id :p) ::model/reference? true]))))
+
 (deftest t-store-scale-to-reference
   (t/scenario "storing scale to reference"
     [(t/id :x) ::model/displays-as "X"]
@@ -140,7 +151,7 @@
     [(t/id :p) ::model/coordinates {"X" 78}]
     [(t/id :p) ::model/reference? true]
     (model/store-scale-to-reference (t/id :x))
-    (t/has-datoms [(t/id :p) ::model/coordinates {"X" 21}]
+    (t/has-datoms [(t/id :p) ::model/coordinates {"X" (/ 42 2)}]
                   ;; The axis should always appear zero after storing
                   [(t/id :x) ::model/transformed-count 0])))
 

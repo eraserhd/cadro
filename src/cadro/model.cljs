@@ -209,16 +209,17 @@
 ;; A coordinate in N-dimensional space.
 (s/def ::coordinates ::tr/locus)
 
-(defn new-fixture [session]
-  (let [fixture-id (random-uuid)
-        point-id   (random-uuid)]
-    {:id      fixture-id
-     :session (-> session
-                  (clara/insert (asserted fixture-id ::displays-as "New Machine")
-                                (asserted fixture-id ::transforms  point-id)
-                                (asserted point-id ::displays-as "Origin")
-                                (asserted point-id ::coordinates {}))
-                  (set-reference point-id))}))
+(defn new-fixture
+  [session {:keys [fixture-id point-id]}]
+  {:pre [(uuid? fixture-id)
+         (uuid? point-id)]}
+  {:id      fixture-id
+   :session (-> session
+                (clara/insert (asserted fixture-id ::displays-as "New Machine")
+                              (asserted fixture-id ::transforms  point-id)
+                              (asserted point-id ::displays-as "Origin")
+                              (asserted point-id ::coordinates {}))
+                (set-reference point-id))})
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [::id
