@@ -218,6 +218,7 @@
                 (clara/insert (asserted fixture-id ::displays-as "New Machine")
                               (asserted fixture-id ::transforms  point-id)
                               (asserted point-id ::displays-as "Origin")
+                              (asserted point-id ::display-order 0)
                               (asserted point-id ::coordinates {}))
                 (set-reference point-id))})
 

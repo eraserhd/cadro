@@ -138,6 +138,7 @@
       (t/has-datoms [(t/id :f) ::model/displays-as "New Machine"]
                     [(t/id :f) ::model/transforms (t/id :p)]
                     [(t/id :p) ::model/displays-as "Origin"]
+                    [(t/id :p) ::model/display-order 0]
                     [(t/id :p) ::model/coordinates {}]
                     [(t/id :p) ::model/reference? true]))))
 
