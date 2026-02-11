@@ -1,5 +1,6 @@
 (ns ^:dev/always cadro.user
   (:require
+   [cadro.bluetooth :refer [bt-set bt-status]]
    [cadro.model :as model]
    [cadro.session :as session]
    [clara.rules :as clara]
@@ -31,9 +32,6 @@
   "Pull data from Clara session."
   [selector eid]
   (pull/pull (session) selector eid))
-
-(defn reference []
-  (model/reference (session)))
 
 (defn upsert [e a v]
   (swap! session/session model/upsert e a v))

@@ -9,13 +9,20 @@
 
 (def ^:private interface-id "00001101-0000-1000-8000-00805f9b34fb")
 
-(def ^:private ^:dynamic fake-subscribeRawData-reply "X500;Y500;Z500;\n")
+(def ^:private ^:dynamic mock-data
+  {"X" 500
+   "Y" 500
+   "Z" 500})
+
 (set! (.-subscribeRawData bt-browser)
       (fn [device-id interface-id success failure]
         (let [encoder (js/TextEncoder. "ascii")]
           (js/window.setInterval
            (fn []
-             (let [data (.encode encoder fake-subscribeRawData-reply)]
+             (let [data (.encode encoder
+                                 (str (map (fn [[axis value]]
+                                             (str axis value ";")) mock-data)
+                                      "\n"))]
                (success data)))
            500))))
 
@@ -111,3 +118,10 @@
       (fn [error]
         (rf/dispatch [::connect-failed device-id error])
         (js/alert (str "Unable to connect: " error)))))))
+
+(defn bt-status []
+  (println (str "Currently receiving: " mock-data)))
+
+(defn bt-set [axis-name value]
+  (set! mock-data (assoc mock-data axis-name value))
+  (bt-status))
