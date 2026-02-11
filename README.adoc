@@ -20,7 +20,7 @@ Run tests:
 
 [source,clojure]
 ----
-user=> (refresh) (run-tests)
+$ npx shadow-cljs watch test
 ----
 
 Testing on tablet:
