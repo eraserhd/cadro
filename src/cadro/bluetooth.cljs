@@ -20,8 +20,10 @@
           (js/window.setInterval
            (fn []
              (let [data (.encode encoder
-                                 (str (map (fn [[axis value]]
-                                             (str axis value ";")) mock-data)
+                                 (str (->> mock-data
+                                           (map (fn [[axis value]]
+                                                  (str axis value ";")))
+                                           (apply str))
                                       "\n"))]
                (success data)))
            500))))
@@ -59,7 +61,7 @@
  ::connect-requested
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id]]
-   (js/console.debug "bluetooth:" (str device-id) "connect requested")
+   (js/console.info "bluetooth:" (str device-id) "connect requested")
    {:session (model/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
@@ -73,19 +75,40 @@
  ::connect-failed
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id error]]
+   (js/console.info "bluetooth:" (str device-id) "connect failed:" error)
    (js/console.error "bluetooth:" (str device-id) "connect failed:" error)
    {:session (model/set-connection-status session device-id :disconnected)}))
+
+(defn hex-dump [s]
+  (->> (.encode (js/TextEncoder.) s)
+       (partition-all 16)
+       (map-indexed
+         (fn [line-num chunk]
+           (let [hex-parts     (map #(.padStart (.toString % 16) 2 "0") chunk)
+                 ascii-parts   (map (fn [b]
+                                      (if (and (>= b 32) (<= b 126))
+                                        (js/String.fromCharCode b)
+                                        "."))
+                                    chunk)
+                 padding       (apply str (repeat (- 16 (count chunk)) "   "))
+                 hex-section   (str (clojure.string/join " " hex-parts) padding)
+                 ascii-section (clojure.string/join "" ascii-parts)
+                 offset-str    (.padStart (.toString (* line-num 16) 16) 4 "0")]
+             (str offset-str ": " hex-section "  | " ascii-section))))
+       (clojure.string/join "\n")))
 
 (rf/reg-event-fx
  ::data-received
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id data]]
-   (js/console.debug "bluetooth:" (str device-id) "data received:" data)
+   (prn data)
+   (js/console.info "bluetooth:" (str device-id) "data received:\n" (hex-dump data))
    {:session (model/add-received-data session device-id data)}))
 
 (rf/reg-event-fx
  ::subscription-error-received
  (fn [_ [_ device-id error]]
+   (js/console.info "bluetooth:" (str device-id) "subscription error:" error)
    (js/console.error "bluetooth:" (str device-id) "subscription error:" error)
    {}))
 
