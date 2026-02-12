@@ -59,34 +59,34 @@
  ::connect-requested
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id]]
+   (js/console.debug "bluetooth:" (str device-id) "connect requested")
    {:session (model/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id]]
+   (js/console.info "bluetooth:" (str device-id) "connect completed")
    {:session (model/set-connection-status session device-id :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id error]]
-  ;   (rf/dispatch [::scale-controller/log-event device-id "connect error" error])
-  ;   (js/alert (str "Unable to connect: " error))]
+   (js/console.error "bluetooth:" (str device-id) "connect failed:" error)
    {:session (model/set-connection-status session device-id :disconnected)}))
 
 (rf/reg-event-fx
  ::data-received
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id data]]
+   (js/console.debug "bluetooth:" (str device-id) "data received:" data)
    {:session (model/add-received-data session device-id data)}))
 
 (rf/reg-event-fx
  ::subscription-error-received
- [(rf/inject-cofx :session)]
- (fn [{:keys [ds]} [_ device-id error]]
-   ;     (rf/dispatch [::scale-controller/log-event device-id "subscribeRawData error" error])]
-   ;FIXME:
+ (fn [_ [_ device-id error]]
+   (js/console.error "bluetooth:" (str device-id) "subscription error:" error)
    {}))
 
 (def ^:private decoder (js/TextDecoder. "ascii"))
@@ -116,8 +116,7 @@
          (fn [error]
            (rf/dispatch [::subscription-error-received device-id error]))))
       (fn [error]
-        (rf/dispatch [::connect-failed device-id error])
-        (js/alert (str "Unable to connect: " error)))))))
+        (rf/dispatch [::connect-failed device-id error]))))))
 
 (defn bt-status []
   (println (str "Currently receiving: " mock-data)))
