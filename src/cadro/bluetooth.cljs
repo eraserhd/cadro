@@ -101,7 +101,6 @@
  ::data-received
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id data]]
-   (prn data)
    (js/console.info "bluetooth:" (str device-id) "data received:\n" (hex-dump data))
    {:session (model/add-received-data session device-id data)}))
 
