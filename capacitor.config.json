@@ -1,5 +1,6 @@
 {
   "appId": "net.eraserhead.cadro",
   "appName": "Cadro",
-  "webDir": "public"
+  "webDir": "public",
+  "loggingBehavior": "production"
 }
