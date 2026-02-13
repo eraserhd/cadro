@@ -1,4 +1,32 @@
-== Cadro
+= Cadro
+
+New DRO software for TouchDRO(-like) hardware.
+
+== Why?
+
+For the most part, the concepts of how the DRO interface works was set in
+neon tubes in the 50s.  It was designed around two coordinate spaces that
+could fit inside wire-wrapped RAM and named ABS and INC (in the early days
+of software development, letters were quite expensive).
+
+These two reference positions were neither absolute, nor incremental,
+except sometimes by convention, but then not even really.  For example,
+you never actually see the absolute coordinate of the scale except possibly
+on first power-on, and then you "set" the absolute coordiante to be some
+place in your reference space.
+
+Now that we are using an Android tablet (or maybe I'll support iPads too),
+we have RAM so large, we can fit millions of Commodore 64 programs in it.
+
+=== Destructive Actions
+
+TouchDRO's philosophy of warning on destructive actions like zeroing doesn't
+help my ADHD-adled brain much.  I usually just power through those... or even
+sometimes I carefully reason and then find out I'm wrong.
+
+CaDRO's philosophy is _anything can be undone_, including zeroing.
+
+===
 
 
 == Development
@@ -27,6 +55,7 @@ Testing on tablet:
 
 ----
 $ npx shadow-cljs release app
+$ adb shell pm clear net.eraserhead.cadro # Clear application state
 $ npx cap run android
 ----
 

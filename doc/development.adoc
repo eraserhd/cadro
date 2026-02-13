@@ -1,0 +1,8 @@
+= Development
+
+----
+$ adb logcat -g                 # Check current log buffer size
+$ adb logcat -G 16M             # Set buffers from 256K to 16M
+$ adb logcat -c                 # Clear buffers
+$ adb logcat -d >/tmp/log.txt   # Dump the log
+----
