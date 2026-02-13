@@ -94,7 +94,7 @@
                            scale-id))))))
 
 (deftest t-add-received-data
-  (let [scales (after-receives "X150;Y250;Z350;T72;\n")]
+  (let [scales (after-receives "X150;y250;Z350;T72;\0")]
     (is (= #{{::model/displays-as "X"
               ::model/raw-count 150}
              {::model/displays-as "Y"
@@ -111,15 +111,24 @@
         "Every new scale is assigned a uuid.")
     (is (= 4 (count (map ::model/id scales)))
         "The new uuids are unique."))
-  (let [scales (after-receives "X150;\n" "X152;\n")]
+  (let [scales (after-receives "X150;\0" "X152;\0")]
     (is (= #{{::model/displays-as "X"
               ::model/raw-count 152}}
            (->> scales
                 (map #(select-keys % [::model/displays-as ::model/raw-count]))
                 (into #{})))
         "It updates existing scale values."))
+  (let [scales (after-receives "x150;y152;\u0000vTouchDRO_SIEG_1.3.1;x155;y157;\0")]
+    (is (= #{{::model/displays-as "X"
+              ::model/raw-count 155}
+             {::model/displays-as "Y"
+              ::model/raw-count 157}}
+           (->> scales
+                (map #(select-keys % [::model/displays-as ::model/raw-count]))
+                (into #{})))
+        "It can parse and ignore version strings."))
   (testing "partial receives"
-    (doseq [:let [full-data "X150;Y250;Z350;T72;\n"]
+    (doseq [:let [full-data "X150;Y250;\u0000Z350;T72;\0"]
             i (range (count full-data))]
       (let [a      (subs full-data 0 i)
             b      (subs full-data i)
