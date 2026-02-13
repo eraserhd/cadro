@@ -124,9 +124,21 @@ send_position (gpointer user_data) {
 	int status;
 	struct spp_data *spp = user_data;
 	char buffer[512];
+	static int cycle = 0;
 
-	sprintf(buffer, "X%ld;Y%ld;Z%ld;\n", spp->x, spp->y, spp->z);
-	status = write(spp->sock_fd, buffer, strlen(buffer));
+	if (++cycle == 5)
+	{
+		cycle = 0;
+		strcpy(buffer, "vTest_DROServe_0.0.0;");
+		status = write(spp->sock_fd, buffer, strlen(buffer));
+		if (status < 0) {
+			perror("write");
+		}
+	}
+
+	sprintf(buffer, "X%ld;Y%ld;Z%ld;", spp->x, spp->y, spp->z);
+	/* Send with NUL terminator, which is part of the protocol. */
+	status = write(spp->sock_fd, buffer, strlen(buffer)+1);
 	if (status < 0) {
 		perror("write");
 	}
