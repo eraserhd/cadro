@@ -29,14 +29,22 @@
 (defn clear! []
   (reset! session base-session))
 
+(defonce ^:private save-timer (atom nil))
+
 (defn- save-session!
-  "Stores session to localStorage."
+  "Stores session to localStorage, throttled to avoid excessive writes."
   [session]
-  (let [data (->> (clara/query session model/persistent-facts)
-                  (map (fn [{:keys [?e ?a ?v]}]
-                         [?e ?a ?v]))
-                  pr-str)]
-    (.setItem js/localStorage "session" data)))
+  (when-let [timer @save-timer]
+    (js/clearTimeout timer))
+  (reset! save-timer
+          (js/setTimeout
+           (fn []
+             (let [data (->> (clara/query session model/persistent-facts)
+                             (map (fn [{:keys [?e ?a ?v]}]
+                                    [?e ?a ?v]))
+                             pr-str)]
+               (.setItem js/localStorage "session" data)))
+           1000)))
 
 (r/reg-fx
  :session

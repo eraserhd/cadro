@@ -23,10 +23,10 @@
   [?fact <- eav/EAV (= ?e e) (= ?a a) (= ?v v)])
 
 (defn upsert
-  "Insert triple, retracting any pre-existing values for it."
+  "Insert triple, retracting any pre-existing values for it.
+   Note: Caller should fire-rules before first upsert and after all upserts."
   [session e a v]
-  (let [session        (clara/fire-rules session)
-        existing-facts (map :?fact (clara/query session fact-values :?e e :?a a))]
+  (let [existing-facts (map :?fact (clara/query session fact-values :?e e :?a a))]
     (if (and (= 1 (count existing-facts)) (= v (:?v (first existing-facts))))
       session
       (as-> session $

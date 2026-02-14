@@ -26,7 +26,7 @@
                                            (apply str))
                                       "\n"))]
                (success data)))
-           500))))
+           50))))
 
 (def ^:private bt-impl
   (if (= "web" (.getPlatform Capacitor))
@@ -101,8 +101,14 @@
  ::data-received
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id data]]
-   (js/console.info "bluetooth:" (str device-id) "data received:\n" (hex-dump data))
-   {:session (model/add-received-data session device-id data)}))
+   ;; Disable expensive hex-dump logging for performance
+   ;; (js/console.info "bluetooth:" (str device-id) "data received:\n" (hex-dump data))
+   (let [start (.now js/performance)
+         result {:session (model/add-received-data session device-id data)}
+         duration (- (.now js/performance) start)]
+     (when (> duration 40)
+       (js/console.warn "Slow packet processing:" (.toFixed duration 2) "ms"))
+     result)))
 
 (rf/reg-event-fx
  ::subscription-error-received
