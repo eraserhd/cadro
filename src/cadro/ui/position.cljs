@@ -10,6 +10,11 @@
   (when value
     (.toFixed value 3)))
 
+(defn axis-hiccup [axis-name value]
+  [:span.axis
+   [:span.name axis-name]
+   [:span.value (format-coordinate value)]])
+
 (defn position-hiccup
   "Renders a position (map of axis-id to value) as hiccup markup.
    Takes a position map and spans (collection of axis info)."
@@ -20,7 +25,4 @@
         axis-name->value (set/rename-keys position axes-names)]
     (into [:span.distance]
           (->> (sort (keys axis-name->value))
-               (map (fn [axis-name]
-                      [:span.axis
-                       [:span.name axis-name]
-                       [:span.value (format-coordinate (get axis-name->value axis-name))]]))))))
+               (map #(axis-hiccup % (get axis-name->value %)))))))
