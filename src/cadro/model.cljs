@@ -156,28 +156,18 @@
 
 ;; ------
 
-(clara/defrule root-fixture-with-transform
-  [eav/EAV (= e ?root) (= a ::transforms)]
-  (not [eav/EAV (= a ::transforms) (= v ?root)])
-  [eav/EAV (= e ?root) (= a ::transform) (= v ?tr)]
+;;FIXME: Does not handled nested fixture transforms.
+(clara/defrule local-transform-on-points
+  [eav/EAV (= e ?fixture) (= a ::transforms) (= v ?p)]
+  [eav/EAV (= e ?fixture) (= a ::transform)  (= v ?tr)]
   =>
-  (clara/insert! (derived ?root ::local-transform ?tr)))
+  (clara/insert! (derived ?p ::local-transform ?tr)))
 
-(clara/defrule root-fixture-without-transform
-  [eav/EAV (= e ?root) (= a ::transforms)]
-  (not [eav/EAV (= a ::transforms) (= v ?root)])
-  (not [eav/EAV (= e ?root) (= a ::transform)])
+(clara/defrule local-transform-on-points2
+  [eav/EAV (= e ?fixture) (= a ::transforms) (= v ?p)]
+  [:not [eav/EAV (= e ?fixture) (= a ::transform)]]
   =>
-  (clara/insert! (derived ?root ::local-transform {})))
-
-(clara/defrule subfixture-transform-no-child-transform
-  [eav/EAV (= e ?parent) (= a ::local-transform) (= v ?parent-tr)]
-  [eav/EAV (= e ?parent) (= a ::transforms) (= v ?child)]
-  (not [eav/EAV (= e ?child) (= a ::transform)])
-  =>
-  (clara/insert! (derived ?child ::local-transform ?parent-tr)))
-
-;;FIXME: combine-case
+  (clara/insert! (derived ?p ::local-transform {})))
 
 (clara/defrule transformed-axis-count
   [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
@@ -335,45 +325,23 @@
 (clara/defquery fixture-scales [?fixture-id]
   [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
 
-;; Offset of a point with coordinates from current scale position in N-dimensional space.
+;; Offset of a point with coordinates from current reference point
 (s/def ::distance ::tr/locus)
 
 (s/def ::transformed-axes ::tr/locus)
 
-(defrecord Axis [displays-as raw-count])
-(defrecord AxisMap [axis-map])
-
-(clara/defrule global-axes
-  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
-  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
+(clara/defrule foo
+  [eav/EAV (= e ?ref) (= a ::reference?)      (= v true)]
+  [eav/EAV (= e ?ref) (= a ::coordinates)     (= v ?ref-coordinates)]
+  [eav/EAV (= e ?ref) (= a ::local-transform) (= v ?ref-local-transform)]
+  [eav/EAV (= e ?p)   (= a ::coordinates)     (= v ?p-coordinates)]
+  [eav/EAV (= e ?p)   (= a ::local-transform) (= v ?p-local-transform)]
   =>
-  (clara/insert! (->Axis ?displays-as ?raw-count)))
-
-(clara/defrule global-axis-map-rule
-  [?all-axes <- (acc/all) :from [Axis]]
-  =>
-  (clara/insert! (->AxisMap (into {}
-                                  (map (juxt :displays-as :raw-count))
-                                  ?all-axes))))
-
-(clara/defrule root-fixture-distances
-  [AxisMap (= axis-map ?axis-map)]
-  [eav/EAV (= e ?root) (= a ::transforms)]
-  (not [eav/EAV (= a ::transforms) (= v ?root)])
-  =>
-  (clara/insert! (derived ?root ::transformed-axes ?axis-map)))
-
-(clara/defrule derived-distances
-  [eav/EAV (= e ?node) (= a ::transformed-axes) (= v ?axis-map)]
-  [eav/EAV (= e ?node) (= a ::transforms) (= v ?transformed)]
-  =>
-  (clara/insert! (derived ?transformed ::transformed-axes ?axis-map)))
-
-(clara/defrule distance
-  [eav/EAV (= e ?p) (= a ::transformed-axes) (= v ?axis-map)]
-  [eav/EAV (= e ?p) (= a ::coordinates)      (= v ?coords)]
-  =>
-  (clara/insert! (derived ?p ::distance (tr/- ?coords ?axis-map))))
+  (clara/insert!
+   (derived ?p ::distance (tr/- ?p-coordinates
+                                (-> ?ref-coordinates
+                                    (tr/transform (tr/inverse ?ref-local-transform))
+                                    (tr/transform ?p-local-transform))))))
 
 (clara/defquery store-scale-to-reference-q
   [?scale-id]

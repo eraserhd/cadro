@@ -223,3 +223,13 @@
     (model/axes) => [{::model/id (t/id :x)
                       ::model/displays-as "X"
                       ::model/transformed-count (- (/ 428 2) 42)}]))
+
+(deftest t-computed-distances
+  (t/scenario "without fixture transformation"
+    [(t/id :m)   ::model/transforms  (t/id :ref)]
+    [(t/id :m)   ::model/transforms  (t/id :p1)]
+    [(t/id :ref) ::model/coordinates {"X" 42}]
+    [(t/id :ref) ::model/reference?  true]
+    [(t/id :p1)  ::model/coordinates {"X" 179}]
+    (t/has-datoms [(t/id :ref) ::model/distance {"X" 0}]
+                  [(t/id :p1)  ::model/distance {"X" (- 179 42)}])))

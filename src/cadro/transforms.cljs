@@ -17,6 +17,14 @@
 
 (def - (partial pairwise clojure.core/- 0))
 
+(defn inverse [m]
+  (if-let [scale (::scale m)]
+    {::scale (reduce-kv (fn [m k v]
+                          (assoc m k (/ v)))
+                        {}
+                        scale)}
+    {}))
+
 (defn transform [p m]
   (if-let [scale (::scale m)]
     (pairwise * 1.0 p scale)
