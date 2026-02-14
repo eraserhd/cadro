@@ -4,8 +4,7 @@
    [clojure.set :as set]))
 
 (defn format-coordinate
-  "Formats a coordinate value to 3 decimal places.
-   In the future, this can be made configurable."
+  "Formats a coordinate value to 3 decimal places."
   [value]
   (when value
     (.toFixed value 3)))
