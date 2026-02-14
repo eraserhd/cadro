@@ -232,4 +232,22 @@
     [(t/id :ref) ::model/reference?  true]
     [(t/id :p1)  ::model/coordinates {"X" 179}]
     (t/has-datoms [(t/id :ref) ::model/distance {"X" 0}]
-                  [(t/id :p1)  ::model/distance {"X" (- 179 42)}])))
+                  [(t/id :p1)  ::model/distance {"X" (- 179 42)}]))
+  (t/scenario "with fixture scaling, both in the same fixture"
+    [(t/id :m)   ::model/transforms  (t/id :ref)]
+    [(t/id :m)   ::model/transforms  (t/id :p1)]
+    [(t/id :m)   ::model/transform   {::tr/scale {"X" 0.5}}]
+    [(t/id :ref) ::model/coordinates {"X" 42}]
+    [(t/id :ref) ::model/reference?  true]
+    [(t/id :p1)  ::model/coordinates {"X" 179}]
+    (t/has-datoms [(t/id :ref) ::model/distance {"X" 0}]
+                  [(t/id :p1)  ::model/distance {"X" (- 179 42)}]))
+  (t/scenario "with fixture scaling, in different fixtures"
+    [(t/id :m1)  ::model/transforms  (t/id :ref)]
+    [(t/id :m1)  ::model/transform   {::tr/scale {"X" 0.5}}]
+    [(t/id :m2)  ::model/transforms  (t/id :p1)]
+    [(t/id :ref) ::model/coordinates {"X" 42}]
+    [(t/id :ref) ::model/reference?  true]
+    [(t/id :p1)  ::model/coordinates {"X" 179}]
+    (t/has-datoms [(t/id :ref) ::model/distance {"X" 0}]
+                  [(t/id :p1)  ::model/distance {"X" (- 179 (* 2 42))}])))
