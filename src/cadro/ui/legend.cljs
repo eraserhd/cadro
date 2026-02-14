@@ -3,6 +3,7 @@
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.edit-panel :as edit-panel]
+   [cadro.ui.format :as fmt]
    [clara.rules :as clara]
    [clojure.set :as set]
    [clojure.string :as str]
@@ -65,7 +66,7 @@
                (map (fn [axis-name]
                       [:span.axis
                        [:span.name axis-name]
-                       [:span.value (get axis-name->value axis-name)]]))))))
+                       [:span.value (fmt/format-coordinate (get axis-name->value axis-name))]]))))))
 
 (defn- legend-keys
   [transforms]
