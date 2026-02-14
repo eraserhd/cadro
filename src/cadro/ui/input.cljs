@@ -59,8 +59,10 @@
        (label {:id id
                :attr attr
                :label lbl}))
-     [:input {:id (control-name id attr)
-              :default-value (lens source-value)
-              :on-blur (fn [e]
-                         (let [value (lens source-value (.. e -target -value))]
-                           (rf/dispatch [::set-value id attr value])))}]]))
+     (let [props (dissoc props :label :id :attr :lens)]
+       [:input (merge {:id (control-name id attr)
+                       :default-value (lens source-value)
+                       :on-blur (fn [e]
+                                  (let [value (lens source-value (.. e -target -value))]
+                                    (rf/dispatch [::set-value id attr value])))}
+                      props)])]))
