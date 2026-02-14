@@ -9,7 +9,8 @@
    [clojure.spec.alpha :as s]
    [clojure.spec.test.alpha]
    [reagent.dom.client :as rdc]
-   [re-frame.core :as rf]))
+   [re-frame.core :as rf]
+   ["@capacitor-community/keep-awake" :refer [KeepAwake]]))
 
 (defonce root (rdc/create-root (js/document.getElementById "app")))
 
@@ -28,5 +29,8 @@
   (when ^boolean goog.DEBUG
     (clojure.spec.test.alpha/instrument)
     (s/check-asserts true))
+  (-> (.keepAwake KeepAwake)
+      (.then #(js/console.log "Screen will stay awake"))
+      (.catch #(js/console.error "Failed to keep screen awake:" %)))
   (rf/dispatch-sync [::initialize])
   (rdc/render root [cadro]))
