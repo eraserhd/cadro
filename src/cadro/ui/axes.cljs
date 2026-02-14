@@ -2,7 +2,7 @@
   (:require
    [cadro.model :as model]
    [cadro.session :as session]
-   [cadro.ui.format :as fmt]
+   [cadro.ui.position :as pos]
    [re-frame.core :as rf]
    ["@fortawesome/react-fontawesome" :as fa]
    ["@fortawesome/free-solid-svg-icons" :as faSolid]))
@@ -29,7 +29,7 @@
                      :as scale}]
                  [:div.axis
                   [:div.name displays-as]
-                  [:div.value (fmt/format-coordinate transformed-count)]
+                  [:div.value (pos/format-coordinate transformed-count)]
                   [:button.icon.store
                    {:on-click #(rf/dispatch [::store-clicked id])}
                    [:> fa/FontAwesomeIcon

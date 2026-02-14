@@ -3,7 +3,7 @@
    [cadro.model :as model]
    [cadro.ui.gestures :as gestures]
    [cadro.ui.edit-panel :as edit-panel]
-   [cadro.ui.format :as fmt]
+   [cadro.ui.position :as pos]
    [clara.rules :as clara]
    [clojure.set :as set]
    [clojure.string :as str]
@@ -55,19 +55,6 @@
    {:on-click #(rf/dispatch [::drop-pin-tapped])}
    drop-pin-icon])
 
-(defn- position-hiccup
-  [position spans]
-  (let [axes-names       (into {}
-                               (map (juxt ::model/id ::model/displays-as))
-                               spans)
-        axis-name->value (set/rename-keys position axes-names)]
-    (into [:span.distance]
-          (->> (sort (keys axis-name->value))
-               (map (fn [axis-name]
-                      [:span.axis
-                       [:span.name axis-name]
-                       [:span.value (fmt/format-coordinate (get axis-name->value axis-name))]]))))))
-
 (defn- legend-keys
   [transforms]
   (into [:ul]
@@ -90,7 +77,7 @@
                                             :fixedWidth true}]
                     [:div.name-and-distance
                      [:span.displays-as displays-as]
-                     (position-hiccup distance spans)]]]
+                     (pos/position-hiccup distance spans)]]]
                   [gestures/wrap {:on-press #(rf/dispatch [::legend-key-longpressed id])}
                    [:button.fixture {}
                     displays-as]])
