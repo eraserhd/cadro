@@ -208,14 +208,14 @@
           display: flex;
           flex-direction: column;
           gap: 3px;
-          --axis-scale: 1.75;
+          --axis-scale: 2.5;
         }
 
         .axes .axis {
            display: flex;
            gap: 3px;
            align-items: center;
-           font-size: 1.75rem;
+           font-size: calc(var(--axis-scale) * 1rem);
         }
 
         .axes button {
