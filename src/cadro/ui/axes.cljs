@@ -28,8 +28,7 @@
                             ::model/transformed-count],
                      :as scale}]
                  [:div.axis
-                  [:div.name displays-as]
-                  [:div.value (pos/format-coordinate transformed-count)]
+                  (pos/axis-hiccup displays-as transformed-count)
                   [:button.icon.store
                    {:on-click #(rf/dispatch [::store-clicked id])}
                    [:> fa/FontAwesomeIcon

@@ -16,7 +16,8 @@
 
 (defn position-hiccup
   "Renders a position (map of axis-id to value) as hiccup markup.
-   Takes a position map and spans (collection of axis info)."
+
+  Takes a position map and spans (collection of axis info)."
   [position spans]
   (let [axes-names       (into {}
                                (map (juxt ::model/id ::model/displays-as))

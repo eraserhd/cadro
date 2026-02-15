@@ -23,6 +23,7 @@
           --axis-name: rgb(var(--axis-name-rgb));
 
           --coordinate-width: 5rem;
+          --axis-scale: 1.0;
         }
 
         * {
@@ -190,7 +191,7 @@
           display: inline-block;
           text-align: right;
           padding-right: 0.5rem;
-          width: var(--coordinate-width);
+          width: calc(var(--coordinate-width) * var(--axis-scale));
         }
 
         .axes {
@@ -198,12 +199,14 @@
           display: flex;
           flex-direction: column;
           gap: 3px;
+          --axis-scale: 1.75;
         }
 
         .axes .axis {
            display: flex;
            gap: 3px;
            align-items: center;
+           font-size: 1.75rem;
         }
 
         .axes button {
@@ -233,9 +236,6 @@
 
         button.point .displays-as {
           font-size: 0.65rem;
-        }
-        button.point .distance {
-          font-size: 1.25rem;
         }
 
         button.point.non-reference::before {
