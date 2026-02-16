@@ -16,9 +16,9 @@
 
 (defn cadro []
   [:<>
+   [cadro.ui.axes/axes-panel]
    [cadro.ui.legend/legend]
-   [cadro.ui.edit-panel/edit-panel]
-   [cadro.ui.axes/axes-panel]])
+   [cadro.ui.edit-panel/edit-panel]])
 
 (rf/reg-event-fx
  ::initialize
