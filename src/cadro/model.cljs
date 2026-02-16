@@ -330,7 +330,7 @@
 
 (s/def ::transformed-axes ::tr/locus)
 
-(clara/defrule foo
+(clara/defrule distance-from-reference
   [eav/EAV (= e ?ref) (= a ::reference?)      (= v true)]
   [eav/EAV (= e ?ref) (= a ::coordinates)     (= v ?ref-coordinates)]
   [eav/EAV (= e ?ref) (= a ::local-transform) (= v ?ref-local-transform)]
