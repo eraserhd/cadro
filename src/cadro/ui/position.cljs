@@ -24,5 +24,5 @@
                                spans)
         axis-name->value (set/rename-keys position axes-names)]
     (into [:span.distance]
-          (->> (sort (keys axis-name->value))
+          (->> (sort (vals axes-names))
                (map #(axis-hiccup % (get axis-name->value %)))))))
