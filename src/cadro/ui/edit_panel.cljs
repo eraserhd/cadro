@@ -2,6 +2,7 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [cadro.model.scales :as scales]
    [cadro.transforms :as tr]
    [cadro.ui.input :as input]
@@ -41,14 +42,14 @@
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ fixture-id scale-id checked?]]
    (if checked?
-     {:session (clara/insert session (model/asserted fixture-id ::model/spans scale-id))}
-     {:session (clara/retract session (model/asserted fixture-id ::model/spans scale-id))})))
+     {:session (clara/insert session (facts/asserted fixture-id ::model/spans scale-id))}
+     {:session (clara/retract session (facts/asserted fixture-id ::model/spans scale-id))})))
 
 (defn scale-controls
   [fixture-id
    {scale-id ::model/id
     :keys [::model/displays-as
-           ::model/raw-count]}
+           ::scales/raw-count]}
    associated-scales]
   [:li.scale
    [:input {:id        (str scale-id)
@@ -88,9 +89,9 @@
          (into [:ul.scale-controllers]
                (map (fn [{controller-id ::model/id
                           :keys [::model/displays-as
-                                 ::model/hardware-address
-                                 ::model/connection-status
-                                 ::model/_controller]}]
+                                 ::scales/hardware-address
+                                 ::scales/connection-status
+                                 ::scales/_controller]}]
                       ^{:key (str controller-id)}
                       [:li.scale-controller
                        [:span.name displays-as] " " [:span.hardware-address "(" hardware-address ")"]

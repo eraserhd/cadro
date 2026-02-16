@@ -2,6 +2,7 @@
   (:require-macros
    [net.eraserhead.clara-eql.core :as clara-eql])
   (:require
+   [cadro.model.facts :as facts]
    [cadro.transforms :as tr]
    [clara.rules :as clara]
    [clara.rules.accumulators :as acc]
@@ -11,33 +12,6 @@
    [medley.core :as medley]
    [net.eraserhead.clara-eql.core :as clara-eql]
    [net.eraserhead.clara-eql.pull :as pull]))
-
-(defn asserted [e a v]
-  (assoc (eav/->EAV e a v) :persistent? true))
-
-(defn derived [e a v]
-  (eav/->EAV e a v))
-
-(clara/defquery fact-values
-  [?e ?a]
-  [?fact <- eav/EAV (= ?e e) (= ?a a) (= ?v v)])
-
-(defn upsert
-  "Insert triple, retracting any pre-existing values for it.
-   Note: Caller should fire-rules before first upsert and after all upserts."
-  [session e a v]
-  (let [existing-facts (map :?fact (clara/query session fact-values :?e e :?a a))]
-    (if (and (= 1 (count existing-facts)) (= v (:?v (first existing-facts))))
-      session
-      (as-> session $
-        (apply clara/retract $ existing-facts)
-        (clara/insert $ (asserted e a v))))))
-
-;;-------------------------------------------------------------------------------
-
-(clara/defquery persistent-facts []
-  [?fact <- eav/EAV (= e ?e) (= a ?a) (= v ?v)]
-  [:test (:persistent? ?fact)])
 
 ;;-------------------------------------------------------------------------------
 
@@ -55,14 +29,14 @@
   "Pull expressions will need access to ::id as an attribute."
   [(acc/exists) :from [eav/EAV (= e ?id)]]
   =>
-  (clara/insert! (derived ?id ::id ?id)))
+  (clara/insert! (facts/derived ?id ::id ?id)))
 
 ;;-------------------------------------------------------------------------------
 
 (def schema
-  [(derived ::id               :db/unique      :db.unique/identity)
-   (derived ::spans            :db/cardinality :db.cardinality/many)
-   (derived ::transforms       :db/cardinality :db.cardinality/many)])
+  [(facts/derived ::id               :db/unique      :db.unique/identity)
+   (facts/derived ::spans            :db/cardinality :db.cardinality/many)
+   (facts/derived ::transforms       :db/cardinality :db.cardinality/many)])
 
 ;; Display name is a common concept everywhere.
 (s/def ::displays-as string?)
@@ -106,7 +80,7 @@
     (clara/fire-rules $)
     (apply clara/retract $ (when-let [r (:?ref (first (clara/query $ reference-query)))]
                              [r]))
-    (clara/insert $ (asserted id ::reference? true))))
+    (clara/insert $ (facts/asserted id ::reference? true))))
 
 (defn reference [session]
   (:?id (first (clara/query session reference-query))))
@@ -148,7 +122,7 @@
   [eav/EAV (= e ?thing) (= a ::transforms) (= v ?object)]
   [eav/EAV (= e ?thing) (= a ::spans) (= v ?axis)]
   =>
-  (clara/insert! (derived ?object ::spans ?axis)))
+  (clara/insert! (facts/derived ?object ::spans ?axis)))
 
 ;; ------
 
@@ -157,13 +131,13 @@
   [eav/EAV (= e ?fixture) (= a ::transforms) (= v ?p)]
   [eav/EAV (= e ?fixture) (= a ::transform)  (= v ?tr)]
   =>
-  (clara/insert! (derived ?p ::local-transform ?tr)))
+  (clara/insert! (facts/derived ?p ::local-transform ?tr)))
 
 (clara/defrule local-transform-on-points2
   [eav/EAV (= e ?fixture) (= a ::transforms) (= v ?p)]
   [:not [eav/EAV (= e ?fixture) (= a ::transform)]]
   =>
-  (clara/insert! (derived ?p ::local-transform {})))
+  (clara/insert! (facts/derived ?p ::local-transform {})))
 
 (clara/defrule transformed-axis-count
   [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
@@ -176,7 +150,7 @@
                               (tr/transform ?tr)
                               (tr/- ?coord)
                               (get ?name))]
-    (clara/insert! (derived ?axis ::transformed-count transformed-count))))
+    (clara/insert! (facts/derived ?axis ::transformed-count transformed-count))))
 
 ;; -------
 
@@ -210,11 +184,11 @@
          (uuid? point-id)]}
   {:id      fixture-id
    :session (-> session
-                (clara/insert (asserted fixture-id ::displays-as "New Machine")
-                              (asserted fixture-id ::transforms  point-id)
-                              (asserted point-id ::displays-as "Origin")
-                              (asserted point-id ::display-order 0)
-                              (asserted point-id ::coordinates {}))
+                (clara/insert (facts/asserted fixture-id ::displays-as "New Machine")
+                              (facts/asserted fixture-id ::transforms  point-id)
+                              (facts/asserted point-id ::displays-as "Origin")
+                              (facts/asserted point-id ::display-order 0)
+                              (facts/asserted point-id ::coordinates {}))
                 (set-reference point-id))})
 
 
@@ -231,10 +205,10 @@
   [eav/EAV (= e ?p)   (= a ::local-transform) (= v ?p-local-transform)]
   =>
   (clara/insert!
-   (derived ?p ::distance (tr/- ?p-coordinates
-                                (-> ?ref-coordinates
-                                    (tr/transform (tr/inverse ?ref-local-transform))
-                                    (tr/transform ?p-local-transform))))))
+   (facts/derived ?p ::distance (tr/- ?p-coordinates
+                                      (-> ?ref-coordinates
+                                          (tr/transform (tr/inverse ?ref-local-transform))
+                                          (tr/transform ?p-local-transform))))))
 
 (clara/defquery store-scale-to-reference-q
   [?scale-id]
@@ -253,7 +227,7 @@
         (first (clara/query session store-scale-to-reference-q :?scale-id scale-id))
         tr-count    (get (tr/transform {?displays-as ?raw-count} ?local-tr) ?displays-as)
         coordinates (assoc ?coordinates ?displays-as tr-count)]
-    (upsert session ?ref-id ::coordinates coordinates)))
+    (facts/upsert session ?ref-id ::coordinates coordinates)))
 
 (defrecord ChildDisplayOrder [fixture-id display-order])
 
@@ -283,8 +257,8 @@
                                            results)
         coordinates                  (tr/transform global-coordinates ?ref-tr)]
     (-> session
-        (clara/insert-all [(asserted ?fixture-id ::transforms new-pin-id)
-                           (asserted new-pin-id ::displays-as "A")
-                           (asserted new-pin-id ::display-order (inc ?max-display-order))
-                           (asserted new-pin-id ::coordinates coordinates)])
+        (clara/insert-all [(facts/asserted ?fixture-id ::transforms new-pin-id)
+                           (facts/asserted new-pin-id ::displays-as "A")
+                           (facts/asserted new-pin-id ::display-order (inc ?max-display-order))
+                           (facts/asserted new-pin-id ::coordinates coordinates)])
         (set-reference new-pin-id))))

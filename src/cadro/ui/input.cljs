@@ -1,6 +1,7 @@
 (ns cadro.ui.input
   (:require
    [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [clara.rules :as clara]
    [net.eraserhead.clara-eql.pull :as pull]
    [clojure.spec.alpha :as s]
@@ -19,7 +20,7 @@
  ::set-value
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ id attr value]]
-   {:session (model/upsert session id attr value)}))
+   {:session (facts/upsert session id attr value)}))
 
 (s/fdef control-name
   :args (s/cat :id uuid? :attr keyword?))

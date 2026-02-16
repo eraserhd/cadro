@@ -6,7 +6,7 @@
   (cond
    (vector? expr)
    (let [[e a v] expr]
-     `(clara.rules/insert (cadro.model/asserted ~e ~a ~v)))
+     `(clara.rules/insert (cadro.model.facts/asserted ~e ~a ~v)))
   
    :else
    `(-> clara.rules/fire-rules

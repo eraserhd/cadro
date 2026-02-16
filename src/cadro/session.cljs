@@ -3,6 +3,7 @@
    [clara.rules :as clara])
   (:require
    [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [cadro.model.reverse]
    [cadro.model.scales :as scales]
    [clara.rules :as clara]
@@ -12,6 +13,7 @@
    [re-frame.core :as r]))
 
 (clara/defsession ^:private empty-session
+  'cadro.model.facts
   'cadro.model
   'cadro.model.scales
   'cadro.model.reverse
@@ -28,7 +30,7 @@
                                      (edn/read-string))]
                      (-> base-session
                          (clara/insert-all (map (fn [[e a v]]
-                                                  (model/asserted e a v))
+                                                  (facts/asserted e a v))
                                                 ls-tuples))
                          (clara/fire-rules)))))
 
@@ -45,7 +47,7 @@
   (reset! save-timer
           (js/setTimeout
            (fn []
-             (let [data (->> (clara/query session model/persistent-facts)
+             (let [data (->> (clara/query session facts/persistent-facts)
                              (map (fn [{:keys [?e ?a ?v]}]
                                     [?e ?a ?v]))
                              pr-str)]

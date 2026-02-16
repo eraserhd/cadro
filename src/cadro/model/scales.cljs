@@ -3,7 +3,7 @@
    [net.eraserhead.clara-eql.core :as clara-eql]
    [clara.rules :as clara])
   (:require
-   [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [clara.rules :as clara]
    [clara-eav.eav :as eav]
    [clojure.spec.alpha :as s]
@@ -12,9 +12,9 @@
    [net.eraserhead.clara-eql.pull :as pull]))
 
 (def schema
-  [(eav/->EAV ::hardware-address :db/unique      :db.unique/identity)
+  [(facts/derived ::hardware-address :db/unique      :db.unique/identity)
    ;; Hrmm, clara-eql can't figure this out?
-   (eav/->EAV ::_controller      :db/cardinality :db.cardinality/many)])
+   (facts/derived ::_controller      :db/cardinality :db.cardinality/many)])
 
 ;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
 (s/def ::controller (s/keys :req [:cadro.model/id
@@ -35,7 +35,7 @@
                              :connected})
 
 (defn set-connection-status [session controller-id status]
-  (model/upsert session controller-id ::connection-status status))
+  (facts/upsert session controller-id ::connection-status status))
 
 ;; Unprocessed, received data
 (s/def ::receive-buffer string?)
@@ -56,9 +56,9 @@
                     id                               (or ?id (random-uuid))
                     connection-status                (or ?connection-status :disconnected)]
                 (-> session
-                    (model/upsert id :cadro.model/displays-as displays-as)
-                    (model/upsert id ::hardware-address hardware-address)
-                    (model/upsert id ::connection-status connection-status))))
+                    (facts/upsert id :cadro.model/displays-as displays-as)
+                    (facts/upsert id ::hardware-address hardware-address)
+                    (facts/upsert id ::connection-status connection-status))))
             session
             controller-list)))
 
@@ -68,12 +68,12 @@
 
 (defn upsert-raw-count [session controller-id scale-name value]
   (if-let [id (:?scale-id (first (clara/query session scale-id :?controller-id controller-id :?scale-name scale-name)))]
-    (model/upsert session id ::raw-count value)
+    (facts/upsert session id ::raw-count value)
     (let [id (random-uuid)]
       (-> session
-          (model/upsert id :cadro.model/displays-as scale-name)
-          (model/upsert id ::raw-count value)
-          (model/upsert id ::controller controller-id)))))
+          (facts/upsert id :cadro.model/displays-as scale-name)
+          (facts/upsert id ::raw-count value)
+          (facts/upsert id ::controller controller-id)))))
 
 (defn add-received-data [session controller-ref data]
   (let [controller-id                 (pull/entid session controller-ref)
@@ -91,7 +91,7 @@
                                           [to-process new-scale-values]))]
     (reduce (fn [session [scale-name value]]
               (upsert-raw-count session controller-id scale-name value))
-            (model/upsert session controller-id ::receive-buffer to-process)
+            (facts/upsert session controller-id ::receive-buffer to-process)
             new-scale-values)))
 
 (clara-eql/defrule scales-rule
@@ -119,4 +119,4 @@
                                                  (sort-by :cadro.model/displays-as scales)))))))
 
 (clara/defquery fixture-scales [?fixture-id]
-  [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
+  [eav/EAV (= e ?fixture-id) (= a :cadro.model/spans) (= v ?scale-id)])

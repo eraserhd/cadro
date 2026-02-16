@@ -2,6 +2,7 @@
   (:require
    [cadro.bluetooth :refer [bt-set bt-status]]
    [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [cadro.session :as session]
    [clara.rules :as clara]
    [clojure.pprint :refer [pprint]]
@@ -34,4 +35,4 @@
   (pull/pull (session) selector eid))
 
 (defn upsert [e a v]
-  (swap! session/session model/upsert e a v))
+  (swap! session/session facts/upsert e a v))
