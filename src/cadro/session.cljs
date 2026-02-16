@@ -10,7 +10,10 @@
    [reagent.ratom]
    [re-frame.core :as r]))
 
-(clara/defsession ^:private empty-session 'cadro.model 'cadro.model.reverse 'net.eraserhead.clara-eql.pull)
+(clara/defsession ^:private empty-session
+  'cadro.model
+  'cadro.model.reverse
+  'net.eraserhead.clara-eql.pull)
 
 (def base-session (-> empty-session
                       (clara/insert-all model/schema)
