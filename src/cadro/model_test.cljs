@@ -193,7 +193,8 @@
                   [(t/id :m) ::model/transforms (t/id :pin)]
                   [(t/id :pin) ::model/displays-as "A"]
                   [(t/id :pin) ::model/display-order 1]
-                  [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}])))
+                  [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}]
+                  [(t/id :pin) ::model/reference? true])))
 
 (deftest t-axes-display
   (t/scenario "with no scale factor"

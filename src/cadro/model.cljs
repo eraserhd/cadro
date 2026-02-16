@@ -386,9 +386,9 @@
                                            (map (fn [{:keys [?displays-as ?raw-count]}]
                                                   [?displays-as ?raw-count]))
                                            results)]
-    (clara/insert-all
-     session
-     [(asserted ?fixture-id ::transforms new-pin-id)
-      (asserted new-pin-id ::displays-as "A")
-      (asserted new-pin-id ::display-order (inc ?max-display-order))
-      (asserted new-pin-id ::coordinates coordinates)])))
+    (-> session
+        (clara/insert-all [(asserted ?fixture-id ::transforms new-pin-id)
+                           (asserted new-pin-id ::displays-as "A")
+                           (asserted new-pin-id ::display-order (inc ?max-display-order))
+                           (asserted new-pin-id ::coordinates coordinates)])
+        (set-reference new-pin-id))))
