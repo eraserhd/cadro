@@ -371,21 +371,24 @@
   (clara/insert! (->ChildDisplayOrder ?parent ?display-order)))
 
 (clara/defquery drop-pin-q []
-  [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
-  [eav/EAV (= e ?ref-id) (= a ::spans) (= v ?scale-id)]
-  [eav/EAV (= e ?fixture-id) (= a ::transforms) (= v ?ref-id)]
-  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
-  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
+  [eav/EAV (= e ?ref-id)     (= a ::reference?)      (= v true)]
+  [eav/EAV (= e ?ref-id)     (= a ::spans)           (= v ?scale-id)]
+  [eav/EAV (= e ?ref-id)     (= a ::local-transform) (= v ?ref-tr)]
+  [eav/EAV (= e ?fixture-id) (= a ::transforms)      (= v ?ref-id)]
+  [eav/EAV (= e ?scale-id)   (= a ::displays-as)     (= v ?displays-as)]
+  [eav/EAV (= e ?scale-id)   (= a ::raw-count)       (= v ?raw-count)]
   [?max-display-order <- (acc/max :display-order) :from [ChildDisplayOrder (= fixture-id ?fixture-id)]])
 
 (defn drop-pin [session new-pin-id]
   (let [results                      (clara/query session drop-pin-q)
-        {:keys [?fixture-id
+        {:keys [?ref-tr
+                ?fixture-id
                 ?max-display-order]} (first results)
-        coordinates                  (into {}
+        global-coordinates           (into {}
                                            (map (fn [{:keys [?displays-as ?raw-count]}]
                                                   [?displays-as ?raw-count]))
-                                           results)]
+                                           results)
+        coordinates                  (tr/transform global-coordinates ?ref-tr)]
     (-> session
         (clara/insert-all [(asserted ?fixture-id ::transforms new-pin-id)
                            (asserted new-pin-id ::displays-as "A")

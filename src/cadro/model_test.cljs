@@ -184,6 +184,7 @@
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/spans (t/id :y)]
     [(t/id :m) ::model/transforms (t/id :p)]
+    [(t/id :m) ::model/transform {::tr/scale {"X" 0.30, "Y" 0.20}}]
     [(t/id :p) ::model/display-order 0]
     [(t/id :p) ::model/coordinates {"X" 78, "Y" 96}]
     [(t/id :p) ::model/reference? true]
@@ -193,7 +194,7 @@
                   [(t/id :m) ::model/transforms (t/id :pin)]
                   [(t/id :pin) ::model/displays-as "A"]
                   [(t/id :pin) ::model/display-order 1]
-                  [(t/id :pin) ::model/coordinates {"X" 42, "Y" 111}]
+                  [(t/id :pin) ::model/coordinates {"X" (* 42 0.30), "Y" (* 111 0.2)}]
                   [(t/id :pin) ::model/reference? true])))
 
 (deftest t-axes-display
