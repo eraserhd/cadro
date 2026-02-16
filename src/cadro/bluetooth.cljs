@@ -1,6 +1,7 @@
 (ns cadro.bluetooth
   (:require
    [cadro.model :as model]
+   [cadro.model.scales :as scales]
    [clara.rules :as clara]
    [cadro.session :as session]
    [re-frame.core :as rf]
@@ -41,7 +42,7 @@
  ::device-list-arrived
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-list]]
-   {:session  (model/insert-controllers session device-list)}))
+   {:session  (scales/insert-controllers session device-list)}))
 
 (rf/reg-fx
  ::fetch-device-list
@@ -51,7 +52,7 @@
             (let [device-list (into []
                                     (map (fn [device]
                                            {::model/displays-as       (.-name device)
-                                            ::model/hardware-address (.-address device)}))
+                                            ::scales/hardware-address (.-address device)}))
                                     devices)]
               (rf/dispatch [::device-list-arrived device-list])))
           (fn [error]
@@ -62,14 +63,14 @@
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id]]
    (js/console.info "bluetooth:" (str device-id) "connect requested")
-   {:session (model/set-connection-status session device-id :connecting)}))
+   {:session (scales/set-connection-status session device-id :connecting)}))
 
 (rf/reg-event-fx
  ::connect-completed
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-id]]
    (js/console.info "bluetooth:" (str device-id) "connect completed")
-   {:session (model/set-connection-status session device-id :connected)}))
+   {:session (scales/set-connection-status session device-id :connected)}))
 
 (rf/reg-event-fx
  ::connect-failed
@@ -77,7 +78,7 @@
  (fn [{:keys [session]} [_ device-id error]]
    (js/console.info "bluetooth:" (str device-id) "connect failed:" error)
    (js/console.error "bluetooth:" (str device-id) "connect failed:" error)
-   {:session (model/set-connection-status session device-id :disconnected)}))
+   {:session (scales/set-connection-status session device-id :disconnected)}))
 
 (defn hex-dump [s]
   (->> (.encode (js/TextEncoder.) s)
@@ -104,7 +105,7 @@
    ;; Disable expensive hex-dump logging for performance
    ;; (js/console.info "bluetooth:" (str device-id) "data received:\n" (hex-dump data))
    (let [start (.now js/performance)
-         result {:session (model/add-received-data session device-id data)}
+         result {:session (scales/add-received-data session device-id data)}
          duration (- (.now js/performance) start)]
      (when (> duration 40)
        (js/console.warn "Slow packet processing:" (.toFixed duration 2) "ms"))
@@ -123,7 +124,7 @@
  ::connect
  (fn connect* [device-id]
    (rf/dispatch [::connect-requested device-id])
-   (let [device-address (->> (clara/query @cadro.session/session model/controllers)
+   (let [device-address (->> (clara/query @cadro.session/session scales/controllers)
                              (filter (fn [{:keys [?id]}]
                                        (= ?id device-id)))
                              (map :?hardware-address)

@@ -3,6 +3,7 @@
    [cadro.test-macros :as t])
   (:require
    [cadro.model :as model]
+   [cadro.model.scales :as scales]
    [cadro.session :as session]
    [cadro.test :as t]
    [cadro.transforms :as tr]
@@ -39,16 +40,16 @@
     (t/has-error (model/->InvariantError "reference point does not have coordinates" {:id (t/id :id)}))))
 
 (defn- controllers [session]
-  (->> (clara/query session model/controllers)
+  (->> (clara/query session scales/controllers)
        (sort-by :?hardware-address)
        (map #(dissoc % :?id))))
 
 (deftest t-insert-controllers
   (t/scenario "inserting controllers"
-    (model/insert-controllers [{::model/displays-as      "Nexus 7"
-                                ::model/hardware-address "00:00:01"}
-                               {::model/displays-as      "HC-06"
-                                ::model/hardware-address "02:03:04"}])
+    (scales/insert-controllers [{::model/displays-as      "Nexus 7"
+                                 ::scales/hardware-address "00:00:01"}
+                                {::model/displays-as      "HC-06"
+                                 ::scales/hardware-address "02:03:04"}])
     (t/has-no-errors)
     controllers => [{:?displays-as       "Nexus 7"
                      :?hardware-address  "00:00:01"
@@ -56,8 +57,8 @@
                     {:?displays-as       "HC-06"
                      :?hardware-address  "02:03:04"
                      :?connection-status :disconnected}]
-    (model/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
-                                ::model/hardware-address "00:00:01"}])
+    (scales/insert-controllers [{::model/displays-as      "Nexus 7 Renamed"
+                                 ::scales/hardware-address "00:00:01"}])
     (t/has-no-errors)
     controllers => [{:?displays-as       "Nexus 7 Renamed"
                      :?hardware-address  "00:00:01"
@@ -68,43 +69,43 @@
 
 (defn- after-receives
   [& receives]
-  (let [controller-id [::model/hardware-address "00:00:01"]
+  (let [controller-id [::scales/hardware-address "00:00:01"]
         session       (-> session/base-session
-                          (model/insert-controllers [{::model/displays-as "HC-06"
-                                                      ::model/hardware-address "00:00:01"}])
+                          (scales/insert-controllers [{::model/displays-as "HC-06"
+                                                       ::scales/hardware-address "00:00:01"}])
                           (clara/fire-rules))
         session       (reduce (fn [session data]
                                 (-> session
-                                    (model/add-received-data controller-id data)
+                                    (scales/add-received-data controller-id data)
                                     (clara/fire-rules)))
                               session
                               receives)
         eav-map       (:?eav-map (first (clara/query session pull/eav-map)))]
     (->> eav-map
          (keep (fn [[k v]]
-                 (when (::model/raw-count v)
+                 (when (::scales/raw-count v)
                    k)))
          (map (fn [scale-id]
                 (pull/pull session
                            [::model/id
                             ::model/displays-as
-                            ::model/raw-count
-                            {::model/controller
+                            ::scales/raw-count
+                            {::scales/controller
                              [::model/id]}]
                            scale-id))))))
 
 (deftest t-add-received-data
   (let [scales (after-receives "X150;y250;Z350;T72;\0")]
     (is (= #{{::model/displays-as "X"
-              ::model/raw-count 150}
+              ::scales/raw-count 150}
              {::model/displays-as "Y"
-              ::model/raw-count 250}
+              ::scales/raw-count 250}
              {::model/displays-as "Z"
-              ::model/raw-count 350}
+              ::scales/raw-count 350}
              {::model/displays-as "T"
-              ::model/raw-count 72}}
+              ::scales/raw-count 72}}
            (->> scales
-                (map #(select-keys % [::model/displays-as ::model/raw-count]))
+                (map #(select-keys % [::model/displays-as ::scales/raw-count]))
                 (into #{})))
         "It creates scales and stores raw values on receipt.")
     (is (every? (comp uuid? ::model/id) scales)
@@ -113,18 +114,18 @@
         "The new uuids are unique."))
   (let [scales (after-receives "X150;\0" "X152;\0")]
     (is (= #{{::model/displays-as "X"
-              ::model/raw-count 152}}
+              ::scales/raw-count 152}}
            (->> scales
-                (map #(select-keys % [::model/displays-as ::model/raw-count]))
+                (map #(select-keys % [::model/displays-as ::scales/raw-count]))
                 (into #{})))
         "It updates existing scale values."))
   (let [scales (after-receives "x150;y152;\u0000vTouchDRO_SIEG_1.3.1;x155;y157;\0")]
     (is (= #{{::model/displays-as "X"
-              ::model/raw-count 155}
+              ::scales/raw-count 155}
              {::model/displays-as "Y"
-              ::model/raw-count 157}}
+              ::scales/raw-count 157}}
            (->> scales
-                (map #(select-keys % [::model/displays-as ::model/raw-count]))
+                (map #(select-keys % [::model/displays-as ::scales/raw-count]))
                 (into #{})))
         "It can parse and ignore version strings."))
   (testing "partial receives"
@@ -134,15 +135,15 @@
             b      (subs full-data i)
             scales (after-receives a b)]
         (is (= #{{::model/displays-as "X"
-                  ::model/raw-count 150}
+                  ::scales/raw-count 150}
                  {::model/displays-as "Y"
-                  ::model/raw-count 250}
+                  ::scales/raw-count 250}
                  {::model/displays-as "Z"
-                  ::model/raw-count 350}
+                  ::scales/raw-count 350}
                  {::model/displays-as "T"
-                  ::model/raw-count 72}}
+                  ::scales/raw-count 72}}
                (->> scales
-                    (map #(select-keys % [::model/displays-as ::model/raw-count]))
+                    (map #(select-keys % [::model/displays-as ::scales/raw-count]))
                     (into #{})))
             (str "It correctly processes '" a "' then '" b "'."))))))
 
@@ -162,7 +163,7 @@
 (deftest t-store-scale-to-reference
   (t/scenario "storing scale to reference"
     [(t/id :x) ::model/displays-as "X"]
-    [(t/id :x) ::model/raw-count 42]
+    [(t/id :x) ::scales/raw-count 42]
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/transform {::tr/scale {"X" 0.5}}]
     [(t/id :m) ::model/transforms (t/id :p)]
@@ -178,9 +179,9 @@
 (deftest t-drop-pin
   (t/scenario "dropping a pin"
     [(t/id :x) ::model/displays-as "X"]
-    [(t/id :x) ::model/raw-count 42]
+    [(t/id :x) ::scales/raw-count 42]
     [(t/id :y) ::model/displays-as "Y"]
-    [(t/id :y) ::model/raw-count 111]
+    [(t/id :y) ::scales/raw-count 111]
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/spans (t/id :y)]
     [(t/id :m) ::model/transforms (t/id :p)]
@@ -200,7 +201,7 @@
 (deftest t-axes-display
   (t/scenario "with no scale factor"
     [(t/id :x) ::model/displays-as "X"]
-    [(t/id :x) ::model/raw-count 428]
+    [(t/id :x) ::scales/raw-count 428]
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/displays-as "Mill"]
     [(t/id :m) ::model/transforms (t/id :p)]
@@ -213,7 +214,7 @@
                       ::model/transformed-count (- 428 42)}])
   (t/scenario "when a transform with a scale factor of 1/2 is present"
     [(t/id :x) ::model/displays-as "X"]
-    [(t/id :x) ::model/raw-count 428]
+    [(t/id :x) ::scales/raw-count 428]
     [(t/id :m) ::model/spans (t/id :x)]
     [(t/id :m) ::model/displays-as "Mill"]
     [(t/id :m) ::model/transform {::tr/scale {"X" 0.5}}]

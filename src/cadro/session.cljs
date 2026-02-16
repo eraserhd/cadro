@@ -4,6 +4,7 @@
   (:require
    [cadro.model :as model]
    [cadro.model.reverse]
+   [cadro.model.scales :as scales]
    [clara.rules :as clara]
    [clojure.edn :as edn]
    [net.eraserhead.clara-eql.pull]
@@ -12,11 +13,13 @@
 
 (clara/defsession ^:private empty-session
   'cadro.model
+  'cadro.model.scales
   'cadro.model.reverse
   'net.eraserhead.clara-eql.pull)
 
 (def base-session (-> empty-session
                       (clara/insert-all model/schema)
+                      (clara/insert-all scales/schema)
                       (clara/fire-rules)))
 
 (defonce session (reagent.ratom/atom

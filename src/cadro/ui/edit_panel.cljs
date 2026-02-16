@@ -2,6 +2,7 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model :as model]
+   [cadro.model.scales :as scales]
    [cadro.transforms :as tr]
    [cadro.ui.input :as input]
    [cadro.ui.panel :as panel]
@@ -15,13 +16,13 @@
   ::scales
   :<- [:session]
   (fn [session _]
-    (model/scales session)))
+    (scales/scales session)))
 
 (rf/reg-sub
   ::fixture-scales
   :<- [:session]
   (fn [session [_ fixture-id]]
-    (->> (clara/query session model/fixture-scales :?fixture-id fixture-id)
+    (->> (clara/query session scales/fixture-scales :?fixture-id fixture-id)
          (map :?scale-id)
          (into #{}))))
 

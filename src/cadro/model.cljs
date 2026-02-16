@@ -62,11 +62,7 @@
 (def schema
   [(derived ::id               :db/unique      :db.unique/identity)
    (derived ::spans            :db/cardinality :db.cardinality/many)
-   (derived ::transforms       :db/cardinality :db.cardinality/many)
-   (derived ::hardware-address :db/unique      :db.unique/identity)
-
-   ;; Hrmm, clara-eql can't figure this out?
-   (derived ::_controller      :db/cardinality :db.cardinality/many)])
+   (derived ::transforms       :db/cardinality :db.cardinality/many)])
 
 ;; Display name is a common concept everywhere.
 (s/def ::displays-as string?)
@@ -173,7 +169,7 @@
   [eav/EAV (= e ?ref) (= a ::reference?) (= v true)]
   [eav/EAV (= e ?ref) (= a ::local-transform) (= v ?tr)]
   [eav/EAV (= e ?ref) (= a ::coordinates) (= v ?coord)]
-  [eav/EAV (= e ?axis) (= a ::raw-count) (= v ?count)]
+  [eav/EAV (= e ?axis) (= a :cadro.model.scales/raw-count) (= v ?count)]
   [eav/EAV (= e ?axis) (= a ::displays-as) (= v ?name)]
   =>
   (let [transformed-count (-> {?name ?count}
@@ -221,109 +217,6 @@
                               (asserted point-id ::coordinates {}))
                 (set-reference point-id))})
 
-;; A scale has a controller, which is what we connect to.  Multiple scales can share one.
-(s/def ::controller (s/keys :req [::id
-                                  ::displays-as
-                                  ::hardware-address
-                                  ::connection-status]
-                            :opt [::receive-buffer]))
-
-;; A untranslated reading, as from a scale.
-(s/def ::raw-count number?)
-
-;; Bluetooth, ethernet, or whatever address.
-(s/def ::hardware-address string?)
-
-;; Connection status for hardware
-(s/def ::connection-status #{:disconnected
-                             :connecting
-                             :connected})
-
-(defn set-connection-status [session controller-id status]
-  (upsert session controller-id ::connection-status status))
-
-;; Unprocessed, received data
-(s/def ::receive-buffer string?)
-
-(clara/defquery controllers []
-  [eav/EAV (= e ?id) (= a ::displays-as)       (= v ?displays-as)]
-  [eav/EAV (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
-  [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
-
-(defn insert-controllers
-  [session controller-list]
-  {:pre [(s/valid? (s/coll-of (s/keys :req [::displays-as ::hardware-address])) controller-list)]}
-  (let [existing-controllers (->> (clara/query session controllers)
-                                  (group-by :?hardware-address))]
-    (reduce (fn [session {:keys [::displays-as ::hardware-address]}]
-              (let [{:keys [?id ?connection-status]} (get-in existing-controllers [hardware-address 0])
-                    id                               (or ?id (random-uuid))
-                    connection-status                (or ?connection-status :disconnected)]
-                (-> session
-                    (upsert id ::displays-as displays-as)
-                    (upsert id ::hardware-address hardware-address)
-                    (upsert id ::connection-status connection-status))))
-            session
-            controller-list)))
-
-(clara/defquery scale-id [?controller-id ?scale-name]
-  [eav/EAV (= e ?scale-id) (= a ::controller) (= v ?controller-id)]
-  [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?scale-name)])
-
-(defn upsert-raw-count [session controller-id scale-name value]
-  (if-let [id (:?scale-id (first (clara/query session scale-id :?controller-id controller-id :?scale-name scale-name)))]
-    (upsert session id ::raw-count value)
-    (let [id (random-uuid)]
-      (-> session
-          (upsert id ::displays-as scale-name)
-          (upsert id ::raw-count value)
-          (upsert id ::controller controller-id)))))
-
-(defn add-received-data [session controller-ref data]
-  (let [controller-id                 (pull/entid session controller-ref)
-        to-process                    (-> (str (::receive-buffer (pull/pull session [::receive-buffer] controller-id))
-                                               data)
-                                          (str/replace #"[;\s\u0000]+" ";")
-                                          (str/replace #"^;+" ""))
-        [to-process new-scale-values] (loop [to-process       to-process
-                                             new-scale-values {}]
-                                        (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])([^;]*);(.*)" to-process)]
-                                          (let [axis (str/upper-case axis)]
-                                            (if (= "V" axis)
-                                              (recur left new-scale-values)
-                                              (recur left (assoc new-scale-values axis (* value-str 1.0)))))
-                                          [to-process new-scale-values]))]
-    (reduce (fn [session [scale-name value]]
-              (upsert-raw-count session controller-id scale-name value))
-            (upsert session controller-id ::receive-buffer to-process)
-            new-scale-values)))
-
-(clara-eql/defrule scales-rule
-  :query
-  [::id
-   ::displays-as
-   ::hardware-address
-   ::connection-status
-   {::_controller [::id
-                   ::displays-as
-                   ::raw-count]}]
-  :from ?controller
-  :where
-  [eav/EAV (= e ?controller) (= a ::hardware-address)])
-
-(clara/defquery scales-query []
-  [clara-eql/QueryResult (= query `scales-rule) (= result ?data)])
-
-(defn scales [session]
-  (->> (clara/query session scales-query)
-       (map :?data)
-       (sort-by ::hardware-address)
-       (map (fn [controller]
-              (update controller ::_controller (fn [scales]
-                                                 (sort-by ::displays-as scales)))))))
-
-(clara/defquery fixture-scales [?fixture-id]
-  [eav/EAV (= e ?fixture-id) (= a ::spans) (= v ?scale-id)])
 
 ;; Offset of a point with coordinates from current reference point
 (s/def ::distance ::tr/locus)
@@ -346,7 +239,7 @@
 (clara/defquery store-scale-to-reference-q
   [?scale-id]
   [eav/EAV (= e ?scale-id) (= a ::displays-as) (= v ?displays-as)]
-  [eav/EAV (= e ?scale-id) (= a ::raw-count) (= v ?raw-count)]
+  [eav/EAV (= e ?scale-id) (= a :cadro.model.scales/raw-count) (= v ?raw-count)]
   [eav/EAV (= e ?ref-id) (= a ::reference?) (= v true)]
   [eav/EAV (= e ?ref-id) (= a ::coordinates) (= v ?coordinates)]
   [eav/EAV (= e ?ref-id) (= a ::local-transform) (= v ?local-tr)])
@@ -376,7 +269,7 @@
   [eav/EAV (= e ?ref-id)     (= a ::local-transform) (= v ?ref-tr)]
   [eav/EAV (= e ?fixture-id) (= a ::transforms)      (= v ?ref-id)]
   [eav/EAV (= e ?scale-id)   (= a ::displays-as)     (= v ?displays-as)]
-  [eav/EAV (= e ?scale-id)   (= a ::raw-count)       (= v ?raw-count)]
+  [eav/EAV (= e ?scale-id)   (= a :cadro.model.scales/raw-count)       (= v ?raw-count)]
   [?max-display-order <- (acc/max :display-order) :from [ChildDisplayOrder (= fixture-id ?fixture-id)]])
 
 (defn drop-pin [session new-pin-id]
