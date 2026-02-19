@@ -37,6 +37,28 @@
           session
           (methods start-hook)))
 
+(defonce ^:private save-timer (atom nil))
+
+(defn- save-to-storage!
+  "Immediately saves session to localStorage."
+  [session]
+  (let [data (->> (clara/query session facts/persistent-facts)
+                  (map (fn [{:keys [?e ?a ?v]}]
+                         [?e ?a ?v]))
+                  pr-str)]
+    (.setItem js/localStorage "session" data)))
+
+(defn- save-session!
+  "Stores session to localStorage, throttled to avoid excessive writes."
+  [session]
+  (when-let [timer @save-timer]
+    (js/clearTimeout timer))
+  (reset! save-timer
+          (js/setTimeout
+           (fn []
+             (save-to-storage! session))
+           1000)))
+
 (defn init-from-storage!
   "Initialize session from localStorage, applying all registered hooks.
    This should be called once at app startup, after all modules are loaded."
@@ -50,27 +72,12 @@
                                                 ls-tuples))
                          (clara/fire-rules)
                          (apply-start-hooks))]
-    (reset! session init-session)))
+    (reset! session init-session)
+    ;; Save immediately to persist any changes made by hooks
+    (save-to-storage! init-session)))
 
 (defn clear! []
   (reset! session base-session))
-
-(defonce ^:private save-timer (atom nil))
-
-(defn- save-session!
-  "Stores session to localStorage, throttled to avoid excessive writes."
-  [session]
-  (when-let [timer @save-timer]
-    (js/clearTimeout timer))
-  (reset! save-timer
-          (js/setTimeout
-           (fn []
-             (let [data (->> (clara/query session facts/persistent-facts)
-                             (map (fn [{:keys [?e ?a ?v]}]
-                                    [?e ?a ?v]))
-                             pr-str)]
-               (.setItem js/localStorage "session" data)))
-           1000)))
 
 (r/reg-fx
  :session
@@ -81,6 +88,13 @@
        (do
          (reset! session new-session)
          (save-session! new-session))))))
+
+;; Flush any pending save before page unload
+(.addEventListener js/window "beforeunload"
+                   (fn [_]
+                     (when-let [timer @save-timer]
+                       (js/clearTimeout timer)
+                       (save-to-storage! @session))))
 
 (r/reg-cofx
  :session
