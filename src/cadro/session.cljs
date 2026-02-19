@@ -24,15 +24,33 @@
                       (clara/insert-all scales/schema)
                       (clara/fire-rules)))
 
-(defonce session (reagent.ratom/atom
-                   (let [ls-tuples (some-> js/localStorage
-                                     (.getItem "session")
-                                     (edn/read-string))]
-                     (-> base-session
+(defonce session (reagent.ratom/atom nil))
+
+(defmulti start-hook
+  #(throw (ex-info "This is not intended to be directly invoked." {})))
+
+(defn- apply-start-hooks
+  "Apply all registered start hooks to the session."
+  [session]
+  (reduce (fn [session [_ hook-fn]]
+            (hook-fn session))
+          session
+          (methods start-hook)))
+
+(defn init-from-storage!
+  "Initialize session from localStorage, applying all registered hooks.
+   This should be called once at app startup, after all modules are loaded."
+  []
+  (let [ls-tuples    (some-> js/localStorage
+                       (.getItem "session")
+                       (edn/read-string))
+        init-session (-> base-session
                          (clara/insert-all (map (fn [[e a v]]
                                                   (facts/asserted e a v))
                                                 ls-tuples))
-                         (clara/fire-rules)))))
+                         (clara/fire-rules)
+                         (apply-start-hooks))]
+    (reset! session init-session)))
 
 (defn clear! []
   (reset! session base-session))

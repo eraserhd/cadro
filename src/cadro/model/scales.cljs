@@ -34,6 +34,9 @@
                              :connecting
                              :connected})
 
+;; Status of connection at the end of the prior OS session
+(s/def ::previous-session-status ::connection-status)
+
 (defn set-connection-status [session controller-id status]
   (facts/upsert session controller-id ::connection-status status))
 
@@ -44,6 +47,14 @@
   [eav/EAV (= e ?id) (= a :cadro.model/displays-as)       (= v ?displays-as)]
   [eav/EAV (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
   [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
+
+;; Query for controllers marked to reconnect after session reload
+(clara/defquery controllers-to-reconnect []
+  [eav/EAV (= e ?id) (= a ::previous-session-status) (= v :connected)])
+
+;; Query for previous session status facts for a specific controller (for cleanup)
+(clara/defquery previous-session-status-facts [?controller-id]
+  [?fact <- eav/EAV (= e ?controller-id) (= a ::previous-session-status)])
 
 (defn insert-controllers
   [session controller-list]

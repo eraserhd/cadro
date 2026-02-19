@@ -2,7 +2,7 @@
   (:require
    [cadro.bluetooth :as bt]
    [cadro.model]
-   [cadro.session]
+   [cadro.session :as session]
    [cadro.ui.axes]
    [cadro.ui.legend]
    [cadro.ui.edit-panel]
@@ -32,5 +32,6 @@
   (-> (.keepAwake KeepAwake)
       (.then #(js/console.log "Screen will stay awake"))
       (.catch #(js/console.error "Failed to keep screen awake:" %)))
+  (session/init-from-storage!)
   (rf/dispatch-sync [::initialize])
   (rdc/render root [cadro]))

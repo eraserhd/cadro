@@ -1,9 +1,10 @@
 (ns cadro.bluetooth
   (:require
    [cadro.model :as model]
+   [cadro.model.facts :as facts]
    [cadro.model.scales :as scales]
-   [clara.rules :as clara]
    [cadro.session :as session]
+   [clara.rules :as clara]
    [re-frame.core :as rf]
    ["@capacitor/core" :refer [Capacitor]]
    ["cordova-plugin-bluetooth-classic-serial-port/src/browser/bluetoothClassicSerial" :as bt-browser]))
@@ -38,11 +39,46 @@
       (js/console.log "found Cordova bluetooth serial implementation")
       js/bluetoothClassicSerial)))
 
+(defmethod session/start-hook :bluetooth
+ [session]
+ (js/console.log "bluetooth: resetting connection states after session reload")
+ (let [connected-controllers (clara/query session scales/controllers)
+       connected-ids         (->> connected-controllers
+                                  (filter #(= :connected (:?connection-status %)))
+                                  (map :?id))]
+   (js/console.log "bluetooth: found" (count connected-ids) "previously connected controllers")
+   ;; Reset all to disconnected and mark for reconnection
+   (reduce (fn [session id]
+             (-> session
+                 (facts/upsert id ::scales/connection-status :disconnected)
+                 (clara/insert (facts/derived id ::scales/previous-session-status :connected))))
+           session
+           connected-ids)))
+
 (rf/reg-event-fx
  ::device-list-arrived
  [(rf/inject-cofx :session)]
  (fn [{:keys [session]} [_ device-list]]
-   {:session  (scales/insert-controllers session device-list)}))
+   {:session        (scales/insert-controllers session device-list)
+    :dispatch-later [{:ms 100 :dispatch [::attempt-reconnections]}]}))
+
+(rf/reg-event-fx
+ ::attempt-reconnections
+ [(rf/inject-cofx :session)]
+ (fn [{:keys [session]} _]
+   (let [to-reconnect (clara/query session scales/controllers-to-reconnect)
+         controller-ids (map :?id to-reconnect)]
+     (js/console.log "bluetooth: attempting to reconnect" (count controller-ids) "controllers")
+     (if (seq controller-ids)
+       ;; Clean up the previous-session-status markers
+       (let [cleanup-session (reduce (fn [s id]
+                                       (let [facts-to-retract (map :?fact (clara/query s scales/previous-session-status-facts :?controller-id id))]
+                                         (apply clara/retract s facts-to-retract)))
+                                     session
+                                     controller-ids)]
+         {:session    cleanup-session
+          :dispatch-n (map (fn [id] [::connect id]) controller-ids)})
+       {}))))
 
 (rf/reg-fx
  ::fetch-device-list
