@@ -34,8 +34,8 @@
                              :connecting
                              :connected})
 
-;; Status of connection at the end of the prior OS session
-(s/def ::previous-session-status ::connection-status)
+;; Marker indicating controller should reconnect after session reload
+(s/def ::wants-reconnect? boolean?)
 
 (defn set-connection-status [session controller-id status]
   (facts/upsert session controller-id ::connection-status status))
@@ -57,11 +57,11 @@
 
 ;; Query for controllers marked to reconnect after session reload
 (clara/defquery controllers-to-reconnect []
-  [eav/EAV (= e ?id) (= a ::previous-session-status) (= v :connected)])
+  [eav/EAV (= e ?id) (= a ::wants-reconnect?) (= v true)])
 
-;; Query for previous session status facts for a specific controller (for cleanup)
-(clara/defquery previous-session-status-facts [?controller-id]
-  [?fact <- eav/EAV (= e ?controller-id) (= a ::previous-session-status)])
+;; Query for wants-reconnect? facts for a specific controller (for cleanup)
+(clara/defquery wants-reconnect-facts [?controller-id]
+  [?fact <- eav/EAV (= e ?controller-id) (= a ::wants-reconnect?)])
 
 (defn insert-controllers
   [session controller-list]

@@ -48,7 +48,7 @@
    (reduce (fn [session id]
              (-> session
                  (facts/upsert id ::scales/connection-status :disconnected)
-                 (clara/insert (facts/derived id ::scales/previous-session-status :connected))))
+                 (clara/insert (facts/derived id ::scales/wants-reconnect? true))))
            session
            connected-ids)))
 
@@ -67,9 +67,9 @@
          controller-ids (map :?id to-reconnect)]
      (js/console.log "bluetooth: attempting to reconnect" (count controller-ids) "controllers")
      (if (seq controller-ids)
-       ;; Clean up the previous-session-status markers
+       ;; Clean up the wants-reconnect? markers
        (let [cleanup-session (reduce (fn [s id]
-                                       (let [facts-to-retract (map :?fact (clara/query s scales/previous-session-status-facts :?controller-id id))]
+                                       (let [facts-to-retract (map :?fact (clara/query s scales/wants-reconnect-facts :?controller-id id))]
                                          (apply clara/retract s facts-to-retract)))
                                      session
                                      controller-ids)]
