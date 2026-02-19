@@ -73,8 +73,8 @@
                                          (apply clara/retract s facts-to-retract)))
                                      session
                                      controller-ids)]
-         {:session    cleanup-session
-          :dispatch-n (map (fn [id] [::connect id]) controller-ids)})
+         {:session cleanup-session
+          :fx      (mapv (fn [id] [::connect id]) controller-ids)})
        {}))))
 
 (rf/reg-fx
