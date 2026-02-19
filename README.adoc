@@ -61,6 +61,9 @@ that share the same set of axes, and the current position of the scales, are
 always displayed relative to the reference.  This builds on Yuri's wonderful
 work-toward-zero philosophy.
 
+You can select the reference point by tapping it.  You can edit a fixture
+(and eventually a point) by long pressing it.
+
 Clicking the target next to a scale value "stores" it to the reference point.
 This is pretty much like zeroing.  Clicking the map pin "pins" the current
 location, creating a point in the same fixture as the reference point that
