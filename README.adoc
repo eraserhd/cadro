@@ -44,9 +44,9 @@ can unzero an axis, unadd a point, unscale an axis, undelete a machine, etc.
 The primary abstraction is the "fixture tree" -- a tree of fixtures
 (which are "machines" at the top level, and below that things like vises or
 rotary tables or even parts) and reference points (what TouchDRO calls datums).
-\[Currently, only top-level machines and points are implemented.\]
-Fixtures can have transformations \[very partially implemented\] such as
-rotations \[not yet implemented\] such that parts can be moved from one
+[Currently, only top-level machines and points are implemented.]
+Fixtures can have transformations [very partially implemented] such as
+rotations [not yet implemented] such that parts can be moved from one
 fixture to another, or rotated.
 
 The little plug icon adds a new machine and a starting Origin point.  The
