@@ -2,6 +2,8 @@
 
 New DRO software for TouchDRO(-like) hardware.
 
+image::doc/cadro.png[Cadro main screen]
+
 NOTE: This is extremely alpha software!  This is here for early adopters
 only!  I've only just got it just barely useable for my purposes!  I don't
 even have scales on my mini-lathe, just my mini-mill!
@@ -50,6 +52,8 @@ fixture to another, or rotated.
 The little plug icon adds a new machine and a starting Origin point.  The
 Origin currently starts out with unset axis values, and you'll have to store
 values.  I'm not sure if that's the right thing moving forward.
+
+image::doc/edit-machine.png[Editing a Machine]
 
 As long as there's at least one point, there will always a point selected as
 "reference" or "target."  It has a target symbol next to it.  All other points
