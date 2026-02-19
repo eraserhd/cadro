@@ -43,8 +43,7 @@
   "Immediately saves session to localStorage."
   [session]
   (let [data (->> (clara/query session facts/persistent-facts)
-                  (map (fn [{:keys [?e ?a ?v]}]
-                         [?e ?a ?v]))
+                  (map (juxt :?e :?a :?v))
                   pr-str)]
     (.setItem js/localStorage "session" data)))
 
@@ -73,7 +72,6 @@
                          (clara/fire-rules)
                          (apply-start-hooks))]
     (reset! session init-session)
-    ;; Save immediately to persist any changes made by hooks
     (save-to-storage! init-session)))
 
 (defn clear! []
