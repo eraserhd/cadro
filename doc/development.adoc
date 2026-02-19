@@ -1,5 +1,67 @@
 = Development
 
+Install Java, Clojure, and NodeJS.
+
+Start the nREPLs and build everything for debug.
+
+----
+$ npm install
+$ npx shadow-cljs watch app
+----
+
+Connect to the CLJS REPL:
+
+----
+$ npx shadow-cljs cljs-repl app
+----
+
+Run tests:
+
+[source,clojure]
+----
+$ npx shadow-cljs watch test
+----
+
+Testing on tablet:
+
+----
+$ npx shadow-cljs release app
+$ adb shell pm clear net.eraserhead.cadro # Clear application state
+$ npx cap run android
+----
+
+== Running droserve (fake DRO server)
+
+=== Pairing the Tablet
+
+----
+$ bluetoothctl
+> discoverable on
+----
+
+In a separate terminal:
+
+----
+$ droserve
+----
+
+Attempt to pair the tablet in Settings | Bluetooth.
+
+You might have to type "yes" to allow the connection in bluetoothctl.  Then in bluetoothctl:
+
+----
+> devices Paired
+Device 78:D6:DC:C1:BA:22 Lenovo Tab M10 Plus 3rd Gen
+> trust 78:D6:DC:C1:BA:22
+----
+
+This prevents needing to allow the connection every time.
+
+From this point forward, just `droserve` should be necessary.
+
+
+== Viewing the Android Logs
+
 ----
 $ adb logcat -g                 # Check current log buffer size
 $ adb logcat -G 16M             # Set buffers from 256K to 16M
