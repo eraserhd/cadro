@@ -16,7 +16,7 @@ _Skeuomorphism_ is a tendency to keep obsolete design elements or features,
 often for familiarity's sake.  There's a story of an ancient civilization
 which transitioned from copper pots to clay pots for water, but the potters
 couldn't sell them without adding "rivets."  Perhaps this story is
-apocryphal -- it sort of seems like it.
+apocryphal?  It sort of seems like it.
 
 In DROs, we still have ABS and INC, things designed around old hardware
 having only a few bytes of memory.
