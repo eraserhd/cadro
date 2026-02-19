@@ -8,8 +8,6 @@ even have scales on my mini-lathe, just my mini-mill!
 
 == Why?
 
-Just two ideas, though not small one ones:
-
 === 1. Cadatious Antiskeuomorphism
 
 _Skeuomorphism_ is a tendency to keep obsolete design elements or features,
