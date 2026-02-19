@@ -44,9 +44,9 @@
 (s/def ::receive-buffer string?)
 
 (clara/defquery controllers []
-  [eav/EAV (= e ?id) (= a :cadro.model/displays-as)       (= v ?displays-as)]
-  [eav/EAV (= e ?id) (= a ::hardware-address)  (= v ?hardware-address)]
-  [eav/EAV (= e ?id) (= a ::connection-status) (= v ?connection-status)])
+  [eav/EAV (= e ?id) (= a :cadro.model/displays-as) (= v ?displays-as)]
+  [eav/EAV (= e ?id) (= a ::hardware-address)       (= v ?hardware-address)]
+  [eav/EAV (= e ?id) (= a ::connection-status)      (= v ?connection-status)])
 
 ;; Query for controllers marked to reconnect after session reload
 (clara/defquery controllers-to-reconnect []
