@@ -6,11 +6,24 @@
    [cadro.model.facts :as facts]
    [cadro.model.reverse]
    [cadro.model.scales :as scales]
+   [cadro.session.local :as local]
+   [cadro.session.sqlite :as sqlite]
+   [cadro.session.storage :refer [save! load!]]
    [clara.rules :as clara]
    [clojure.edn :as edn]
    [net.eraserhead.clara-eql.pull]
    [reagent.ratom]
-   [re-frame.core :as r]))
+   [re-frame.core :as r]
+   ["@capacitor/core" :refer [Capacitor]]))
+
+(def ^:private storage-backend
+  (if (= "web" (.getPlatform Capacitor))
+    (do
+      (js/console.log "using local session storage")
+      (local/create))
+    (do
+      (js/console.log "using SQLite session storage")
+      (sqlite/create))))
 
 (clara/defsession ^:private empty-session
   'cadro.model.facts
@@ -40,12 +53,12 @@
 (defonce ^:private save-timer (atom nil))
 
 (defn- save-to-storage!
-  "Immediately saves session to localStorage."
+  "Immediately saves session to storage backend."
   [session]
   (let [data (->> (clara/query session facts/persistent-facts)
                   (map (juxt :?e :?a :?v))
                   pr-str)]
-    (.setItem js/localStorage "session" data)))
+    (save! storage-backend data)))
 
 (defn- save-session!
   "Stores session to localStorage, throttled to avoid excessive writes."
@@ -59,20 +72,24 @@
            1000)))
 
 (defn init-from-storage!
-  "Initialize session from localStorage, applying all registered hooks.
+  "Initialize session from storage backend, applying all registered hooks.
    This should be called once at app startup, after all modules are loaded."
   []
-  (let [ls-tuples    (some-> js/localStorage
-                       (.getItem "session")
-                       (edn/read-string))
-        init-session (-> base-session
-                         (clara/insert-all (map (fn [[e a v]]
-                                                  (facts/asserted e a v))
-                                                ls-tuples))
-                         (clara/fire-rules)
-                         (apply-start-hooks))]
-    (reset! session init-session)
-    (save-to-storage! init-session)))
+  (-> (load! storage-backend)
+      (.then (fn [data]
+               (let [ls-tuples    (some-> data edn/read-string)
+                     init-session (-> base-session
+                                      (clara/insert-all (map (fn [[e a v]]
+                                                               (facts/asserted e a v))
+                                                             ls-tuples))
+                                      (clara/fire-rules)
+                                      (apply-start-hooks))]
+                 (reset! session init-session)
+                 (save-to-storage! init-session))))
+      (.catch (fn [err]
+                (js/console.error "Failed to load session from storage:" err)
+                ;; Initialize with base session on error
+                (reset! session base-session)))))
 
 (defn clear! []
   (reset! session base-session))
