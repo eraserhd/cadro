@@ -19,8 +19,6 @@
       (.then (fn []
                (.execute CapacitorSQLite (clj->js {:database db-name
                                                    :statements "CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY, session TEXT);"}))))
-      (.then (fn []
-               db-name))
       (.catch (fn [err]
                 (js/console.error "Failed to initialize database:" err)
                 (throw err)))))
@@ -37,7 +35,7 @@
       (-> (init-db!)
           (.then (fn [db]
                    (js/console.log "SQLite: connection initialized, storing in atom")
-                   (reset! db-atom db)
+                   (reset! db-atom db-name)
                    db))))))
 
 (defrecord SQLiteBackend [db]
