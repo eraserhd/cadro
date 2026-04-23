@@ -16,7 +16,7 @@
    [re-frame.core :as r]
    ["@capacitor/core" :refer [Capacitor]]))
 
-(def ^:private storage-backend
+(defonce ^:private storage-backend
   (if (= "web" (.getPlatform Capacitor))
     (do
       (js/console.log "using local session storage")
