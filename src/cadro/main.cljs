@@ -32,6 +32,9 @@
   (-> (.keepAwake KeepAwake)
       (.then #(js/console.log "Screen will stay awake"))
       (.catch #(js/console.error "Failed to keep screen awake:" %)))
-  (session/init-from-storage!)
-  (rf/dispatch-sync [::initialize])
-  (rdc/render root [cadro]))
+  (-> (session/init-from-storage!)
+      (.then (fn []
+               (rf/dispatch-sync [::initialize])
+               (rdc/render root [cadro])))
+      (.catch (fn [err]
+                (js/console.error "Failed to start app:" err)))))
