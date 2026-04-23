@@ -6,8 +6,6 @@
 
 (def ^:private db-name "cadro.db")
 
-(defonce ^:private db-connection (atom nil))
-
 (defn- init-db!
   "Initialize the SQLite database and create table if needed."
   []
@@ -26,33 +24,33 @@
                 (js/console.error "Failed to initialize database:" err)
                 (throw err)))))
 
-(defn ensure-db!
+(defn- ensure-db!
   "Ensure database is initialized and return connection."
-  []
-  (if-let [db @db-connection]
+  [db-atom]
+  (if-let [db @db-atom]
     (js/Promise.resolve db)
     (-> (init-db!)
         (.then (fn [db]
-                 (reset! db-connection db)
+                 (reset! db-atom db)
                  db)))))
 
-(defrecord SQLiteBackend []
+(defrecord SQLiteBackend [db]
   storage/SessionStorage
   (save! [this data]
-    (-> (ensure-db!)
-        (.then (fn [db]
-                 (.executeSet db (clj->js {:statements
-                                           [{:statement "INSERT OR REPLACE INTO sessions (id, session) VALUES (1, ?)"
-                                             :values [data]}]}))))
+    (-> (ensure-db! db)
+        (.then (fn [conn]
+                 (.executeSet conn (clj->js {:statements
+                                             [{:statement "INSERT OR REPLACE INTO sessions (id, session) VALUES (1, ?)"
+                                               :values [data]}]}))))
         (.catch (fn [err]
                   (js/console.error "Failed to save session:" err)
                   (throw err)))))
 
   (load! [this]
-    (-> (ensure-db!)
-        (.then (fn [db]
-                 (.query db (clj->js {:statement "SELECT session FROM sessions WHERE id = 1"
-                                      :values []}))))
+    (-> (ensure-db! db)
+        (.then (fn [conn]
+                 (.query conn (clj->js {:statement "SELECT session FROM sessions WHERE id = 1"
+                                        :values []}))))
         (.then (fn [result]
                  (if-let [rows (.-values result)]
                    (when (pos? (.-length rows))
@@ -63,4 +61,4 @@
                   nil)))))
 
 (defn create []
-  (->SQLiteBackend))
+  (->SQLiteBackend (atom nil)))
