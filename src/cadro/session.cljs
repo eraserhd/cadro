@@ -16,14 +16,7 @@
    [re-frame.core :as r]
    ["@capacitor/core" :refer [Capacitor]]))
 
-(defonce ^:private storage-backend
-  (if (= "web" (.getPlatform Capacitor))
-    (do
-      (js/console.log "using local session storage")
-      (local/create))
-    (do
-      (js/console.log "using SQLite session storage")
-      (sqlite/create))))
+(def ^:private storage-backend nil)
 
 (clara/defsession ^:private empty-session
   'cadro.model.facts
@@ -75,7 +68,16 @@
   "Initialize session from storage backend, applying all registered hooks.
    This should be called once at app startup, after all modules are loaded."
   []
-  (-> (load! storage-backend)
+  (-> (if (= "web" (.getPlatform Capacitor))
+        (do
+          (js/console.log "using local session storage")
+          (local/create))
+        (do
+          (js/console.log "using SQLite session storage")
+          (sqlite/create)))
+      (.then (fn [backend]
+               (set! storage-backend backend)
+               (load! storage-backend)))
       (.then (fn [data]
                (let [ls-tuples    (some-> data edn/read-string)
                      init-session (-> base-session

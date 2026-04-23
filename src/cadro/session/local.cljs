@@ -5,13 +5,12 @@
 
 (defrecord LocalStorageBackend []
   storage/SessionStorage
-  (save! [this data]
-    (js/Promise.resolve
-     (.setItem js/localStorage "session" data)))
-
   (load! [this]
     (js/Promise.resolve
-     (.getItem js/localStorage "session"))))
+     (.getItem js/localStorage "session")))
+  (save! [this data]
+    (js/Promise.resolve
+     (.setItem js/localStorage "session" data))))
 
 (defn create []
-  (->LocalStorageBackend))
+  (js/Promise.resolve (->LocalStorageBackend)))
