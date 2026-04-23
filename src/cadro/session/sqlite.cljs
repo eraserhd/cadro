@@ -6,7 +6,7 @@
 
 (def ^:private db-name "cadro.db")
 
-(defrecord SQLiteBackend [db]
+(defrecord SQLiteBackend []
   storage/SessionStorage
   (load! [this]
     (-> (.query CapacitorSQLite (clj->js {:database db-name
@@ -40,7 +40,7 @@
                (.execute CapacitorSQLite (clj->js {:database db-name
                                                    :statements "CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY, session TEXT);"}))))
       (.then (fn []
-               (->SQLiteBackend (atom nil))))
+               (->SQLiteBackend)))
       (.catch (fn [err]
                 (js/console.error "Failed to initialize database:" err)
                 (throw err)))))
