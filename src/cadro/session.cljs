@@ -48,21 +48,39 @@
 (defn- save-to-storage!
   "Immediately saves session to storage backend."
   [session]
-  (let [data (->> (clara/query session facts/persistent-facts)
+  (let [start (.now js/Date)
+        data (->> (clara/query session facts/persistent-facts)
                   (map (juxt :?e :?a :?v))
                   pr-str)]
-    (save! storage-backend data)))
+    (js/console.log "Session: starting save, data size:" (.-length data))
+    (-> (save! storage-backend data)
+        (.then (fn []
+                 (js/console.log "Session: save completed in" (- (.now js/Date) start) "ms")))
+        (.catch (fn [err]
+                  (js/console.error "Session: save failed after" (- (.now js/Date) start) "ms:" err))))))
 
-(defn- save-session!
-  "Stores session to localStorage, throttled to avoid excessive writes."
-  [session]
-  (when-let [timer @save-timer]
-    (js/clearTimeout timer))
-  (reset! save-timer
-          (js/setTimeout
-           (fn []
-             (save-to-storage! session))
-           1000)))
+(let [state (volatile! {:last-save  (.now js/Date),
+                        :last-saved nil
+                        :saving-by  nil})]
+  (add-watch session :persist
+    (fn [_ _ _ _]
+      (let [id      (js/Math.random)
+            now     (.now js/Date)
+            current @session
+            result  (vswap! state (fn [{:keys [last-save last-saved saving-by], :as state}]
+                                    (if (and (not saving-by)
+                                             (<= 1000 (- now last-save))
+                                             (not= current last-saved))
+                                      {:last-save  now,
+                                       :last-saved current,
+                                       :saving-by  id}
+                                      state)))]
+        (when (= id (:saving-by result))
+          (-> (save-to-storage! current)
+              (.then (fn []
+                       (vswap! state dissoc :saving-by)))
+              (.catch (fn [err]
+                        (vswap! state dissoc :saving-by)))))))))
 
 (defn init-from-storage!
   "Initialize session from storage backend, applying all registered hooks.
@@ -102,9 +120,7 @@
    (let [new-session (clara/fire-rules new-session)]
      (if-let [errors (seq (model/errors new-session))]
        (js/console.warn "Session not saved due to errors:" errors)
-       (do
-         (reset! session new-session)
-         (save-session! new-session))))))
+       (reset! session new-session)))))
 
 ;; Flush any pending save before page unload
 (.addEventListener js/window "beforeunload"
