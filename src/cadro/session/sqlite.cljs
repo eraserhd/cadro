@@ -21,9 +21,10 @@
                   (js/console.error "Failed to load session:" err)
                   nil))))
   (save! [this data]
-    (-> (.executeSet CapacitorSQLite (clj->js {:database db-name
-                                               :set [{:statement "INSERT OR REPLACE INTO sessions (id, session) VALUES (1, ?)"
-                                                      :values [data]}]}))
+    (-> (.run CapacitorSQLite (clj->js {:database db-name
+                                        :statement "INSERT OR REPLACE INTO sessions (id, session) VALUES (1, ?)"
+                                        :values [data]
+                                        :transaction false}))
         (.catch (fn [err]
                   (js/console.error "Failed to save session:" err)
                   (throw err))))))
