@@ -46,10 +46,10 @@ struct sockaddr_rc {
 };
 
 struct spp_data {
-	GMainLoop *loop;	
+	GMainLoop *loop;
 	int sock_fd;
 	struct sockaddr_rc local;
-	struct sockaddr_rc remote;	
+	struct sockaddr_rc remote;
 	long x, y, z;
 };
 
@@ -136,7 +136,12 @@ send_position (gpointer user_data) {
 		}
 	}
 
-	sprintf(buffer, "X%ld;Y%ld;Z%ld;", spp->x, spp->y, spp->z);
+	// Simulate jitter
+	long x = spp->x + rand()%3 - 1;
+	long y = spp->y + rand()%3 - 1;
+	long z = spp->z + rand()%3 - 1;
+
+	sprintf(buffer, "X%ld;Y%ld;Z%ld;", x, y, z);
 	/* Send with NUL terminator, which is part of the protocol. */
 	status = write(spp->sock_fd, buffer, strlen(buffer)+1);
 	if (status < 0) {
@@ -203,7 +208,7 @@ on_handle_new_connection (OrgBluezProfile1 *interface,
 	g_dbus_method_invocation_return_value(invocation, NULL);
 
 	// Continuously send position
-	g_timeout_add(500, send_position, spp);
+	g_timeout_add(25, send_position, spp);
 
 	return TRUE;
 }

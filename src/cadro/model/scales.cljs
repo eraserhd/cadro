@@ -48,11 +48,11 @@
   [eav/EAV (= e ?id) (= a ::hardware-address)       (= v ?hardware-address)]
   [eav/EAV (= e ?id) (= a ::connection-status)      (= v ?connection-status)])
 
-(defn connected-controller-ids
+(defn reconnectable-controller-ids
   "Returns a sequence of controller IDs that are currently connected."
   [session]
   (->> (clara/query session controllers)
-       (filter #(= :connected (:?connection-status %)))
+       (filter (comp #{:connected :connecting} :?connection-status))
        (map :?id)))
 
 ;; Query for controllers marked to reconnect after session reload

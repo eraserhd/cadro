@@ -42,7 +42,7 @@
 (defmethod session/start-hook :bluetooth
  [session]
  (js/console.log "bluetooth: resetting connection states after session reload")
- (let [connected-ids (scales/connected-controller-ids session)]
+ (let [connected-ids (scales/reconnectable-controller-ids session)]
    (js/console.log "bluetooth: found" (count connected-ids) "previously connected controllers")
    ;; Reset all to disconnected and mark for reconnection
    (reduce (fn [session id]
