@@ -208,7 +208,7 @@ on_handle_new_connection (OrgBluezProfile1 *interface,
 	g_dbus_method_invocation_return_value(invocation, NULL);
 
 	// Continuously send position
-	g_timeout_add(25, send_position, spp);
+	g_timeout_add(50, send_position, spp);
 
 	return TRUE;
 }
