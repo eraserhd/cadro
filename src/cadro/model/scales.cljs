@@ -102,10 +102,11 @@
         [to-process new-scale-values] (loop [to-process       to-process
                                              new-scale-values {}]
                                         (if-let [[_ axis value-str left] (re-matches #"^([a-zA-Z])([^;]*);(.*)" to-process)]
-                                          (let [axis (str/upper-case axis)]
-                                            (if (= "V" axis)
+                                          (let [axis  (str/upper-case axis)
+                                                value (* value-str 1.0)]
+                                            (if (or (= "V" axis) (NaN? value))
                                               (recur left new-scale-values)
-                                              (recur left (assoc new-scale-values axis (* value-str 1.0)))))
+                                              (recur left (assoc new-scale-values axis value))))
                                           [to-process new-scale-values]))]
     (reduce (fn [session [scale-name value]]
               (upsert-raw-count session controller-id scale-name value))

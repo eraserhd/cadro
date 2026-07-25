@@ -89,5 +89,13 @@
                (->> scales
                     (map #(select-keys % [::model/displays-as ::scales/raw-count]))
                     (into #{})))
-            (str "It correctly processes '" a "' then '" b "'."))))))
-
+            (str "It correctly processes '" a "' then '" b "'.")))))
+  (testing "recovering from corrupt data"
+    (is (= #{{::model/displays-as "X"
+              ::scales/raw-count 150},
+             {::model/displays-as "Y"
+              ::scales/raw-count 47}}
+           (->> (after-receives ";;x150;qluxderflorp;y47\0")
+                (map #(select-keys % [::model/displays-as ::scales/raw-count]))
+                (into #{})))
+        "It ignores axes that it cannot parse into a coordinate value.")))
