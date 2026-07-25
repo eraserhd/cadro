@@ -15,7 +15,8 @@
         (.then (fn [result]
                  (if-let [rows (.-values result)]
                    (when (pos? (.-length rows))
-                     (.-session (aget rows 0)))
+                     (let [^js row (aget rows 0)]
+                       (.-session row)))
                    nil)))
         (.catch (fn [err]
                   (js/console.error "Failed to load session:" err)
